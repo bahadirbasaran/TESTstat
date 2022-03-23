@@ -320,7 +320,7 @@ class Ui_MainWindow(object):
                 param = param_value_pair.split('=')[0]
                 value = param_value_pair.split('=')[1]
                 expected_output[param] = value
-            
+
             test_output = teststat.run_test(data_call, test_input, expected_output)
 
             if isinstance(test_output, str):

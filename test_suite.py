@@ -1,23 +1,21 @@
-# Conditional flags
+# Flags
 
+ALL = "All following are True"
+ANY = "At least one of following is True"
+
+INCLUDE = "assert expected_output[param] in test_output['data'][param]"
+MATCH = "assert expected_output[param] == test_output['data'][param]"
+GTE = "assert test_output['data'][param] >= expected_output[param]"
 TRIM_AS = (
     "if expected_output[param].startswith('as'):"
         "expected_output[param] = expected_output[param][2:]"
 )
-GTE_ZERO = (
-    "assert expected_output[param] >= 0"
-)
-NOTEMPTY_OR_INCLUDES = (
+NOT_EMPTY = (
     "if expected_output[param] == 'not empty':"
         "assert test_output['data'][param]"
-    "else:"
-        "assert expected_output[param] in test_output['data'][param]"
 )
-NOTEMPTY_OR_MATCHES = (
-    "if expected_output[param] == 'not empty'"
-        "assert test_output['data'][param]"
-    "else:"
-        "assert expected_output[param] == test_output['data'][param]"
+QUANTITATIVE = (
+    "a"
 )
 
 
@@ -34,30 +32,29 @@ VERBOSE_PARAMS = [
 # Data Call Mapping
 
 WHOIS_PARAMS = {
-    "inetnum": [NOTEMPTY_OR_MATCHES],
-    "netname": [NOTEMPTY_OR_MATCHES],
-    "descr": [NOTEMPTY_OR_MATCHES],
-    "org": [NOTEMPTY_OR_MATCHES],
-    "remarks": [NOTEMPTY_OR_MATCHES],
-    "country": [NOTEMPTY_OR_MATCHES],
-    "admin-c": [NOTEMPTY_OR_MATCHES],
-    "tech-c": [NOTEMPTY_OR_MATCHES],
-    "status": [NOTEMPTY_OR_MATCHES],
-    "mnt-by": [NOTEMPTY_OR_MATCHES],
-    "mnt-lower": [NOTEMPTY_OR_MATCHES],
-    "mnt-routes": [NOTEMPTY_OR_MATCHES],
-    "created": [NOTEMPTY_OR_MATCHES],
-    "last-modified": [NOTEMPTY_OR_MATCHES],
-    "source": [NOTEMPTY_OR_MATCHES]
+    "inetnum": [ANY, NOT_EMPTY, MATCH],
+    "netname": [ANY, NOT_EMPTY, MATCH],
+    "descr": [ANY, NOT_EMPTY, MATCH],
+    "org": [ANY, NOT_EMPTY, MATCH],
+    "remarks": [ANY, NOT_EMPTY, MATCH],
+    "country": [ANY, NOT_EMPTY, MATCH],
+    "admin-c": [ANY, NOT_EMPTY, MATCH],
+    "tech-c": [ANY, NOT_EMPTY, MATCH],
+    "status": [ANY, NOT_EMPTY, MATCH],
+    "mnt-by": [ANY, NOT_EMPTY, MATCH],
+    "mnt-lower": [ANY, NOT_EMPTY, MATCH],
+    "mnt-routes": [ANY, NOT_EMPTY, MATCH],
+    "created": [ANY, NOT_EMPTY, MATCH],
+    "last-modified": [ANY, NOT_EMPTY, MATCH],
+    "source": [ANY, NOT_EMPTY, MATCH]
 }
 
 AS_PATH_STATS = {
-    "avg": [NOTEMPTY_OR_MATCHES],
-    "max": [NOTEMPTY_OR_MATCHES],
-    "min": [NOTEMPTY_OR_MATCHES],
-    "sum": [NOTEMPTY_OR_MATCHES]
+    "avg": [ANY, NOT_EMPTY, MATCH, QUANTITATIVE],
+    "max": [ANY, NOT_EMPTY, MATCH, QUANTITATIVE],
+    "min": [ANY, NOT_EMPTY, MATCH, QUANTITATIVE],
+    "sum": [ANY, NOT_EMPTY, MATCH, QUANTITATIVE]
 }
-
 
 DATA_CALL_MAP = {
 
@@ -66,12 +63,12 @@ DATA_CALL_MAP = {
         "required_params": ["resource"],
         "optional_params": [],
         "output_params": {
-            "abuse_contacts": [NOTEMPTY_OR_INCLUDES],
-            "authoritative_rir": [NOTEMPTY_OR_MATCHES],
-            "earliest_time": [NOTEMPTY_OR_MATCHES],
-            "latest_time": [NOTEMPTY_OR_MATCHES],
+            "abuse_contacts": [ANY, NOT_EMPTY, INCLUDE],
+            "authoritative_rir": [ANY, NOT_EMPTY, MATCH],
+            "earliest_time": [ANY, NOT_EMPTY, MATCH],
+            "latest_time": [ANY, NOT_EMPTY, MATCH],
             "parameters": {
-                "resource": [TRIM_AS, NOTEMPTY_OR_MATCHES]
+                "resource": [TRIM_AS, ANY, NOT_EMPTY, MATCH]
             }
         }
     },
@@ -81,11 +78,11 @@ DATA_CALL_MAP = {
         "required_params": ["resource"],
         "optional_params": [],
         "output_params": {
-            "query_time": [NOTEMPTY_OR_MATCHES],
-            "rir": [NOTEMPTY_OR_MATCHES],
-            "resource": [NOTEMPTY_OR_MATCHES],
+            "query_time": [ANY, NOT_EMPTY, MATCH],
+            "rir": [ANY, NOT_EMPTY, MATCH],
+            "resource": [ANY, NOT_EMPTY, MATCH],
             "parameters": {
-                "resource": [NOTEMPTY_OR_MATCHES]
+                "resource": [ANY, NOT_EMPTY, MATCH]
             },
             "exact": WHOIS_PARAMS,
             "more_specific": WHOIS_PARAMS,
@@ -98,13 +95,12 @@ DATA_CALL_MAP = {
         "required_params": ["resource"],
         "optional_params": ["sort_by"],
         "output_params": {
-            "query_time": [NOTEMPTY_OR_MATCHES],
-            "resource": [NOTEMPTY_OR_MATCHES],
-            "sort_by": [NOTEMPTY_OR_MATCHES],
+            "query_time": [ANY, NOT_EMPTY, MATCH],
+            "resource": [ANY, NOT_EMPTY, MATCH],
+            "sort_by": [ANY, NOT_EMPTY, MATCH],
             "stats": {
-                "number": [NOTEMPTY_OR_MATCHES],
-                "count": [NOTEMPTY_OR_MATCHES],
-                "location": [NOTEMPTY_OR_MATCHES],
+                "count": [ANY, NOT_EMPTY, MATCH, QUANTITATIVE],
+                "location": [ANY, NOT_EMPTY, MATCH],
                 "stripped": AS_PATH_STATS,
                 "unstripped": AS_PATH_STATS
             }

@@ -1,3 +1,4 @@
+from tabnanny import check
 import requests
 
 from PyQt5 import QtWidgets, QtGui
@@ -43,36 +44,53 @@ class TestStat():
 
             return inner_param_value
 
-        def _apply_flag(flag, param_set, param, output_value, return_bool=False):
+        def _apply_flag(flag, param_set, param, output_value):
+
+            if isinstance(output_value, str):
+                output_value = output_value.lower().replace(' ', '')
+            elif isinstance(output_value, list):
+                output_value = [val.lower().replace(' ', '') for val in output_value]
 
             if flag == TRIM_AS:
                 if param_set[param].startswith('as'):
                     param_set[param] = param_set[param][2:]
+                return
 
-            elif flag == GTE_ZERO:
-                print("db1")
-                if ">=0" in param_set[param]:
-                    print("yeey")
-                else:
-                    print("noo")
-            
-            elif flag == NOTEMPTY_OR_INCLUDES:
-                if ((param_set[param] == "notempty") and output_value) or \
-                    all([p in output_value for p in param_set[param].split(',')]):
+            elif flag == NOT_EMPTY:
+                if param_set[param] == "notempty" and output_value:
                     return True
-                else:
-                    if return_bool:
-                        return False
-                    failed_params[param] = output_value
+                
 
-            elif flag == NOTEMPTY_OR_MATCHES:
-                if ((param_set[param] == "notempty") and output_value) or \
-                    param_set[param] == output_value.lower():
+            elif flag == INCLUDE:
+                if all([p in output_value for p in param_set[param].split(',')]):
                     return True
-                else:
-                    if return_bool:
-                        return False
-                    failed_params[param] = output_value
+
+            elif flag == MATCH:
+                if param_set[param] == output_value:
+                    return True
+
+            elif flag == QUANTITATIVE:
+                if ">=" in param_set[param]:
+                    expected_value = float(param_set[param].split(">=")[1])
+                    if float(test_output_value) >= expected_value:
+                        return True
+
+                elif ">" in param_set[param]:
+                    expected_value = float(param_set[param].split(">")[1])
+                    if float(test_output_value) > expected_value:
+                        return True
+
+                elif "<=" in param_set[param]:
+                    expected_value = float(param_set[param].split("<=")[1])
+                    if float(test_output_value) <= expected_value:
+                        return True
+
+                elif "<" in param_set[param]:
+                    expected_value = float(param_set[param].split("<")[1])
+                    if float(test_output_value) < expected_value:
+                        return True
+
+            return False
 
 
         failed_params = {}
@@ -110,8 +128,22 @@ class TestStat():
             test_output_value = _get_inner_param_value(param, test_output["data"])
             param_flags = _get_inner_param_value(param, DATA_CALL_MAP[data_call]["output_params"])
 
-            for flag in param_flags:
-                _apply_flag(flag, expected_output, param, test_output_value)
+            param_flags = param_flags.copy()
+            criteria = param_flags.pop(0)
+
+            # Apply filters before ANY/ALL if there are such
+            while criteria not in [ANY, ALL]:
+                _apply_flag(criteria, expected_output, param, test_output_value)
+                criteria = param_flags.pop(0)
+
+            if criteria == ANY and \
+                any([_apply_flag(flag, expected_output, param, test_output_value) for flag in param_flags]):
+                continue
+            elif criteria == ALL and \
+                all([_apply_flag(flag, expected_output, param, test_output_value) for flag in param_flags]):
+                continue
+
+            failed_params[param] = test_output_value
 
 
         for verbose_param, fields in verbose_param_set.items():
@@ -120,7 +152,7 @@ class TestStat():
 
             # If checkbox "Not Empty" is checked for a verbose param,
             # check if the corresponding response list of the param is empty
-            if "->" not in verbose_param:
+            if fields == "notempty":
                 if not test_output["data"][verbose_param]:
                     failed_params[verbose_param] = []
                 continue
@@ -137,16 +169,30 @@ class TestStat():
 
                 for field in fields:
                     field_flags = _get_inner_param_value(f"{verbose_param}->{field}", DATA_CALL_MAP[data_call]["output_params"])
-                    for flag in field_flags:
-                        check_results.append(_apply_flag(flag=flag, param_set=fields, param=field, output_value=block[field], return_bool=True))
+
+                    field_flags = field_flags.copy()
+                    criteria = field_flags.pop(0)
+
+                    # Apply filters before ANY/ALL if there are such
+                    while criteria not in [ANY, ALL]:
+                        _apply_flag(criteria, expected_output, param, test_output_value)
+                        criteria = param_flags.pop(0)
+
+                    if criteria == ANY:
+                        check_results.append(
+                            any([_apply_flag(flag=flag, param_set=fields, param=field, output_value=block[field]) for flag in field_flags])
+                        )
+                    elif criteria == ALL:
+                        check_results.append(
+                            all([_apply_flag(flag=flag, param_set=fields, param=field, output_value=block[field]) for flag in field_flags])
+                        )
 
                 if all(check_results):
                     is_match = True
                     break
 
             if not is_match:
-                for field in verbose_param_set[verbose_param]:
-                    failed_params[f"{verbose_param}->{field}"] = "No match found in the response!"
+                failed_params[verbose_param] = "No item matching all the expected inputs found!"
 
         return failed_params
 
