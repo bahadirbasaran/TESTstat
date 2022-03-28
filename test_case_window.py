@@ -240,7 +240,7 @@ class Ui_TestCaseWindow(object):
                 reference_to_input = getattr(self, f"test_input_{param}")
                 
                 if reference_to_input.text() != '':
-                    test_input.append(f"{param} = {reference_to_input.text().lower().replace(' ', '')}")
+                    test_input.append(f"{param}: {reference_to_input.text().lower().replace(' ', '')}")
 
             return test_input
 
@@ -256,13 +256,13 @@ class Ui_TestCaseWindow(object):
 
                     if reference_to_input.text() != '':
                         if reference_to_input.text().lower() == "not empty":
-                            output_params.append(f"{label} = {reference_to_input.text().lower()}")
+                            output_params.append(f"{label}: {reference_to_input.text().lower()}")
                         else:
-                            output_params.append(f"{label} = {reference_to_input.text().lower().replace(' ', '')}")
+                            output_params.append(f"{label}: {reference_to_input.text().lower().replace(' ', '')}")
                 
                 else:
                     if param in VERBOSE_PARAMS and getattr(self, f"checkbox_input_{param}").isChecked():
-                        output_params.append(f"{param} = not empty")
+                        output_params.append(f"{param}: not empty")
                         continue
                     output_params = _get_output_params(param_set[param], output_params, label, var)
 
@@ -286,7 +286,7 @@ class Ui_TestCaseWindow(object):
 
         expected_output = _get_output_params(
             DATA_CALL_MAP[self.data_call]["output_params"],
-            ["status_code = 200" if self.status_code.text() == '' else f"status_code = {self.status_code.text().lower().replace(' ', '')}"]
+            ["status_code: 200" if self.status_code.text() == '' else f"status_code: {self.status_code.text().lower().replace(' ', '')}"]
         )
 
         test_input = "\n".join(test_input)

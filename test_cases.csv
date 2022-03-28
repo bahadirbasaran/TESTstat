@@ -1,18 +1,31 @@
 data_call,test_input,expected_output
-address-space-hierarchy,resource = 193/21,status_code = 200;exact->inetnum = ripe-ncc;exact->status = assignedpa;more_specific = not empty;less_specific->remarks = utrecht&netherlands;less_specific->country = nl
-address-space-hierarchy,resource = 193/21,status_code = 200;more_specific->inetnum = not empty
-address-space-hierarchy,resource = 193/21,status_code = 200;less_specific = not empty
-abuse-contact-finder,resource = 3333,status_code = 200
-abuse-contact-finder,resource = 3333,status_code = 200;abuse_contacts = not empty
-abuse-contact-finder,resource = 3333,status_code = 200;abuse_contacts = abuse@ripe.net;parameters->resource = 3333
-abuse-contact-finder,resource = as3333,status_code = 200;parameters->resource = 3333
-abuse-contact-finder,resource = as3333,status_code = 200;parameters->resource = as3333
-abuse-contact-finder,resource = 3333,status_code = 200;parameters->resource = as3333
-abuse-contact-finder,resource = as3333,status_code = 200;parameters->resource = 3333
-address-space-hierarchy,resource = 193/21,status_code = 200;rir = ripe;resource = 193.0.0.0/21;parameters->resource = 193.0.0.0/21;exact->netname = ripe-ncc;exact->org = org-rien1-ripe;exact->source = ripe;less_specific->netname = nl-ripencc-ops-990305;less_specific->country = nl;less_specific->mnt-lower = ripe-ncc-mnt
-address-space-hierarchy,resource = 193/21,status_code = 200;exact->org = not empty
-address-space-hierarchy,resource = 193/21,status_code = 200;exact = not empty
-address-space-hierarchy,resource = 193/21,status_code = 200;more_specific = not empty
-address-space-hierarchy,resource = 193/21,status_code = 200;less_specific = not empty
-address-space-hierarchy,resource = 193/21,status_code = 200;less_specific = not empty
-address-space-hierarchy,resource = 193/21,status_code = 200;exact->country = not empty;exact->admin-c = fafaa;more_specific->descr = not empty;more_specific->org = asdf;less_specific->mnt-lower = ripe-ncc-mnt;less_specific->last-modified = ripe-ncc-mnt
+address-space-hierarchy,resource: 193/21,status_code: 200;exact->inetnum: ripe-ncc;exact->status: assignedpa;more_specific: not empty;less_specific->remarks: utrecht&netherlands;less_specific->country: nl
+address-space-hierarchy,resource: 193/21,status_code: 200;more_specific->inetnum: not empty
+address-space-hierarchy,resource: 193/21,status_code: 200;less_specific: not empty
+abuse-contact-finder,resource: 3333,status_code: 200
+abuse-contact-finder,resource: 3333,status_code: 200;abuse_contacts: not empty
+abuse-contact-finder,resource: 3333,status_code: 200;abuse_contacts: abuse@ripe.net;parameters->resource: 3333
+abuse-contact-finder,resource: as3333,status_code: 200;parameters->resource: 3333
+abuse-contact-finder,resource: as3333,status_code: 200;parameters->resource: as3333
+abuse-contact-finder,resource: 3333,status_code: 200;parameters->resource: as3333
+abuse-contact-finder,resource: as3333,status_code: 200;parameters->resource: 3333
+address-space-hierarchy,resource: 193/21,status_code: 200;rir: ripe;resource: 193.0.0.0/21;parameters->resource: 193.0.0.0/21;exact->netname: ripe-ncc;exact->org: org-rien1-ripe;exact->source: ripe;less_specific->netname: nl-ripencc-ops-990305;less_specific->country: nl;less_specific->mnt-lower: ripe-ncc-mnt
+address-space-hierarchy,resource: 193/21,status_code: 200;exact->org: not empty
+address-space-hierarchy,resource: 193/21,status_code: 200;exact: not empty
+address-space-hierarchy,resource: 193/21,status_code: 200;more_specific: not empty
+address-space-hierarchy,resource: 193/21,status_code: 200;less_specific: not empty
+address-space-hierarchy,resource: 193/21,status_code: 200;less_specific: not empty
+address-space-hierarchy,resource: 193/21,status_code: 200;exact->country: not empty;exact->admin-c: fafaa;more_specific->descr: not empty;more_specific->org: asdf;less_specific->mnt-lower: ripe-ncc-mnt;less_specific->last-modified: ripe-ncc-mnt
+as-path-length,resource: 1111,status_code: 200;stats->count: >=53
+as-path-length,resource: 1111,status_code: 200;stats->count: <53
+as-path-length,resource: 1111,status_code: 200;stats->count: >53
+as-path-length,resource: 1111,status_code: 200;stats->count: <=3;stats->location: sdfsd
+as-path-length,resource: 1111,status_code: 200;stats->count: <=3;stats->location: dix-ie&tokyo&japan
+as-path-length,resource: 1111,status_code: 200;stats: not empty
+as-path-length,resource: as98813,status_code: 200;stats: not empty
+as-path-length,resource: 1111,status_code: 200;stats->count: not empty
+as-path-length,resource: 1111,status_code: 200;stats->count: 29
+as-path-length,resource: 1111,status_code: 200;stats->count: >53
+as-path-length,resource: 1111,status_code: 200;stats->count: >55
+as-path-length,resource: 1111,status_code: 200;stats: not empty
+as-path-length,resource: 1111,status_code: 200;stats->stripped->sum: not empty

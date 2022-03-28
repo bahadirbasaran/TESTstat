@@ -15,7 +15,7 @@ NOT_EMPTY = (
         "assert test_output['data'][param]"
 )
 QUANTITATIVE = (
-    "a"
+    "quantative comparisons"
 )
 
 

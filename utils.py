@@ -31,6 +31,7 @@ class TestStat():
     
     def evaluate_result(self, data_call, test_output, expected_output):
 
+
         def _get_inner_param_value(param, param_set):
 
             if "->" in param:
@@ -44,10 +45,13 @@ class TestStat():
 
             return inner_param_value
 
+
         def _apply_flag(flag, param_set, param, output_value):
 
             if isinstance(output_value, str):
                 output_value = output_value.lower().replace(' ', '')
+            elif isinstance(output_value, int) or isinstance(output_value, float):
+                output_value = str(output_value)
             elif isinstance(output_value, list):
                 output_value = [val.lower().replace(' ', '') for val in output_value]
 
@@ -59,7 +63,6 @@ class TestStat():
             elif flag == NOT_EMPTY:
                 if param_set[param] == "notempty" and output_value:
                     return True
-                
 
             elif flag == INCLUDE:
                 if all([p in output_value for p in param_set[param].split(',')]):
@@ -72,31 +75,66 @@ class TestStat():
             elif flag == QUANTITATIVE:
                 if ">=" in param_set[param]:
                     expected_value = float(param_set[param].split(">=")[1])
-                    if float(test_output_value) >= expected_value:
+                    if float(output_value) >= expected_value:
                         return True
 
                 elif ">" in param_set[param]:
                     expected_value = float(param_set[param].split(">")[1])
-                    if float(test_output_value) > expected_value:
+                    if float(output_value) > expected_value:
                         return True
 
                 elif "<=" in param_set[param]:
                     expected_value = float(param_set[param].split("<=")[1])
-                    if float(test_output_value) <= expected_value:
+                    if float(output_value) <= expected_value:
                         return True
 
                 elif "<" in param_set[param]:
                     expected_value = float(param_set[param].split("<")[1])
-                    if float(test_output_value) < expected_value:
+                    if float(output_value) < expected_value:
                         return True
 
             return False
 
 
+        def _check_current_level(current_level, current_identifier):
+            #current_identifier = "exact" - "stats->stripped"
+            
+            for field in current_level:
+
+                if not isinstance(current_level[field], dict):
+
+                    field_flags = _get_inner_param_value(f"{current_identifier}->{field}", DATA_CALL_MAP[data_call]["output_params"])
+                    field_flags = field_flags.copy()
+                    criteria = field_flags.pop(0)
+
+                    if "->" in current_identifier:
+                        current_identifier = "->".join(current_identifier.split("->")[1:] + [field])
+                        output_value = _get_inner_param_value(current_identifier, block)
+                        expected = fields[current_identifier.split("->")[0]]
+                    else:
+                        output_value = _get_inner_param_value(field, block)
+                        expected = fields
+
+                    # Apply filters before ANY/ALL if there are such
+                    while criteria not in [ANY, ALL]:
+                        _apply_flag(criteria, expected, field, output_value)
+                        criteria = param_flags.pop(0)
+
+                    bools = [_apply_flag(flag, expected, field, output_value) for flag in field_flags]
+
+                    if criteria == ANY:
+                        resulting_bools.append(any(bools))
+                    elif criteria == ALL:
+                        resulting_bools.append(all(bools))
+
+                else:
+                    _check_current_level(current_level[field], f"{current_identifier}->{field}")
+
+
         failed_params = {}
-        verbose_param_set = {}
+        verbose_params = {}
         
-        for param in expected_output:
+        for param, value in expected_output.items():
 
             if param == "status_code":
                 if expected_output["status_code"] != str(test_output["status_code"]):
@@ -104,25 +142,9 @@ class TestStat():
                     failed_params[test_output["messages"][0][0]] = test_output["messages"][0][1].split("\n")[0]
                     return failed_params
                 continue
-                
+
             if param.split("->")[0] in VERBOSE_PARAMS:
-
-                if "->" in param:
-                
-                    if param.split("->")[0] not in verbose_param_set:
-                        verbose_param_set.update({
-                            param.split("->")[0]: {
-                                param.split("->")[1]: expected_output[param]
-                            }
-                        })
-                    else:
-                        verbose_param_set[param.split("->")[0]].update({
-                            param.split("->")[1]: expected_output[param]
-                        })
-
-                else:
-                    verbose_param_set[param] = "notempty"
-                    
+                verbose_params[param] = value
                 continue
 
             test_output_value = _get_inner_param_value(param, test_output["data"])
@@ -145,10 +167,8 @@ class TestStat():
 
             failed_params[param] = test_output_value
 
-
-        for verbose_param, fields in verbose_param_set.items():
-            # e.g.  exact         ->  {'inetnum': '1', 'netname': '2'}
-            #       more_specific ->  {'inetnum': '3', 'org': '4'}
+  
+        for verbose_param, fields in reshape_param_set(verbose_params).items():
 
             # If checkbox "Not Empty" is checked for a verbose param,
             # check if the corresponding response list of the param is empty
@@ -158,7 +178,7 @@ class TestStat():
                 continue
             
             is_match = False
-            check_results = []
+            resulting_bools = []
 
             # Check if there is a block in test_output["data"][verbose_param] that match with all fields of same verbose_param
             for block in test_output["data"][verbose_param]:
@@ -166,30 +186,14 @@ class TestStat():
                 # Jump to next block if current one does not include all fields
                 if not all(field in block for field in fields):
                     continue
+                
+                _check_current_level(fields, verbose_param)
 
-                for field in fields:
-                    field_flags = _get_inner_param_value(f"{verbose_param}->{field}", DATA_CALL_MAP[data_call]["output_params"])
-
-                    field_flags = field_flags.copy()
-                    criteria = field_flags.pop(0)
-
-                    # Apply filters before ANY/ALL if there are such
-                    while criteria not in [ANY, ALL]:
-                        _apply_flag(criteria, expected_output, param, test_output_value)
-                        criteria = param_flags.pop(0)
-
-                    if criteria == ANY:
-                        check_results.append(
-                            any([_apply_flag(flag=flag, param_set=fields, param=field, output_value=block[field]) for flag in field_flags])
-                        )
-                    elif criteria == ALL:
-                        check_results.append(
-                            all([_apply_flag(flag=flag, param_set=fields, param=field, output_value=block[field]) for flag in field_flags])
-                        )
-
-                if all(check_results):
+                if all(resulting_bools):
                     is_match = True
                     break
+                else:
+                    resulting_bools.clear()
 
             if not is_match:
                 failed_params[verbose_param] = "No item matching all the expected inputs found!"
@@ -232,3 +236,50 @@ def throw_message(type, title, message):
     ret_val = msg.exec_()
 
     return ret_val
+
+
+def reshape_param_set(param_set):
+    """ param_set:
+            param = 'exact->inetnum'          value = 'a'
+            param = 'exact->netname'          value = 'b'
+            param = 'more_specific'           value = 'notempty'
+            param = 'stats->stripped->avg'    value = 'c'
+            param = 'stats->stripped->min'    value = 'd'
+            param = 'stats->unstripped->avg'  value = 'e'
+    =>> reshaped_param_set = {
+            'exact': {
+                'inetnum': 'a',
+                'netname': 'b'                              
+            },
+
+            'more_specific': "notempty",
+
+            'stats': {
+                'stripped': {
+                    'avg': 'c',
+                    'min': 'd'
+                },
+                'unstripped': {
+                    'avg': 'e'
+                }                            
+            }
+        }
+    """
+
+    reshaped_param_set = {}
+
+    for key, value in param_set.items():
+
+        current_dict = reshaped_param_set
+        *parts, last = key.split('->')
+
+        for part in parts:
+
+            if part not in current_dict:
+                current_dict[part] = {}
+
+            current_dict = current_dict[part]
+
+        current_dict[last] = value
+
+    return reshaped_param_set

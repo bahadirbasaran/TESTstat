@@ -51,7 +51,7 @@ class Ui_MainWindow(object):
         font.setBold(True)
         font.setPointSize(14)
         self.status.setFont(font)
-        self.status.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.status.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter)
 
         self.combobox_api_source = QtWidgets.QComboBox(self.layoutWidget)
         self.combobox_api_source.addItems([
@@ -313,12 +313,12 @@ class Ui_MainWindow(object):
         for row_index in rows_to_run:
 
             data_call = self.table_test_suite.item(row_index, 0).text().lower()
-            test_input = self.table_test_suite.item(row_index, 1).text().replace("\n", '&').replace(' ', '')
+            test_input = self.table_test_suite.item(row_index, 1).text().replace(':', '=').replace("\n", '&').replace(' ', '')
             
             expected_output = {}
             for param_value_pair in self.table_test_suite.item(row_index, 2).text().replace(' ', '').split("\n"):
-                param = param_value_pair.split('=')[0]
-                value = param_value_pair.split('=')[1]
+                param = param_value_pair.split(':')[0]
+                value = param_value_pair.split(':')[1]
                 expected_output[param] = value
 
             test_output = teststat.run_test(data_call, test_input, expected_output)
@@ -349,7 +349,7 @@ class Ui_MainWindow(object):
             else:
                 failed_output = []
                 for param, value in test_output.items():
-                    failed_output.append(f"{param} = {value}")
+                    failed_output.append(f"{param}: {value}")
 
                 failed_output = "\n".join(failed_output)
                 item_failed_output = QtWidgets.QTableWidgetItem(failed_output)
