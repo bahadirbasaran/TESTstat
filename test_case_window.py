@@ -14,18 +14,18 @@ class Ui_TestCaseWindow(object):
         
         self.TestCaseWindow = QtWidgets.QMainWindow()
         self.TestCaseWindow.setWindowTitle("New Test Case")
-        self.TestCaseWindow.resize(800, 512)
+        self.TestCaseWindow.resize(900, 512)
         self.TestCaseWindow.setStyleSheet("background-color: rgb(235, 236, 244); color: rgb(66, 77, 112);")
 
         self.centralwidget = QtWidgets.QWidget(self.TestCaseWindow)
         self.TestCaseWindow.setCentralWidget(self.centralwidget)
 
-        self.menubar = QtWidgets.QMenuBar(self.TestCaseWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 24))
-        self.TestCaseWindow.setMenuBar(self.menubar)
+        # self.menubar = QtWidgets.QMenuBar(self.TestCaseWindow)
+        # self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 24))
+        # self.TestCaseWindow.setMenuBar(self.menubar)
 
-        self.statusbar = QtWidgets.QStatusBar(self.TestCaseWindow)
-        self.TestCaseWindow.setStatusBar(self.statusbar)
+        # self.statusbar = QtWidgets.QStatusBar(self.TestCaseWindow)
+        # self.TestCaseWindow.setStatusBar(self.statusbar)
 
         self.items_in_previous_view = []
         self.input_names_in_previous_view = []
@@ -34,17 +34,17 @@ class Ui_TestCaseWindow(object):
     def setupUi(self):
 
         self.label_test_input = QtWidgets.QLabel(self.centralwidget)
-        self.label_test_input.setGeometry(QtCore.QRect(50, 60, 68, 16))
+        self.label_test_input.setGeometry(QtCore.QRect(50, 80, 68, 16))
         self.label_test_input.setStyleSheet("font-weight: bold;")
         self.label_test_input.setText("Test Input:")
 
         self.label_expected_output = QtWidgets.QLabel(self.centralwidget)
-        self.label_expected_output.setGeometry(QtCore.QRect(440, 60, 112, 16))
+        self.label_expected_output.setGeometry(QtCore.QRect(480, 80, 112, 16))
         self.label_expected_output.setStyleSheet("font-weight: bold;")
         self.label_expected_output.setText("Expected Output:")
 
         self.layoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.layoutWidget.setGeometry(QtCore.QRect(530, 420, 216, 32))
+        self.layoutWidget.setGeometry(QtCore.QRect(614, 450, 216, 32))
         
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.layoutWidget)
         self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -66,7 +66,7 @@ class Ui_TestCaseWindow(object):
         self.horizontalLayout_2.addWidget(self.btn_save_new_test)
 
         self.layoutWidget1 = QtWidgets.QWidget(self.centralwidget)
-        self.layoutWidget1.setGeometry(QtCore.QRect(50, 10, 249, 28))
+        self.layoutWidget1.setGeometry(QtCore.QRect(50, 30, 249, 28))
 
         self.formLayout_data_call = QtWidgets.QFormLayout(self.layoutWidget1)
         self.formLayout_data_call.setContentsMargins(0, 0, 0, 0)
@@ -87,19 +87,19 @@ class Ui_TestCaseWindow(object):
         self.input_scrollArea = QtWidgets.QScrollArea(self.centralwidget)
         self.input_scrollArea.setWidgetResizable(True)
         self.input_scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
-        self.input_scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.input_scrollArea.setGeometry(QtCore.QRect(50, 90, 311, 311))
+        self.input_scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        self.input_scrollArea.setGeometry(QtCore.QRect(50, 110, 350, 310))
         self.input_scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.input_scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 309, 309))
+        # self.input_scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 348, 308))
         self.input_scrollAreaWidgetContents.setObjectName("input_scrollAreaWidgetContents")
 
         self.output_scrollArea = QtWidgets.QScrollArea(self.centralwidget)
         self.output_scrollArea.setWidgetResizable(True)
         self.output_scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
-        self.output_scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.output_scrollArea.setGeometry(QtCore.QRect(440, 90, 311, 311))
+        self.output_scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        self.output_scrollArea.setGeometry(QtCore.QRect(480, 110, 350, 310))
         self.output_scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.output_scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 309, 309))
+        # self.output_scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 348, 308))
 
         self.input_formLayout = QtWidgets.QFormLayout()
         self.output_formLayout = QtWidgets.QFormLayout()
@@ -168,7 +168,7 @@ class Ui_TestCaseWindow(object):
 
             for param, value in param_set.items():
                 
-                if param in VERBOSE_PARAMS:
+                if param in VERBOSE_PARAMS and isinstance(value, dict):
                     setattr(self, f"checkbox_label_{param}", QtWidgets.QLabel(f"{param}:"))
                     reference_to_label = getattr(self, f"checkbox_label_{param}")
                     self.items_in_previous_view.append(reference_to_label)

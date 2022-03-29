@@ -14,7 +14,7 @@ NOT_EMPTY = (
     "if expected_output[param] == 'not empty':"
         "assert test_output['data'][param]"
 )
-QUANTITATIVE = (
+COMPARE = (
     "quantative comparisons"
 )
 
@@ -25,7 +25,10 @@ VERBOSE_PARAMS = [
     "exact",
     "more_specific",
     "less_specific",
-    "stats"
+    "stats",
+    "assignments",
+    "allocations",
+    "ip_stats"
 ]
 
 
@@ -50,10 +53,10 @@ WHOIS_PARAMS = {
 }
 
 AS_PATH_STATS = {
-    "avg": [ANY, NOT_EMPTY, MATCH, QUANTITATIVE],
-    "max": [ANY, NOT_EMPTY, MATCH, QUANTITATIVE],
-    "min": [ANY, NOT_EMPTY, MATCH, QUANTITATIVE],
-    "sum": [ANY, NOT_EMPTY, MATCH, QUANTITATIVE]
+    "avg": [ANY, NOT_EMPTY, MATCH, COMPARE],
+    "max": [ANY, NOT_EMPTY, MATCH, COMPARE],
+    "min": [ANY, NOT_EMPTY, MATCH, COMPARE],
+    "sum": [ANY, NOT_EMPTY, MATCH, COMPARE]
 }
 
 DATA_CALL_MAP = {
@@ -90,6 +93,32 @@ DATA_CALL_MAP = {
         }
     },
 
+    "address-space-usage": {
+        "data_call_name": "Address Space Usage",
+        "required_params": ["resource"],
+        "optional_params": ["all_level_more_specifics"],
+        "output_params": {
+            "query_time": [ANY, NOT_EMPTY, MATCH],
+            "resource": [ANY, NOT_EMPTY, MATCH],
+            "assignments": {
+                "address_range": [ANY, NOT_EMPTY, MATCH],
+                "asn_name": [ANY, NOT_EMPTY, MATCH],
+                "status": [ANY, NOT_EMPTY, MATCH],
+                "parent_allocation": [ANY, NOT_EMPTY, MATCH]
+            },
+            "allocations": {
+                "allocation": [ANY, NOT_EMPTY, MATCH],
+                "asn_name": [ANY, NOT_EMPTY, MATCH],
+                "status": [ANY, NOT_EMPTY, MATCH],
+                "assignments": [ANY, NOT_EMPTY, MATCH, COMPARE]
+            },
+            "ip_stats": {
+                "status": [ANY, NOT_EMPTY, MATCH],
+                "ips": [ANY, NOT_EMPTY, MATCH, COMPARE]
+            }
+        }
+    },
+
     "as-path-length": {
         "data_call_name": "AS Path Length",
         "required_params": ["resource"],
@@ -99,7 +128,7 @@ DATA_CALL_MAP = {
             "resource": [ANY, NOT_EMPTY, MATCH],
             "sort_by": [ANY, NOT_EMPTY, MATCH],
             "stats": {
-                "count": [ANY, NOT_EMPTY, MATCH, QUANTITATIVE],
+                "count": [ANY, NOT_EMPTY, MATCH, COMPARE],
                 "location": [ANY, NOT_EMPTY, MATCH],
                 "stripped": AS_PATH_STATS,
                 "unstripped": AS_PATH_STATS
@@ -107,32 +136,33 @@ DATA_CALL_MAP = {
         }
     },
 
-    "blocklist": {
-        "data_call_name": "Blocklist",
-        "required_params": ["resource", "starttime"],
-        "optional_params": ["endtime"],
-        "output_params": {
-            "source": None,
-            "prefix": None,
-            "details": None,
-            "timelines": None,
-            "query_starttime": None,
-            "query_endtime": None,
-            "resource": None
-        }
-    },
-
-    "dns-chain": {
-        "data_call_name": "Dns Chain",
-        "required_params": ["resource"],
-        "optional_params": [],
-        "output_params": {
-            "forward_nodes": None,
-            "reverse_nodes": None,
-            "nameservers": None,
-            "authoritative_nameservers": None,
-            "query_time": None,
-            "resource": None
-        }
-    }
 }
+
+# "blocklist": {
+#     "data_call_name": "Blocklist",
+#     "required_params": ["resource", "starttime"],
+#     "optional_params": ["endtime"],
+#     "output_params": {
+#         "source": None,
+#         "prefix": None,
+#         "details": None,
+#         "timelines": None,
+#         "query_starttime": None,
+#         "query_endtime": None,
+#         "resource": None
+#     }
+# },
+
+# "dns-chain": {
+#     "data_call_name": "Dns Chain",
+#     "required_params": ["resource"],
+#     "optional_params": [],
+#     "output_params": {
+#         "forward_nodes": None,
+#         "reverse_nodes": None,
+#         "nameservers": None,
+#         "authoritative_nameservers": None,
+#         "query_time": None,
+#         "resource": None
+#     }
+# }

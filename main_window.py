@@ -2,8 +2,7 @@ import sys
 import csv
 
 import test_case_window
-
-from utils import TestStat
+from TestStat import TestStat
 from utils import throw_message, MESSAGE_ENUM, COLOR_ENUM, TEST_CASES_PATH
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -15,8 +14,11 @@ class Ui_MainWindow(object):
 
         self.MainWindow = QtWidgets.QMainWindow()
         self.MainWindow.setWindowTitle("TESTstat")
-        self.MainWindow.resize(1024, 768)
+        self.MainWindow.resize(1280, 800)
         self.MainWindow.setStyleSheet("background-color: rgb(235, 236, 244); color: rgb(66, 77, 112);")
+
+        # self.statusbar = QtWidgets.QStatusBar(self.MainWindow)
+        # self.MainWindow.setStatusBar(self.statusbar)
 
         self.centralwidget = QtWidgets.QWidget(self.MainWindow)
 
@@ -26,7 +28,7 @@ class Ui_MainWindow(object):
     def setupUi(self):
     
         self.groupbox_config = QtWidgets.QGroupBox(self.centralwidget)
-        self.groupbox_config.setGeometry(QtCore.QRect(30, 30, 431, 121))
+        self.groupbox_config.setGeometry(QtCore.QRect(50, 50, 431, 121))
 
         self.layoutWidget = QtWidgets.QWidget(self.groupbox_config)
         self.layoutWidget.setGeometry(QtCore.QRect(20, 20, 389, 32))
@@ -45,7 +47,7 @@ class Ui_MainWindow(object):
         self.btn_run.setGeometry(QtCore.QRect(20, 70, 111, 32))
 
         self.status = QtWidgets.QLabel(self.groupbox_config)
-        self.status.setGeometry(QtCore.QRect(249, 70, 161, 32))
+        self.status.setGeometry(QtCore.QRect(240, 70, 161, 32))
         self.status.setText(f"Test cases: {self.num_test_case}")
         font = QtGui.QFont()
         font.setBold(True)
@@ -78,14 +80,14 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addWidget(self.port)
 
         self.table_test_suite = QtWidgets.QTableWidget(self.centralwidget)
-        self.table_test_suite.setGeometry(QtCore.QRect(30, 180, 961, 451))
+        self.table_test_suite.setGeometry(QtCore.QRect(50, 200, 1171, 470))
         self.table_test_suite.setStyleSheet("background-color: rgb(255, 255, 255);")
         self.table_test_suite.setColumnCount(4)
         self.table_test_suite.setRowCount(0)
-        self.table_test_suite.setColumnWidth(0, 165)
-        self.table_test_suite.setColumnWidth(1, 260)
-        self.table_test_suite.setColumnWidth(2, 260)
-        self.table_test_suite.setColumnWidth(3, 260)
+        self.table_test_suite.setColumnWidth(0, 190)
+        self.table_test_suite.setColumnWidth(1, 315)
+        self.table_test_suite.setColumnWidth(2, 315)
+        self.table_test_suite.setColumnWidth(3, 315)
 
         for index, column_name in enumerate(["Data Call", "Test Input", "Expected Output", "Output"]):
             item = QtWidgets.QTableWidgetItem(column_name)
@@ -97,26 +99,26 @@ class Ui_MainWindow(object):
 
         self.btn_new_test = QtWidgets.QPushButton(self.centralwidget, clicked=lambda: self.on_btn_new_test_click())
         self.btn_new_test.setText("New Test Case")
-        self.btn_new_test.setGeometry(QtCore.QRect(720, 660, 130, 32))
+        self.btn_new_test.setGeometry(QtCore.QRect(950, 700, 130, 32))
         self.btn_new_test.setStyleSheet("font-weight: bold;")
 
         self.btn_remove_test = QtWidgets.QPushButton(self.centralwidget, clicked=lambda: self.on_btn_remove_test_click())
         self.btn_remove_test.setText("Remove Test Case")
-        self.btn_remove_test.setGeometry(QtCore.QRect(860, 660, 130, 32))
+        self.btn_remove_test.setGeometry(QtCore.QRect(1090, 700, 130, 32))
         self.btn_remove_test.setStyleSheet("font-weight: bold;")
 
         self.btn_load_test = QtWidgets.QPushButton(self.centralwidget, clicked=lambda: self.on_btn_load_test_click())
         self.btn_load_test.setText("Load Test Suite")
-        self.btn_load_test.setGeometry(QtCore.QRect(30, 660, 111, 32))
+        self.btn_load_test.setGeometry(QtCore.QRect(50, 700, 111, 32))
         self.btn_load_test.setStyleSheet("font-weight: bold;")
 
         self.btn_save_test = QtWidgets.QPushButton(self.centralwidget, clicked=lambda: self.on_btn_save_test_click())
         self.btn_save_test.setText("Save Test Suite")
-        self.btn_save_test.setGeometry(QtCore.QRect(150, 660, 111, 32))
+        self.btn_save_test.setGeometry(QtCore.QRect(170, 700, 111, 32))
         self.btn_save_test.setStyleSheet("font-weight: bold;")
 
-        self.progress_bar = QtWidgets.QProgressBar(self.centralwidget)
-        self.progress_bar.setGeometry(QtCore.QRect(50, 134, 390, 11))
+        self.progress_bar = QtWidgets.QProgressBar(self.groupbox_config)
+        self.progress_bar.setGeometry(QtCore.QRect(20, 105, 390, 11))
         self.progress_bar.setProperty("value", 0)
         self.progress_bar.setOrientation(QtCore.Qt.Horizontal)
         self.progress_bar.setInvertedAppearance(False)
@@ -336,6 +338,7 @@ class Ui_MainWindow(object):
 
             num_tests_run += 1
             self.progress_bar.setProperty("value", num_tests_run)
+            # self.statusbar.showMessage(f"Test Case {num_tests_run}: {teststat.query}")
 
             if not test_output:
                 num_passed_tests += 1
@@ -358,6 +361,8 @@ class Ui_MainWindow(object):
                 self.table_test_suite.resizeRowsToContents()
 
                 self.colorize_table_row(row_index, COLOR_ENUM.BLACK, COLOR_ENUM.FAILURE)
+
+            
 
 
 if __name__ == "__main__":
