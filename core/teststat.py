@@ -1,7 +1,7 @@
 import requests
 
-from test_suite import *
-from utils import *
+from core.config import *
+from core.utils import filter_param_set, reshape_param_set
 
 
 class TestStat():
@@ -13,7 +13,6 @@ class TestStat():
 
     
     def evaluate_result(self, data_call, test_output, expected_output):
-
 
         def _get_inner_param_value(param, param_set):
 
@@ -30,13 +29,6 @@ class TestStat():
 
 
         def _apply_flag(flag, param_set, param, output_value):
-
-            if isinstance(output_value, str):
-                output_value = output_value.lower().replace(' ', '')
-            elif isinstance(output_value, int) or isinstance(output_value, float):
-                output_value = str(output_value)
-            elif isinstance(output_value, list):
-                output_value = [val.lower().replace(' ', '') for val in output_value]
 
             if flag == TRIM_AS:
                 if param_set[param].startswith('as'):
@@ -80,7 +72,6 @@ class TestStat():
 
 
         def _check_current_level(current_level, current_identifier):
-            #current_identifier = "exact" - "stats->stripped"
             
             for field in current_level:
 
@@ -113,17 +104,28 @@ class TestStat():
                 else:
                     _check_current_level(current_level[field], f"{current_identifier}->{field}")
 
-
         failed_params = {}
         verbose_params = {}
+
+        if expected_output.pop("status_code") != str(test_output["status_code"]):
+            failed_params["status_code"] = str(test_output["status_code"])
+            failed_params[test_output["messages"][0][0]] = test_output["messages"][0][1].split("\n")[0]
+            return failed_params
+
+        # In some data call responses, 'data' is wrapped with 'results'
+        if "results" in test_output["data"]:
+            for key, value in test_output["data"]["results"].items():
+                test_output["data"][key] = value
+            del test_output["data"]["results"]
+        
+        # Make all items of test_output["data"] lower case,
+        # trim whitespaces, and convert bools into strings
+        test_output["data"] = filter_param_set(test_output["data"].copy())
         
         for param, value in expected_output.items():
 
-            if param == "status_code":
-                if expected_output["status_code"] != str(test_output["status_code"]):
-                    failed_params["status_code"] = str(test_output["status_code"])
-                    failed_params[test_output["messages"][0][0]] = test_output["messages"][0][1].split("\n")[0]
-                    return failed_params
+            if param.split("->")[0] not in test_output["data"]:
+                failed_params[param] = f"The response does not include this key!"
                 continue
 
             if param.split("->")[0] in VERBOSE_PARAMS:
@@ -150,7 +152,6 @@ class TestStat():
 
             failed_params[param] = test_output_value
 
-  
         for verbose_param, fields in reshape_param_set(verbose_params).items():
 
             # If checkbox "Not Empty" is checked for a verbose param,
@@ -166,7 +167,7 @@ class TestStat():
             # Check if there is a block in test_output["data"][verbose_param] that match with all fields of same verbose_param
             for block in test_output["data"][verbose_param]:
                 
-                # Jump to next block if current one does not include all fields
+                # Jump to next block if current one dos not include all fields
                 if not all(field in block for field in fields):
                     continue
                 
@@ -187,7 +188,9 @@ class TestStat():
     def run_test(self, data_call, test_input, expected_output):
 
         try:
-            response = requests.get(f"{self.query}{data_call}/data.json?{test_input}")
+            request = f"{self.query}{data_call}/data.json?{test_input}"
+            print(request)
+            response = requests.get(request)
 
         except requests.exceptions.ConnectionError:
             return f"Connection to {self.api_source} could not be established!"

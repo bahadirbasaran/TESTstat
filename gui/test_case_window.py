@@ -1,12 +1,12 @@
 import sys
 
-from utils import throw_message
-from test_suite import DATA_CALL_MAP, VERBOSE_PARAMS
+from core.utils import throw_message
+from core.config import DATA_CALL_MAP, VERBOSE_PARAMS
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 
 
-class Ui_TestCaseWindow(object):
+class TestCaseWindow():
 
     def __init__(self, main_ui):
 
@@ -20,18 +20,11 @@ class Ui_TestCaseWindow(object):
         self.centralwidget = QtWidgets.QWidget(self.TestCaseWindow)
         self.TestCaseWindow.setCentralWidget(self.centralwidget)
 
-        # self.menubar = QtWidgets.QMenuBar(self.TestCaseWindow)
-        # self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 24))
-        # self.TestCaseWindow.setMenuBar(self.menubar)
-
-        # self.statusbar = QtWidgets.QStatusBar(self.TestCaseWindow)
-        # self.TestCaseWindow.setStatusBar(self.statusbar)
-
         self.items_in_previous_view = []
         self.input_names_in_previous_view = []
 
 
-    def setupUi(self):
+    def setup_ui(self):
 
         self.label_test_input = QtWidgets.QLabel(self.centralwidget)
         self.label_test_input.setGeometry(QtCore.QRect(50, 80, 68, 16))
@@ -135,12 +128,13 @@ class Ui_TestCaseWindow(object):
 
             for input_name in self.input_names_in_previous_view:
 
-                if input_name.startswith(checkbox_name.replace("checkbox", "expected")):
+                reference_to_input = getattr(self, input_name)
 
-                    reference_to_input = getattr(self, input_name)
+                if input_name.startswith(checkbox_name.replace("checkbox", "expected") + '_'):
                     
                     if getattr(self, checkbox_name).isChecked():
                         reference_to_input.setEnabled(False)
+                        reference_to_input.setText('')
                         reference_to_input.setStyleSheet("background-color: rgb(225, 226, 232);")
                     else:
                         reference_to_input.setEnabled(True)
@@ -165,21 +159,26 @@ class Ui_TestCaseWindow(object):
                 self.input_formLayout.addRow(reference_to_label, reference_to_input)
 
         def _populate_output_area(param_set, parent_label=None, parent_var=None):
-
+            
             for param, value in param_set.items():
-                
-                if param in VERBOSE_PARAMS and isinstance(value, dict):
-                    setattr(self, f"checkbox_label_{param}", QtWidgets.QLabel(f"{param}:"))
-                    reference_to_label = getattr(self, f"checkbox_label_{param}")
+
+                if (param in VERBOSE_PARAMS or f"{parent_label}->{param}" in VERBOSE_PARAMS) and isinstance(value, dict):
+
+                    label_identifier = f"{param}:" if not parent_label else f"{parent_label}->{param}:"
+                    var_identifier = param if not parent_label else f"{parent_var}_{param}"
+
+                    setattr(self, f"checkbox_label_{var_identifier}", QtWidgets.QLabel(label_identifier))
+                    reference_to_label = getattr(self, f"checkbox_label_{var_identifier}")
+                    reference_to_label.setStyleSheet("font-weight: bold;")
                     self.items_in_previous_view.append(reference_to_label)
 
-                    setattr(self, f"checkbox_input_{param}", QtWidgets.QCheckBox("Not Empty"))
-                    reference_to_input = getattr(self, f"checkbox_input_{param}")
-                    reference_to_input.setObjectName(f"checkbox_input_{param}")
-                    reference_to_input.toggled.connect(lambda: self.on_checkbox_change())
+                    setattr(self, f"checkbox_input_{var_identifier}", QtWidgets.QCheckBox("Not Empty"))
+                    reference_to_input = getattr(self, f"checkbox_input_{var_identifier}")
+                    reference_to_input.setObjectName(f"checkbox_input_{var_identifier}")
+                    reference_to_input.clicked.connect(lambda: self.on_checkbox_change())
+                    self.input_names_in_previous_view.append(f"checkbox_input_{var_identifier}")
                     self.items_in_previous_view.append(reference_to_input)
-                    self.input_names_in_previous_view.append(f"checkbox_input_{param}")
-
+                    
                     self.output_formLayout.addRow(reference_to_label, reference_to_input)
 
                 label = parent_label + "->" + param if parent_label else param
@@ -251,19 +250,20 @@ class Ui_TestCaseWindow(object):
                 label = parent_label + "->" + param if parent_label else param
                 var = parent_var + "_" + param if parent_var else param
 
+                if label in VERBOSE_PARAMS:
+                    if getattr(self, f"checkbox_input_{var}").isChecked():
+                        output_params.append(f"{label}: not empty")
+                            
+
                 if isinstance(value, list):
                     reference_to_input = getattr(self, f"expected_input_{var}")
 
                     if reference_to_input.text() != '':
                         if reference_to_input.text().lower() == "not empty":
-                            output_params.append(f"{label}: {reference_to_input.text().lower()}")
+                            output_params.append(f"{label}: not empty")
                         else:
                             output_params.append(f"{label}: {reference_to_input.text().lower().replace(' ', '')}")
-                
                 else:
-                    if param in VERBOSE_PARAMS and getattr(self, f"checkbox_input_{param}").isChecked():
-                        output_params.append(f"{param}: not empty")
-                        continue
                     output_params = _get_output_params(param_set[param], output_params, label, var)
 
             return output_params
@@ -315,8 +315,8 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     app.setStyle("fusion")    
 
-    ui = Ui_TestCaseWindow()
-    ui.setupUi()
+    ui = TestCaseWindow()
+    ui.setup_ui()
     ui.show()
     
     sys.exit(app.exec_())

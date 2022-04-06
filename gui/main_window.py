@@ -1,14 +1,17 @@
-import sys
-import csv
+import sys, os, csv
+sys.path.append(os.path.abspath(".."))
 
-import test_case_window
-from TestStat import TestStat
-from utils import throw_message, MESSAGE_ENUM, COLOR_ENUM, TEST_CASES_PATH
+from gui.test_case_window import TestCaseWindow
+from core.teststat import TestStat
+from core.utils import throw_message, MessageEnum, ColorEnum
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_MainWindow(object):
+TEST_CASES_PATH = "../data/test_cases.csv"
+
+
+class MainWindow():
 
     def __init__(self):
 
@@ -16,16 +19,12 @@ class Ui_MainWindow(object):
         self.MainWindow.setWindowTitle("TESTstat")
         self.MainWindow.resize(1280, 800)
         self.MainWindow.setStyleSheet("background-color: rgb(235, 236, 244); color: rgb(66, 77, 112);")
-
-        # self.statusbar = QtWidgets.QStatusBar(self.MainWindow)
-        # self.MainWindow.setStatusBar(self.statusbar)
-
         self.centralwidget = QtWidgets.QWidget(self.MainWindow)
 
         self.num_test_case = 0
 
 
-    def setupUi(self):
+    def setup_ui(self):
     
         self.groupbox_config = QtWidgets.QGroupBox(self.centralwidget)
         self.groupbox_config.setGeometry(QtCore.QRect(50, 50, 431, 121))
@@ -147,11 +146,11 @@ class Ui_MainWindow(object):
          # Check if there is a result on the table remaining from a previous run
         if '/' in self.status.text():
             ret_val = throw_message("warning", "Warning", "Are you sure you want to discard the test result?")
-            if ret_val == MESSAGE_ENUM.NO:
+            if ret_val == MessageEnum.NO:
                 return
             
             for row_index in range(self.table_test_suite.rowCount()):
-                self.colorize_table_row(row_index, COLOR_ENUM.UI_FONT, COLOR_ENUM.WHITE)
+                self.colorize_table_row(row_index, ColorEnum.UI_FONT, ColorEnum.WHITE)
                 self.table_test_suite.item(row_index, self.table_test_suite.columnCount() - 1).setText('')
 
             self.status.setText(f"Test cases: {self.num_test_case}")
@@ -186,8 +185,8 @@ class Ui_MainWindow(object):
 
         self.reset_test_suite()
 
-        self.test_case_ui = test_case_window.Ui_TestCaseWindow(ui)
-        self.test_case_ui.setupUi()
+        self.test_case_ui = TestCaseWindow(ui)
+        self.test_case_ui.setup_ui()
         self.test_case_ui.show()
 
 
@@ -211,7 +210,7 @@ class Ui_MainWindow(object):
 
         if self.table_test_suite.rowCount():
             ret_val = throw_message("warning", "Warning", "Are you sure you want to override the test suite?")
-            if ret_val == MESSAGE_ENUM.NO:
+            if ret_val == MessageEnum.NO:
                 return
             self.table_test_suite.clearContents()
             self.table_test_suite.setRowCount(0)
@@ -265,7 +264,7 @@ class Ui_MainWindow(object):
             rows_to_save = [row_index for row_index in range(self.table_test_suite.rowCount())]
 
         ret_val = throw_message("warning", "Warning", "Are you sure you want to override the test cases?")
-        if ret_val == MESSAGE_ENUM.NO:
+        if ret_val == MessageEnum.NO:
             return
 
         with open(TEST_CASES_PATH, 'w') as csv_file:
@@ -315,19 +314,22 @@ class Ui_MainWindow(object):
         for row_index in rows_to_run:
 
             data_call = self.table_test_suite.item(row_index, 0).text().lower()
-            test_input = self.table_test_suite.item(row_index, 1).text().replace(':', '=').replace("\n", '&').replace(' ', '')
+            test_input = self.table_test_suite.item(row_index, 1).text().replace(':', '=', 1).replace("\n", '&').replace(' ', '')
             
             expected_output = {}
             for param_value_pair in self.table_test_suite.item(row_index, 2).text().replace(' ', '').split("\n"):
-                param = param_value_pair.split(':')[0]
-                value = param_value_pair.split(':')[1]
+                param_value_set = param_value_pair.split(':')
+                param = param_value_set.pop(0)
+                value = param_value_set.pop() if len(param_value_set) == 1 else ':'.join(param_value_set)
                 expected_output[param] = value
+
+            print(f"Test Case {row_index+1} ({num_tests_run+1}/{num_total_tests}):", end=' ')
 
             test_output = teststat.run_test(data_call, test_input, expected_output)
 
             if isinstance(test_output, str):
                 if test_output == "Connection timed out!":
-                    self.colorize_table_row(row_index, COLOR_ENUM.BLACK, COLOR_ENUM.TIMEOUT)
+                    self.colorize_table_row(row_index, ColorEnum.BLACK, ColorEnum.TIMEOUT)
                     throw_message("critical", "Test Case {row_index}", "Test Case {row_index} could not run because of time out!")
                     num_tests_run += 1
                     self.progress_bar.setProperty("value", num_tests_run)
@@ -338,7 +340,6 @@ class Ui_MainWindow(object):
 
             num_tests_run += 1
             self.progress_bar.setProperty("value", num_tests_run)
-            # self.statusbar.showMessage(f"Test Case {num_tests_run}: {teststat.query}")
 
             if not test_output:
                 num_passed_tests += 1
@@ -347,7 +348,7 @@ class Ui_MainWindow(object):
                 empty_item = QtWidgets.QTableWidgetItem("")
                 self.table_test_suite.setItem(row_index, 3, empty_item)
 
-                self.colorize_table_row(row_index, COLOR_ENUM.BLACK, COLOR_ENUM.SUCCESS)
+                self.colorize_table_row(row_index, ColorEnum.BLACK, ColorEnum.SUCCESS)
             
             else:
                 failed_output = []
@@ -360,9 +361,7 @@ class Ui_MainWindow(object):
 
                 self.table_test_suite.resizeRowsToContents()
 
-                self.colorize_table_row(row_index, COLOR_ENUM.BLACK, COLOR_ENUM.FAILURE)
-
-            
+                self.colorize_table_row(row_index, ColorEnum.BLACK, ColorEnum.FAILURE)
 
 
 if __name__ == "__main__":
@@ -370,8 +369,8 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     app.setStyle("fusion")
 
-    ui = Ui_MainWindow()
-    ui.setupUi()
+    ui = MainWindow()
+    ui.setup_ui()
     ui.show()
 
     sys.exit(app.exec_())

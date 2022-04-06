@@ -1,20 +1,73 @@
 from PyQt5 import QtWidgets, QtGui
 
 
-TEST_CASES_PATH = "test_cases.csv"
-
-
-class MESSAGE_ENUM():
+class MessageEnum():
     NO = 65536
     YES = 16384
 
-class COLOR_ENUM():
+
+class ColorEnum():
     FAILURE = QtGui.QColor("#FFB8B8")
     SUCCESS = QtGui.QColor("#D4FCD7")
     TIMEOUT = QtGui.QColor("F5B445")
     BLACK = QtGui.QColor("#000000")
     WHITE = QtGui.QColor("#FFFFFF")
     UI_FONT = QtGui.QColor("#424D70")
+
+
+def filter_param_set(param_set, filtered_param_set={}, current_level=None):
+
+    def _filter(val):
+        return val.lower().replace(' ', '')
+
+    for k, v in param_set.items():
+
+        if isinstance(v, str):
+            if current_level:
+                filtered_param_set[current_level][_filter(k)] = _filter(v)
+            else:
+                filtered_param_set[_filter(k)] = _filter(v)
+
+        # bools should be checked first, since boolean is a subclass of int,
+        # any bool variable matches with the following isinstance too!
+        elif isinstance(v, bool):
+            if current_level:
+                filtered_param_set[current_level][_filter(k)] = "true" if v else "false"
+            else:
+                filtered_param_set[_filter(k)] = "true" if v else "false"
+
+        elif isinstance(v, (int, float)):
+            if current_level:
+                filtered_param_set[current_level][_filter(k)] = str(v)
+            else:
+                filtered_param_set[_filter(k)] = str(v)
+
+        elif isinstance(v, list):
+            v_new = []
+            for list_item in v:
+                if isinstance(list_item, str):
+                    v_new.append(_filter(list_item))
+                elif isinstance(list_item, bool) and list_item:
+                    v_new.append("true")
+                elif isinstance(list_item, bool):
+                    v_new.append("false")
+                elif isinstance(list_item, (int, float)):
+                    v_new.append(str(list_item))
+                else:
+                    v_new.append(
+                        filter_param_set(list_item, {})
+                    )
+
+            if current_level:
+                filtered_param_set[current_level][_filter(k)] = v_new
+            else:
+                filtered_param_set[_filter(k)] = v_new
+        
+        else:
+            filtered_param_set[k] = {}
+            filtered_param_set = filter_param_set(v, filtered_param_set, k)
+
+    return filtered_param_set
 
 
 def reshape_param_set(param_set):
@@ -67,13 +120,13 @@ def reshape_param_set(param_set):
 def throw_message(type, title, message):
 
     msg = QtWidgets.QMessageBox()
-
     msg.setText(message)
     msg.setWindowTitle(title)
 
     if type == "critical":
         msg.setIcon(QtWidgets.QMessageBox.Critical)
         msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+
     elif type == "warning":
         msg.setIcon(QtWidgets.QMessageBox.Warning)
         msg.setStandardButtons(QtWidgets.QMessageBox.No | QtWidgets.QMessageBox.Yes)
