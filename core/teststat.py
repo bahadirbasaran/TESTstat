@@ -33,42 +33,32 @@ class TestStat():
             if flag == TRIM_AS:
                 if param_set[param].startswith('as'):
                     param_set[param] = param_set[param][2:]
-                return
 
             elif flag == NOT_EMPTY:
-                if param_set[param] == "notempty" and output_value:
-                    return True
+                return param_set[param] == "notempty" and output_value
 
             elif flag == INCLUDE:
-                if all([p in output_value for p in param_set[param].split(',')]):
-                    return True
+                return all([p in output_value for p in param_set[param].split(',')])
 
             elif flag == MATCH:
-                if param_set[param] == output_value:
-                    return True
+                return param_set[param] == output_value
 
             elif flag == COMPARE:
                 if ">=" in param_set[param]:
                     expected_value = float(param_set[param].split(">=")[1])
-                    if float(output_value) >= expected_value:
-                        return True
+                    return float(output_value) >= expected_value
 
                 elif ">" in param_set[param]:
                     expected_value = float(param_set[param].split(">")[1])
-                    if float(output_value) > expected_value:
-                        return True
+                    return float(output_value) > expected_value
 
                 elif "<=" in param_set[param]:
                     expected_value = float(param_set[param].split("<=")[1])
-                    if float(output_value) <= expected_value:
-                        return True
+                    return float(output_value) <= expected_value
 
                 elif "<" in param_set[param]:
                     expected_value = float(param_set[param].split("<")[1])
-                    if float(output_value) < expected_value:
-                        return True
-
-            return False
+                    return float(output_value) < expected_value
 
 
         def _check_current_level(current_level, current_identifier):
