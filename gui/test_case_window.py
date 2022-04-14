@@ -1,5 +1,5 @@
 from core.utils import throw_message
-from core.config import DATA_CALL_MAP, VERBOSE_PARAMS
+from core.config import DATA_CALL_MAP, NESTED_PARAMS
 
 from PyQt5.QtCore import Qt, QRect, QMetaObject
 from PyQt5.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QPushButton, \
@@ -70,11 +70,14 @@ class TestCaseWindow():
         self.label_data_call.setText("Data Call:")
 
         self.combobox_data_call = QComboBox(self.layoutWidget1)
+        self.combobox_data_call.setStyleSheet("QComboBox { combobox-popup: 0; }")
+        # self.combobox_data_call.setMaxVisibleItems(10)
+        self.combobox_data_call.view().setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.combobox_data_call.addItems([specs["data_call_name"] for _, specs in DATA_CALL_MAP.items()])
         self.combobox_data_call.currentIndexChanged.connect(
             self.on_combobox_data_call_changed
         )
-
+        
         self.formLayout_data_call.setWidget(0, QFormLayout.LabelRole, self.label_data_call)
         self.formLayout_data_call.setWidget(0, QFormLayout.FieldRole, self.combobox_data_call)
 
@@ -82,7 +85,7 @@ class TestCaseWindow():
         self.input_scrollArea.setWidgetResizable(True)
         self.input_scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.input_scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        self.input_scrollArea.setGeometry(QRect(50, 110, 350, 310))
+        self.input_scrollArea.setGeometry(QRect(50, 110, 370, 310))
         self.input_scrollAreaWidgetContents = QWidget()
         # self.input_scrollAreaWidgetContents.setGeometry(QRect(0, 0, 348, 308))
         self.input_scrollAreaWidgetContents.setObjectName("input_scrollAreaWidgetContents")
@@ -91,7 +94,7 @@ class TestCaseWindow():
         self.output_scrollArea.setWidgetResizable(True)
         self.output_scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.output_scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        self.output_scrollArea.setGeometry(QRect(480, 110, 350, 310))
+        self.output_scrollArea.setGeometry(QRect(480, 110, 370, 310))
         self.output_scrollAreaWidgetContents = QWidget()
         # self.output_scrollAreaWidgetContents.setGeometry(QRect(0, 0, 348, 308))
 
@@ -163,7 +166,7 @@ class TestCaseWindow():
             
             for param, value in param_set.items():
 
-                if (param in VERBOSE_PARAMS or f"{parent_label}->{param}" in VERBOSE_PARAMS) and isinstance(value, dict):
+                if (param in NESTED_PARAMS or f"{parent_label}->{param}" in NESTED_PARAMS) and isinstance(value, dict):
 
                     label_identifier = f"{param}:" if not parent_label else f"{parent_label}->{param}:"
                     var_identifier = param if not parent_label else f"{parent_var}_{param}"
@@ -240,7 +243,7 @@ class TestCaseWindow():
                 reference_to_input = getattr(self, f"test_input_{param}")
                 
                 if reference_to_input.text() != '':
-                    test_input.append(f"{param}: {reference_to_input.text().lower().replace(' ', '')}")
+                    test_input.append(f"{param} = {reference_to_input.text().replace(' ', '')}")
 
             return test_input
 
@@ -251,19 +254,19 @@ class TestCaseWindow():
                 label = parent_label + "->" + param if parent_label else param
                 var = parent_var + "_" + param if parent_var else param
 
-                if label in VERBOSE_PARAMS:
+                if label in NESTED_PARAMS:
                     if getattr(self, f"checkbox_input_{var}").isChecked():
-                        output_params.append(f"{label}: not empty")
+                        output_params.append(f"{label} = not empty")
                             
 
                 if isinstance(value, list):
                     reference_to_input = getattr(self, f"expected_input_{var}")
 
                     if reference_to_input.text() != '':
-                        if reference_to_input.text().lower() == "not empty":
-                            output_params.append(f"{label}: not empty")
+                        if reference_to_input.text().lower().replace(' ', '') == "notempty":
+                            output_params.append(f"{label} = not empty")
                         else:
-                            output_params.append(f"{label}: {reference_to_input.text().lower().replace(' ', '')}")
+                            output_params.append(f"{label} = {reference_to_input.text().lower().replace(' ', '')}")
                 else:
                     output_params = _get_output_params(param_set[param], output_params, label, var)
 
@@ -287,7 +290,7 @@ class TestCaseWindow():
 
         expected_output = _get_output_params(
             DATA_CALL_MAP[self.data_call]["output_params"],
-            ["status_code: 200" if self.status_code.text() == '' else f"status_code: {self.status_code.text().lower().replace(' ', '')}"]
+            ["status_code = 200" if self.status_code.text() == '' else f"status_code = {self.status_code.text().replace(' ', '')}"]
         )
 
         test_input = "\n".join(test_input)

@@ -42,6 +42,12 @@ def filter_param_set(param_set, filtered_param_set={}, current_level=None):
             else:
                 filtered_param_set[_filter(k)] = str(v)
 
+        elif v is None:
+            if current_level:
+                filtered_param_set[current_level][_filter(k)] = "none"
+            else:
+                filtered_param_set[_filter(k)] = "none"
+
         elif isinstance(v, list):
             v_new = []
             for list_item in v:
@@ -53,6 +59,15 @@ def filter_param_set(param_set, filtered_param_set={}, current_level=None):
                     v_new.append("false")
                 elif isinstance(list_item, (int, float)):
                     v_new.append(str(list_item))
+                elif list_item is None:
+                    v_new.append("none")
+                elif isinstance(list_item, list):
+                    v_inner = []
+                    for inner_item in list_item:
+                        v_inner.append(
+                            filter_param_set(inner_item, {})
+                        )
+                    v_new.append(v_inner)
                 else:
                     v_new.append(
                         filter_param_set(list_item, {})

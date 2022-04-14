@@ -8,8 +8,7 @@ from PyQt5.QtCore import Qt, QRect, QMetaObject
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QMainWindow, QWidget, QGroupBox, QHBoxLayout, \
                             QLabel, QPushButton, QComboBox, QTableWidget, \
-                            QTableWidgetItem, QProgressBar, QLineEdit
-
+                            QTableWidgetItem, QProgressBar, QLineEdit, QApplication
 
 TEST_CASES_PATH = "data/test_cases.csv"
 
@@ -30,7 +29,7 @@ class MainWindow():
     def setup_ui(self):
     
         self.groupbox_config = QGroupBox(self.centralwidget)
-        self.groupbox_config.setGeometry(QRect(50, 50, 431, 121))
+        self.groupbox_config.setGeometry(QRect(50, 44, 430, 130))
 
         self.layoutWidget = QWidget(self.groupbox_config)
         self.layoutWidget.setGeometry(QRect(20, 20, 389, 32))
@@ -120,7 +119,7 @@ class MainWindow():
         self.btn_save_test.setStyleSheet("font-weight: bold;")
 
         self.progress_bar = QProgressBar(self.groupbox_config)
-        self.progress_bar.setGeometry(QRect(20, 105, 390, 11))
+        self.progress_bar.setGeometry(QRect(20, 107, 390, 13))
         self.progress_bar.setProperty("value", 0)
         self.progress_bar.setOrientation(Qt.Horizontal)
         self.progress_bar.setInvertedAppearance(False)
@@ -150,7 +149,7 @@ class MainWindow():
         if '/' in self.status.text():
             ret_val = throw_message("warning", "Warning", "Are you sure you want to discard the test result?")
             if ret_val == MessageEnum.NO:
-                return
+                return ret_val
             
             for row_index in range(self.table_test_suite.rowCount()):
                 self.colorize_table_row(row_index, ColorEnum.UI_FONT, ColorEnum.WHITE)
@@ -186,11 +185,10 @@ class MainWindow():
 
     def on_btn_new_test_click(self):
 
-        self.reset_test_suite()
-
-        self.test_case_ui = TestCaseWindow(self)
-        self.test_case_ui.setup_ui()
-        self.test_case_ui.show()
+        if self.reset_test_suite() != MessageEnum.NO:
+            self.test_case_ui = TestCaseWindow(self)
+            self.test_case_ui.setup_ui()
+            self.test_case_ui.show()
 
 
     def on_btn_remove_test_click(self):
@@ -276,7 +274,7 @@ class MainWindow():
             csv_writer.writerow(["data_call", "test_input" , "expected_output"])
 
             for row_index in rows_to_save:
-                data_call = self.table_test_suite.item(row_index, 0).text().lower()
+                data_call = self.table_test_suite.item(row_index, 0).text()
                 test_input = self.table_test_suite.item(row_index, 1).text().replace("\n", ';').replace(',', '&')
                 expected_output = self.table_test_suite.item(row_index, 2).text().replace("\n", ';').replace(',', '&')
 
@@ -316,14 +314,15 @@ class MainWindow():
 
         for row_index in rows_to_run:
 
-            data_call = self.table_test_suite.item(row_index, 0).text().lower()
-            test_input = self.table_test_suite.item(row_index, 1).text().replace(':', '=', 1).replace("\n", '&').replace(' ', '')
+            data_call = self.table_test_suite.item(row_index, 0).text()
+            test_input = self.table_test_suite.item(row_index, 1).text().replace("\n", '&').replace(' ', '')
             
             expected_output = {}
             for param_value_pair in self.table_test_suite.item(row_index, 2).text().replace(' ', '').split("\n"):
-                param_value_set = param_value_pair.split(':')
-                param = param_value_set.pop(0)
-                value = param_value_set.pop() if len(param_value_set) == 1 else ':'.join(param_value_set)
+                # param_value_set = param_value_pair.split('=')
+                # param = param_value_set.pop(0)
+                # value = param_value_set.pop() if len(param_value_set) == 1 else ':'.join(param_value_set)
+                param, value = param_value_pair.split('=', 1)
                 expected_output[param] = value
 
             print(f"Test Case {row_index+1} ({num_tests_run+1}/{num_total_tests}):", end=' ')
@@ -356,7 +355,7 @@ class MainWindow():
             else:
                 failed_output = []
                 for param, value in test_output.items():
-                    failed_output.append(f"{param}: {value}")
+                    failed_output.append(f"{param} = {value}")
 
                 failed_output = "\n".join(failed_output)
                 item_failed_output = QTableWidgetItem(failed_output)
@@ -365,3 +364,5 @@ class MainWindow():
                 self.table_test_suite.resizeRowsToContents()
 
                 self.colorize_table_row(row_index, ColorEnum.BLACK, ColorEnum.FAILURE)
+
+            QApplication.processEvents()

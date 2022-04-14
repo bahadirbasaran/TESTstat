@@ -40,6 +40,9 @@ class TestStat():
             elif flag == INCLUDE:
                 return all([p in output_value for p in param_set[param].split(',')])
 
+            elif flag == INCLUDE_KEYS:
+                return all([p in output_value.keys() for p in param_set[param].split(',')])
+
             elif flag == MATCH:
                 return param_set[param] == output_value
 
@@ -95,7 +98,7 @@ class TestStat():
                     _check_current_level(current_level[field], f"{current_identifier}->{field}")
 
         failed_params = {}
-        verbose_params = {}
+        nested_params = {}
 
         if expected_output.pop("status_code") != str(test_output["status_code"]):
             failed_params["status_code"] = str(test_output["status_code"])
@@ -118,8 +121,8 @@ class TestStat():
                 failed_params[param] = f"The response does not include this key!"
                 continue
 
-            if param.split("->")[0] in VERBOSE_PARAMS:
-                verbose_params[param] = value
+            if param.split("->")[0] in NESTED_PARAMS:
+                nested_params[param] = value
                 continue
 
             test_output_value = _get_inner_param_value(param, test_output["data"])
@@ -142,26 +145,27 @@ class TestStat():
 
             failed_params[param] = test_output_value
 
-        for verbose_param, fields in reshape_param_set(verbose_params).items():
 
-            # If checkbox "Not Empty" is checked for a verbose param,
+        for nested_param, fields in reshape_param_set(nested_params).items():
+
+            # If checkbox "Not Empty" is checked for a nested param,
             # check if the corresponding response list of the param is empty
             if fields == "notempty":
-                if not test_output["data"][verbose_param]:
-                    failed_params[verbose_param] = []
+                if not test_output["data"][nested_param]:
+                    failed_params[nested_param] = []
                 continue
             
             is_match = False
             resulting_bools = []
 
-            # Check if there is a block in test_output["data"][verbose_param] that match with all fields of same verbose_param
-            for block in test_output["data"][verbose_param]:
+            # Check if there is a block in test_output["data"][nested_param] that match with all fields of same nested_param
+            for block in test_output["data"][nested_param]:
                 
                 # Jump to next block if current one dos not include all fields
                 if not all(field in block for field in fields):
                     continue
                 
-                _check_current_level(fields, verbose_param)
+                _check_current_level(fields, nested_param)
 
                 if all(resulting_bools):
                     is_match = True
@@ -170,7 +174,7 @@ class TestStat():
                     resulting_bools.clear()
 
             if not is_match:
-                failed_params[verbose_param] = "No item matching all the expected inputs found!"
+                failed_params[nested_param] = "No item matching all the expected inputs found!"
 
         return failed_params
 
