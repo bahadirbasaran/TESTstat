@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import QMainWindow, QWidget, QGroupBox, QHBoxLayout, \
                             QLabel, QPushButton, QComboBox, QTableWidget, \
                             QTableWidgetItem, QProgressBar, QLineEdit, QApplication
 
+
 TEST_CASES_PATH = "data/test_cases.csv"
 
 
@@ -37,10 +38,10 @@ class MainWindow():
         self.horizontalLayout = QHBoxLayout(self.layoutWidget)
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
 
-        self.label_api_source = QLabel(self.layoutWidget)
-        self.label_api_source.setText("API Source:")
-        self.label_api_source.setStyleSheet("font-weight: bold;")
-        self.horizontalLayout.addWidget(self.label_api_source)
+        self.label_host = QLabel(self.layoutWidget)
+        self.label_host.setText("API Source:")
+        self.label_host.setStyleSheet("font-weight: bold;")
+        self.horizontalLayout.addWidget(self.label_host)
 
         self.btn_run = QPushButton(self.groupbox_config, clicked=lambda: self.on_btn_run_click())
         self.btn_run.setText("Run Tests")
@@ -56,8 +57,8 @@ class MainWindow():
         self.status.setFont(font)
         self.status.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter)
 
-        self.combobox_api_source = QComboBox(self.layoutWidget)
-        self.combobox_api_source.addItems([
+        self.combobox_host = QComboBox(self.layoutWidget)
+        self.combobox_host.addItems([
             "Localhost",
             "stat.ripe.net",
             "dev001.stat.ripe.net",
@@ -69,11 +70,11 @@ class MainWindow():
             "dev007.stat.ripe.net",
             "dev008.stat.ripe.net"
         ])
-        self.combobox_api_source.currentIndexChanged.connect(
-            self.on_combobox_api_source_changed,
-            self.combobox_api_source.currentIndex()
+        self.combobox_host.currentIndexChanged.connect(
+            self.on_combobox_host_changed,
+            self.combobox_host.currentIndex()
         )
-        self.horizontalLayout.addWidget(self.combobox_api_source)
+        self.horizontalLayout.addWidget(self.combobox_host)
 
         self.port = QLineEdit(self.layoutWidget)
         self.port.setStyleSheet("background-color: rgb(255, 255, 255);")
@@ -171,7 +172,7 @@ class MainWindow():
         return checked_data_calls_indexes
 
 
-    def on_combobox_api_source_changed(self, combobox_index):
+    def on_combobox_host_changed(self, combobox_index):
         
         if combobox_index != 0:
             self.port.setDisabled(True)
@@ -294,13 +295,13 @@ class MainWindow():
         num_passed_tests = 0
         num_tests_run = 0
         num_total_tests = len(rows_to_run)
-        api_source = self.combobox_api_source.currentText()
+        host = self.combobox_host.currentText()
 
         self.progress_bar.show()
         self.progress_bar.setProperty("maximum", num_total_tests)
         self.status.setText(f"{num_passed_tests} / {num_total_tests} passed")
 
-        if api_source == "Localhost":
+        if host == "Localhost":
             port = "8000" if not self.port.text() else self.port.text()
 
             if not port.isdecimal():
@@ -310,7 +311,7 @@ class MainWindow():
             teststat = TestStat("localhost", port)
 
         else:
-            teststat = TestStat(api_source)
+            teststat = TestStat(host)
 
         for row_index in rows_to_run:
 
@@ -319,9 +320,6 @@ class MainWindow():
             
             expected_output = {}
             for param_value_pair in self.table_test_suite.item(row_index, 2).text().replace(' ', '').split("\n"):
-                # param_value_set = param_value_pair.split('=')
-                # param = param_value_set.pop(0)
-                # value = param_value_set.pop() if len(param_value_set) == 1 else ':'.join(param_value_set)
                 param, value = param_value_pair.split('=', 1)
                 expected_output[param] = value
 

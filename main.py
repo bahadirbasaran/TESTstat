@@ -1,10 +1,12 @@
-import sys, os
+import os
+import sys
 
 sys.path.append(os.path.abspath("."))
 
 from gui.main_window import MainWindow
 
 from PyQt5.QtWidgets import QApplication
+
 
 if __name__ == "__main__":
 

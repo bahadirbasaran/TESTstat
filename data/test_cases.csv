@@ -24,7 +24,7 @@ address-space-usage,resource = 193/23,status_code = 200;ip_stats->status = assig
 allocation-history,resource = 190.28,status_code = 200
 allocation-history,resource = loremipsum,status_code = 200
 allocation-history,resource = 190.28,status_code = 200;resource = 12451868
-allocation-history,resource = 190.28,status_code = 200;query_starttime = 2000-01-01T00:00:00;query_endtime = 2022-04-04T00:00:00
+allocation-history,resource = 190.28,status_code = 200;query_starttime = 2000-01-01t00:00:00;query_endtime = 2022-04-04t00:00:00
 allocation-history,resource = 190.28,status_code = 200;iana->resource = 65537-4294967294;iana->status = iana
 allocation-history,resource = 190.28,status_code = 200;iana = not empty
 allocation-history,resource = 190.28,status_code = 200;ripencc = not empty
@@ -32,7 +32,7 @@ allocation-history,resource = 140.78/16;starttime = 2020-12-12T12:00,status_code
 announced-prefixes,resource = 3333,status_code = 200
 announced-prefixes,resource = loremipsum,status_code = 200
 announced-prefixes,resource = 3333,status_code = 200;prefixes = not empty
-announced-prefixes,resource = as3333;starttime = 2020-12-12T12:00,status_code = 200;prefixes->prefix = 2001:67c:2e8::/48;earliest_time = 2000-08-01T00:00:00
+announced-prefixes,resource = as3333;starttime = 2020-12-12T12:00,status_code = 200;prefixes->prefix = 2001:67c:2e8::/48;earliest_time = 2000-08-01t00:00:00
 announced-prefixes,resource = 3333,status_code = 200;prefixes->prefix = 193.0.18.0/10
 as-path-length,resource = 1111,status_code = 200
 as-path-length,resource = loremipsum,status_code = 200
@@ -62,7 +62,7 @@ asn-neighbours-history,resource = 1205,status_code = 200
 asn-neighbours-history,resource = loremipsum,status_code = 200
 asn-neighbours-history,resource = 1205,status_code = 200;neighbours = not empty
 asn-neighbours-history,resource = 1205;starttime = 2020-10-10T12:00;max_rows = 50,status_code = 200;neighbours = not empty
-asn-neighbours-history,resource = 1205;starttime = 2020-10-10T12:00;max_rows = 50,status_code = 200;neighbours->neighbour = >=1000;query_starttime = 2022-01-13T00:00:00;resource = 1205
+asn-neighbours-history,resource = 1205;starttime = 2020-10-10T12:00;max_rows = 50,status_code = 200;neighbours->neighbour = >=1000;query_starttime = 2022-01-13t00:00:00;resource = 1205
 dns-chain,resource = www.ripe.net,status_code = 200
 dns-chain,resource = loremipsum,status_code = 200
 dns-chain,resource = www.ripe.net,status_code = 200;forward_nodes = www.ripe.net&www.ripe.net.cdn.cloudflare.net;reverse_nodes = 104.18.21.44&104.18.20.44;nameservers = 193.0.19.101;authoritative_nameservers = manus.authdns.ripe.net&rirns.arin.net

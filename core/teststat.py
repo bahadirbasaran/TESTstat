@@ -6,10 +6,10 @@ from core.utils import filter_param_set, reshape_param_set
 
 class TestStat():
 
-    def __init__(self, api_source, port=8000):
+    def __init__(self, host, port=8000):
 
-        self.api_source = api_source
-        self.query = f"https://127.0.0.1:{port}/data/" if api_source == "localhost" else f"https://{api_source}/data/"
+        self.host = host
+        self.query = f"https://127.0.0.1:{port}/data/" if host == "localhost" else f"https://{host}/data/"
 
     
     def evaluate_result(self, data_call, test_output, expected_output):
@@ -187,7 +187,7 @@ class TestStat():
             response = requests.get(request)
 
         except requests.exceptions.ConnectionError:
-            return f"Connection to {self.api_source} could not be established!"
+            return f"Connection to {self.host} could not be established!"
         
         except requests.exceptions.Timeout:
             return "Connection timed out!"
