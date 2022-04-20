@@ -1,4 +1,4 @@
-from core.utils import throw_message
+from gui.utils import throw_message
 from core.config import DATA_CALL_MAP, NESTED_PARAMS
 
 from PyQt5.QtCore import Qt, QRect, QMetaObject

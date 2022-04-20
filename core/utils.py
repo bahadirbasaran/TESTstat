@@ -1,20 +1,3 @@
-from PyQt5 import QtWidgets, QtGui
-
-
-class MessageEnum():
-    NO = 65536
-    YES = 16384
-
-
-class ColorEnum():
-    FAILURE = QtGui.QColor("#FFB8B8")
-    SUCCESS = QtGui.QColor("#D4FCD7")
-    TIMEOUT = QtGui.QColor("F5B445")
-    BLACK = QtGui.QColor("#000000")
-    WHITE = QtGui.QColor("#FFFFFF")
-    UI_FONT = QtGui.QColor("#424D70")
-
-
 def filter_param_set(param_set, filtered_param_set={}, current_level=None):
 
     def _filter(val):
@@ -130,22 +113,3 @@ def reshape_param_set(param_set):
         current_dict[last] = value
 
     return reshaped_param_set
-
-
-def throw_message(type, title, message):
-
-    msg = QtWidgets.QMessageBox()
-    msg.setText(message)
-    msg.setWindowTitle(title)
-
-    if type == "critical":
-        msg.setIcon(QtWidgets.QMessageBox.Critical)
-        msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
-
-    elif type == "warning":
-        msg.setIcon(QtWidgets.QMessageBox.Warning)
-        msg.setStandardButtons(QtWidgets.QMessageBox.No | QtWidgets.QMessageBox.Yes)
-    
-    ret_val = msg.exec_()
-
-    return ret_val

@@ -2,7 +2,7 @@ import csv
 
 from gui.test_case_window import TestCaseWindow
 from core.teststat import TestStat
-from core.utils import throw_message, MessageEnum, ColorEnum
+from gui.utils import MessageEnum, ColorEnum, throw_message
 
 from PyQt5.QtCore import Qt, QRect, QMetaObject
 from PyQt5.QtGui import QFont
