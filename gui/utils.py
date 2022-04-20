@@ -9,7 +9,7 @@ class MessageEnum():
 class ColorEnum():
     FAILURE = QColor("#FFB8B8")
     SUCCESS = QColor("#D4FCD7")
-    TIMEOUT = QColor("F5B445")
+    TIMEOUT = QColor("#F5B445")
     BLACK = QColor("#000000")
     WHITE = QColor("#FFFFFF")
     UI_FONT = QColor("#424D70")
