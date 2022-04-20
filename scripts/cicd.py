@@ -36,6 +36,8 @@ def run_tests():
 
             test_output = teststat.run_test(data_call, test_input, expected_output)
 
+            print("----> Expected: ", row[2].replace(';', ' | '))
+
             if test_output:
                 for param, value in expected_output.items():
                     print(f"Parameter {param}:")
