@@ -184,13 +184,13 @@ class TestStat():
         try:
             request = f"{self.query}{data_call}/data.json?{test_input}"
             print(request)
-            response = requests.get(request)
+            response = requests.get(request, timeout=60)
 
         except requests.exceptions.ConnectionError:
             return f"Connection to {self.host} could not be established!"
         
-        except requests.exceptions.Timeout:
-            return "Connection timed out!"
+        except (requests.exceptions.Timeout, requests.exceptions.JSONDecodeError) as e:
+            return "timeout"
 
         test_result = self.evaluate_result(data_call, response.json(), expected_output)
 

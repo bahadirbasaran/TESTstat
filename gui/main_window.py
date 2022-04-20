@@ -328,9 +328,11 @@ class MainWindow():
             test_output = teststat.run_test(data_call, test_input, expected_output)
 
             if isinstance(test_output, str):
-                if test_output == "Connection timed out!":
+                if test_output == "timeout":
+                    empty_item = QTableWidgetItem("error: connection timed out!")
+                    self.table_test_suite.setItem(row_index, 3, empty_item)
                     self.colorize_table_row(row_index, ColorEnum.BLACK, ColorEnum.TIMEOUT)
-                    throw_message("critical", "Test Case {row_index}", "Test Case {row_index} could not run because of time out!")
+                    throw_message("critical", f"Test Case {row_index+1}", f"Test Case {row_index+1} could not run because of time out!")
                     num_tests_run += 1
                     self.progress_bar.setProperty("value", num_tests_run)
                     continue
