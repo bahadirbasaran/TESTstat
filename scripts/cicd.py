@@ -41,7 +41,7 @@ def run_tests():
                     print(f"Parameter {param}:")
                     print(f"Expected: {value} - Actual: {test_output[param]}")
 
-                raise Exception(f"Job failed for Test Case {row_index}!")
+                sys.exit(f"Job failed for Test Case {row_index}!")
 
 
 if __name__ == "__main__":
