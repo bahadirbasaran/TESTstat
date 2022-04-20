@@ -52,6 +52,8 @@ if __name__ == "__main__":
 
     host = args.host if args.host else "stat.ripe.net"
 
+    print(f"The host: {host}")
+
     run_tests()
 
 
