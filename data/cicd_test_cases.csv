@@ -20,6 +20,10 @@ allocation-history,resource = 140.78/16;starttime = 2020-12-12T12:00,status_code
 announced-prefixes,resource = 3333,status_code = 200
 announced-prefixes,resource = 3333,status_code = 200;prefixes = not empty
 announced-prefixes,resource = as3333;starttime = 2020-12-12T12:00,status_code = 200;prefixes->prefix = 2001:67c:2e8::/48;earliest_time = 2000-08-01t00:00:00
+as-overview,resource = 1111,status_code = 200
+as-overview,resource = 127.0.0.1,status_code = 200
+as-overview,resource = 140.78/16,status_code = 200
+as-overview,resource = loremipsum,status_code = 200
 as-path-length,resource = 1111,status_code = 200
 as-path-length,resource = 1111,status_code = 200;stats->count = >=53
 as-path-length,resource = 1111,status_code = 200;stats->count = <53
