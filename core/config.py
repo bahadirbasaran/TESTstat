@@ -17,6 +17,7 @@ NESTED_PARAMS = [
     "exports",
     "neighbours",
     # "neighbours->timelines',
+    "probes"
 ]
 
 
@@ -354,31 +355,31 @@ DATA_CALL_MAP = {
         "optional_params": [],
         "output_params": {
             "probes": {
-                "prefix_v4": [],
-                "status": [],
-                "status_name": [],
-                "prefix_v6": [],
-                "is_anchor": [],
-                "last_connected": [],
-                "tags": [],
-                "type": [],
-                "address_v6": [],
-                "latitude": [],
-                "longitude": [],
-                "id": [],
-                "address_v4": [],
-                "country_code": [],
-                "is_public": [],
-                "asn_v4": [],
-                "asn_v6": [],
-                "status_since": [],
-                "first_connected": [],
-                "total_uptime": []
+                "prefix_v4": [ANY, NOT_EMPTY, MATCH],
+                "status": [ANY, NOT_EMPTY, MATCH],
+                "status_name": [ANY, NOT_EMPTY, MATCH],
+                "prefix_v6": [ANY, NOT_EMPTY, MATCH],
+                "is_anchor": [ANY, NOT_EMPTY, MATCH],
+                "last_connected": [ANY, NOT_EMPTY, MATCH],
+                "tags": [ANY, NOT_EMPTY, INCLUDE],
+                "type": [ANY, NOT_EMPTY, MATCH],
+                "address_v6": [ANY, NOT_EMPTY, MATCH],
+                "latitude": [ANY, NOT_EMPTY, MATCH],
+                "longitude": [ANY, NOT_EMPTY, MATCH],
+                "id": [ANY, NOT_EMPTY, MATCH],
+                "address_v4": [ANY, NOT_EMPTY, MATCH],
+                "country_code": [ANY, NOT_EMPTY, MATCH],
+                "is_public": [ANY, NOT_EMPTY, MATCH],
+                "asn_v4": [ANY, NOT_EMPTY, MATCH],
+                "asn_v6": [ANY, NOT_EMPTY, MATCH],
+                "status_since": [ANY, NOT_EMPTY, MATCH],
+                "first_connected": [ANY, NOT_EMPTY, MATCH],
+                "total_uptime": [ANY, NOT_EMPTY, MATCH]
             },
             "stats": {
-                "total": []
+                "total": [ANY, NOT_EMPTY, MATCH, COMPARE]
             },
-            "resource": []
+            "resource": [ANY, NOT_EMPTY, MATCH]
         }
     },
 
@@ -571,6 +572,14 @@ DATA_CALL_MAP = {
                 "ipv6": []
             },
             "query_time": []
+        }
+    },
+
+    "country-resource-stats": {
+        "data_call_name": "Country Resource Stats",
+        "required_params": ["resource"],
+        "optional_params": ["starttime", "endtime", "resolution"],
+        "output_params": {
         }
     },
 

@@ -92,6 +92,8 @@ country-asns,resource = nl,status_code = 200
 country-asns,resource = loremipsum,status_code = 200
 country-resource-list,resource = at,status_code = 200
 country-resource-list,resource = loremipsum,status_code = 200
+country-resource-stats,resource = at,status_code = 200
+country-resource-stats,resource = loremipsum,status_code = 200
 atlas-targets,resource = 140.78/16,status_code = 200
 atlas-targets,resource = loremipsum,status_code = 200
 bgp-state,resource = 140.78/16,status_code = 200
