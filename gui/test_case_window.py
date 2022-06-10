@@ -258,13 +258,14 @@ class TestCaseWindow():
                     if getattr(self, f"checkbox_input_{var}").isChecked():
                         output_params.append(f"{label} = not empty")
                             
-
                 if isinstance(value, list):
                     reference_to_input = getattr(self, f"expected_input_{var}")
 
                     if reference_to_input.text() != '':
                         if reference_to_input.text().lower().replace(' ', '') == "notempty":
                             output_params.append(f"{label} = not empty")
+                        elif reference_to_input.text().lower().replace(' ', '') == "null":
+                            output_params.append(f"{label} = none")
                         else:
                             output_params.append(f"{label} = {reference_to_input.text().lower().replace(' ', '')}")
                 else:
@@ -299,6 +300,7 @@ class TestCaseWindow():
         item_data_call = QTableWidgetItem(self.data_call)
         item_test_input = QTableWidgetItem(test_input)
         item_expected_output = QTableWidgetItem(expected_output)
+        item_test_output = QTableWidgetItem("")
 
         item_data_call.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsEditable)
         item_data_call.setCheckState(Qt.Unchecked)
@@ -306,6 +308,7 @@ class TestCaseWindow():
         self.main_ui.table_test_suite.setItem(row_count, 0, item_data_call)
         self.main_ui.table_test_suite.setItem(row_count, 1, item_test_input)
         self.main_ui.table_test_suite.setItem(row_count, 2, item_expected_output)
+        self.main_ui.table_test_suite.setItem(row_count, 3, item_test_output)
 
         self.main_ui.table_test_suite.resizeRowsToContents()
 

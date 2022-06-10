@@ -2,14 +2,30 @@ import requests
 
 from core.config import *
 from core.utils import filter_param_set, reshape_param_set
+from gui.utils import throw_message
 
 
 class TestStat():
 
-    def __init__(self, host, port=8000):
+    def __init__(self, host, port, with_tls=True):
 
         self.host = host
-        self.query = f"https://127.0.0.1:{port}/data/" if host == "localhost" else f"https://{host}/data/"
+
+        protocol = "https" if with_tls else "http"
+
+        if (host == "127.0.0.1" or 
+                host.lower().replace(' ', '') == "localhost") and \
+                    port.isdecimal():
+            self.raw_query = f"http://127.0.0.1:{port}/data/"
+
+        elif port is None:
+            self.raw_query = f"{protocol}://{host}/data/"
+
+        elif port.isdecimal():
+            self.raw_query = f"{protocol}://{host}:{port}/data/"
+
+        else:
+            throw_message("critical", "Port Error", "Port cannot include characters!")
 
     
     def evaluate_result(self, data_call, test_output, expected_output):
@@ -182,9 +198,9 @@ class TestStat():
     def run_test(self, data_call, test_input, expected_output):
 
         try:
-            request = f"{self.query}{data_call}/data.json?{test_input}"
+            request = f"{self.raw_query}{data_call}/data.json?{test_input}"
             print(request)
-            response = requests.get(request, timeout=60)
+            response = requests.get(request, timeout=30)
 
         except requests.exceptions.ConnectionError:
             return f"Connection to {self.host} could not be established!"
