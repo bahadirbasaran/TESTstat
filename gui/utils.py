@@ -10,6 +10,7 @@ class MessageEnum():
     CRITICAL = 1
     WARNING = 2
 
+
 class ColorEnum():
     FAILURE = QColor("#FFB8B8")
     FAILURE_SECOND_HOST = QColor("#E2D4BA")
@@ -33,7 +34,7 @@ def throw_message(type, title, message):
     elif type == MessageEnum.WARNING:
         msg.setIcon(QMessageBox.Warning)
         msg.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
-    
+
     ret_val = msg.exec_()
 
     return ret_val
@@ -48,10 +49,10 @@ def format_table_item(text, csv_to_table=True):
 
     if param csv_to_table = False, table items are converted to save into csv:
     resource = 1111
-    sort_by = count             -> resource = 1111;sort_by = count                                      
+    sort_by = count             -> resource = 1111;sort_by = count
     irr_sources = ripe,radb     -> irr_sources = ripe&radb
     """
-    
+
     if csv_to_table:
         return text.replace(';', "\n").replace('&', ',')
     else:
