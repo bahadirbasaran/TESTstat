@@ -5,6 +5,10 @@ from PyQt5.QtGui import QColor
 class MessageEnum():
     NO = 65536
     YES = 16384
+    TIMEOUT = 408
+    CONNECTION_ERROR = 500
+    CRITICAL = 1
+    WARNING = 2
 
 class ColorEnum():
     FAILURE = QColor("#FFB8B8")
@@ -22,14 +26,33 @@ def throw_message(type, title, message):
     msg.setText(message)
     msg.setWindowTitle(title)
 
-    if type == "critical":
+    if type == MessageEnum.CRITICAL:
         msg.setIcon(QMessageBox.Critical)
         msg.setStandardButtons(QMessageBox.Ok)
 
-    elif type == "warning":
+    elif type == MessageEnum.WARNING:
         msg.setIcon(QMessageBox.Warning)
         msg.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
     
     ret_val = msg.exec_()
 
     return ret_val
+
+
+def format_table_item(text, csv_to_table=True):
+    """
+    if param csv_to_table = True, csv fields are formatted to load into table:
+    resource = 1111;sort_by = count     ->  resource = 1111
+                                            sort_by = count
+    irr_sources = ripe&radb             ->  irr_sources = ripe,radb
+
+    if param csv_to_table = False, table items are converted to save into csv:
+    resource = 1111
+    sort_by = count             -> resource = 1111;sort_by = count                                      
+    irr_sources = ripe,radb     -> irr_sources = ripe&radb
+    """
+    
+    if csv_to_table:
+        return text.replace(';', "\n").replace('&', ',')
+    else:
+        return text.replace("\n", ';').replace(',', '&')

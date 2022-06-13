@@ -1,16 +1,15 @@
-from cProfile import label
 import csv
 
 from gui.test_case_window import TestCaseWindow
 from core.teststat import TestStat
-from gui.utils import MessageEnum, ColorEnum, throw_message
+from gui.utils import MessageEnum, ColorEnum, throw_message, format_table_item
 
 from PyQt5.QtCore import Qt, QRect, QMetaObject
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QMainWindow, QWidget, QGroupBox, QHBoxLayout, \
                             QLabel, QPushButton, QComboBox, QTableWidget, \
                             QTableWidgetItem, QProgressBar, QLineEdit, \
-                            QApplication, QDialog, QToolButton
+                            QApplication, QDialog
 
 
 TEST_CASES_PATH = "data/test_cases.csv"
@@ -32,232 +31,362 @@ class MainWindow():
 
     def __init__(self):
 
-        self.MainWindow = QMainWindow()
-        self.MainWindow.setWindowTitle("TESTstat")
-        self.MainWindow.resize(1280, 800)
-        self.MainWindow.setStyleSheet("background-color: rgb(235, 236, 244); color: rgb(66, 77, 112);")
-        self.centralwidget = QWidget(self.MainWindow)
+        self.main_window = QMainWindow()
+        self.main_window.setWindowTitle("TESTstat")
+        self.main_window.resize(1280, 800)
+        self.main_window.setStyleSheet((
+            "background-color: rgb(235, 236, 244);"
+            "color: rgb(66, 77, 112);"
+        ))
 
-        self.num_test_case = 0
-
+        self.font = QFont()
+        self.font.setBold(True)
 
     def setup_ui(self):
-    
-        self.groupbox_config = QGroupBox(self.centralwidget)
-        self.groupbox_config.setGeometry(QRect(50, 44, 430, 130))
-        #self.groupbox_config.setStyleSheet("background-color: rgb(235, 236, 244);")
+        """Sets main window up"""
 
-        self.layoutWidget = QWidget(self.groupbox_config)
-        self.layoutWidget.setGeometry(QRect(20, 20, 389, 32))
+        central_widget = QWidget(self.main_window)
 
-        self.horizontal_layout = QHBoxLayout(self.layoutWidget)
-        self.horizontal_layout.setContentsMargins(0, 0, 0, 0)
+        groupbox_config = QGroupBox(central_widget)
+        groupbox_config.setGeometry(QRect(50, 44, 430, 130))
 
-        self.label_host = QLabel(self.layoutWidget)
-        self.label_host.setText("API Source:")
-        self.label_host.setStyleSheet("font-weight: bold;")
-        self.horizontal_layout.addWidget(self.label_host)
+        layout_widget = QWidget(groupbox_config)
+        layout_widget.setGeometry(QRect(20, 20, 389, 32))
 
-        self.btn_run = QPushButton(self.groupbox_config, clicked=lambda: self.on_btn_run_click())
-        self.btn_run.setText("Run Tests")
-        self.btn_run.setStyleSheet("font-weight: bold;")
-        self.btn_run.setGeometry(QRect(20, 70, 111, 32))
+        horizontal_layout = QHBoxLayout(layout_widget)
+        horizontal_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.btn_compare = QPushButton(self.groupbox_config, clicked=lambda: self.on_btn_compare_click())
-        self.btn_compare.setText("Compare")
-        self.btn_compare.setStyleSheet("font-weight: bold;")
-        self.btn_compare.setGeometry(QRect(144, 70, 111, 32))
+        # Test cases table
 
-        self.status = QLabel(self.groupbox_config)
-        self.status.setGeometry(QRect(255, 70, 150, 32))
-        self.status.setText(f"Tests: {self.num_test_case}")
-        font = QFont()
-        font.setBold(True)
-        font.setPointSize(14)
-        self.status.setFont(font)
-        self.status.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter)
-
-        self.combobox_host = QComboBox(self.layoutWidget)
-        self.combobox_host.addItems(HOSTS)
-        self.combobox_host.currentIndexChanged.connect(
-            lambda:self.on_combobox_host_changed(self.combobox_host, self.port)
-        )
-        self.horizontal_layout.addWidget(self.combobox_host)
-
-        self.port = QLineEdit(self.layoutWidget)
-        self.port.setStyleSheet("background-color: rgb(255, 255, 255);")
-        self.port.setPlaceholderText("Port")
-        self.port.setText("8000")
-        self.horizontal_layout.addWidget(self.port)
-
-        self.table_test_suite = QTableWidget(self.centralwidget)
+        self.table_test_suite = QTableWidget(central_widget)
         self.table_test_suite.setGeometry(QRect(50, 200, 1171, 470))
-        self.table_test_suite.setStyleSheet("background-color: rgb(255, 255, 255);")
         self.table_test_suite.setColumnCount(4)
         self.table_test_suite.setRowCount(0)
         self.table_test_suite.setColumnWidth(0, 200)
         self.table_test_suite.setColumnWidth(1, 322)
         self.table_test_suite.setColumnWidth(2, 322)
         self.table_test_suite.setColumnWidth(3, 322)
+        self.table_test_suite.setStyleSheet(
+            "background-color: rgb(255, 255, 255);"
+        )
 
-        for index, column_name in enumerate(["Data Call", "Test Input", "Expected Output", "Output"]):
+        table_cols = ["Data Call", "Test Input", "Expected Output", "Output"]
+        for index, column_name in enumerate(table_cols):
             item = QTableWidgetItem(column_name)
-            font = QFont()
-            font.setPointSize(12)
-            font.setBold(True)
-            item.setFont(font)
+            self.font.setPointSize(12)
+            item.setFont(self.font)
             self.table_test_suite.setHorizontalHeaderItem(index, item)
 
-        self.btn_new_test = QPushButton(self.centralwidget, clicked=lambda: self.on_btn_new_test_click())
-        self.btn_new_test.setText("New Test Case")
-        self.btn_new_test.setGeometry(QRect(950, 700, 130, 32))
-        self.btn_new_test.setStyleSheet("font-weight: bold;")
+        # Labels
 
-        self.btn_remove_test = QPushButton(self.centralwidget, clicked=lambda: self.on_btn_remove_test_click())
-        self.btn_remove_test.setText("Remove Test Case")
-        self.btn_remove_test.setGeometry(QRect(1090, 700, 130, 32))
-        self.btn_remove_test.setStyleSheet("font-weight: bold;")
+        label_host = QLabel(layout_widget)
+        label_host.setText("API Source:")
+        label_host.setStyleSheet("font-weight: bold;")
 
-        self.btn_load_test = QPushButton(self.centralwidget, clicked=lambda: self.on_btn_load_test_click())
-        self.btn_load_test.setText("Load Test Suite")
-        self.btn_load_test.setGeometry(QRect(50, 700, 111, 32))
-        self.btn_load_test.setStyleSheet("font-weight: bold;")
+        self.label_status = QLabel(groupbox_config)
+        self.label_status.setGeometry(QRect(255, 70, 150, 32))
+        self.label_status.setText(f"Tests: {self.table_test_suite.rowCount()}")
 
-        self.btn_save_test = QPushButton(self.centralwidget, clicked=lambda: self.on_btn_save_test_click())
-        self.btn_save_test.setText("Save Test Suite")
-        self.btn_save_test.setGeometry(QRect(170, 700, 111, 32))
-        self.btn_save_test.setStyleSheet("font-weight: bold;")
+        self.font.setPointSize(14)
+        self.label_status.setFont(self.font)
+        self.label_status.setAlignment(
+            Qt.AlignRight |
+            Qt.AlignTrailing |
+            Qt.AlignVCenter
+        )
 
-        self.progress_bar = QProgressBar(self.groupbox_config)
+        # Buttons
+
+        btn_run = QPushButton(
+            groupbox_config,
+            clicked=lambda: self.on_btn_run_click()
+        )
+        btn_run.setText("Run Tests")
+        btn_run.setStyleSheet("font-weight: bold;")
+        btn_run.setGeometry(QRect(20, 70, 111, 32))
+
+        btn_compare = QPushButton(
+            groupbox_config,
+            clicked=lambda: self.on_btn_compare_click()
+        )
+        btn_compare.setText("Compare")
+        btn_compare.setStyleSheet("font-weight: bold;")
+        btn_compare.setGeometry(QRect(144, 70, 111, 32))
+
+        btn_new_test = QPushButton(
+            central_widget,
+            clicked=lambda: self.on_btn_new_test_click()
+        )
+        btn_new_test.setText("New Test Case")
+        btn_new_test.setGeometry(QRect(950, 700, 130, 32))
+        btn_new_test.setStyleSheet("font-weight: bold;")
+
+        btn_remove_test = QPushButton(
+            central_widget,
+            clicked=lambda: self.on_btn_remove_test_click()
+        )
+        btn_remove_test.setText("Remove Test Case")
+        btn_remove_test.setGeometry(QRect(1090, 700, 130, 32))
+        btn_remove_test.setStyleSheet("font-weight: bold;")
+
+        btn_load_test = QPushButton(
+            central_widget,
+            clicked=lambda: self.on_btn_load_test_click()
+        )
+        btn_load_test.setText("Load Test Suite")
+        btn_load_test.setGeometry(QRect(50, 700, 111, 32))
+        btn_load_test.setStyleSheet("font-weight: bold;")
+
+        btn_save_test = QPushButton(
+            central_widget,
+            clicked=lambda: self.on_btn_save_test_click()
+        )
+        btn_save_test.setText("Save Test Suite")
+        btn_save_test.setGeometry(QRect(170, 700, 111, 32))
+        btn_save_test.setStyleSheet("font-weight: bold;")
+
+        # Comboboxes
+
+        self.combobox_host = QComboBox(layout_widget)
+        self.combobox_host.addItems(HOSTS)
+        self.combobox_host.currentIndexChanged.connect(
+            lambda: self.on_combobox_host_changed(
+                self.combobox_host,
+                self.port
+            )
+        )
+
+        # Line Edits
+
+        self.port = QLineEdit(layout_widget)
+        self.port.setStyleSheet("background-color: rgb(255, 255, 255);")
+        self.port.setPlaceholderText("Port")
+        self.port.setText("8000")
+
+        # Other indicators
+
+        self.progress_bar = QProgressBar(groupbox_config)
         self.progress_bar.setGeometry(QRect(20, 107, 390, 13))
         self.progress_bar.setProperty("value", 0)
         self.progress_bar.setOrientation(Qt.Horizontal)
         self.progress_bar.setInvertedAppearance(False)
         self.progress_bar.setTextDirection(QProgressBar.TopToBottom)
         self.progress_bar.hide()
-        
-        self.MainWindow.setCentralWidget(self.centralwidget)
 
-        QMetaObject.connectSlotsByName(self.MainWindow)
+        # Set the main window UI up
 
+        horizontal_layout.addWidget(label_host)
+        horizontal_layout.addWidget(self.combobox_host)
+        horizontal_layout.addWidget(self.port)
 
-    def show(self):
+        self.main_window.setCentralWidget(central_widget)
 
-        self.MainWindow.show()
+        QMetaObject.connectSlotsByName(self.main_window)
 
+        self.main_window.show()
 
-    def colorize_table_row(self, row_index, text_color, background_color):
+    # Utilization methods
+
+    def colorize_table_row(
+        self,
+        row_index,
+        text_color,
+        background_color,
+        process_immediately=True
+    ):
+        """Colorizes given row's background and text"""
 
         for col_index in range(self.table_test_suite.columnCount()):
-            self.table_test_suite.item(row_index, col_index).setForeground(text_color)
-            self.table_test_suite.item(row_index, col_index).setBackground(background_color)
+            self.table_test_suite.item(
+                row_index,
+                col_index
+            ).setForeground(text_color)
+            self.table_test_suite.item(
+                row_index,
+                col_index
+            ).setBackground(background_color)
 
-    
-    def reset_test_suite(self, confirmation=True):
+        if process_immediately:
+            QApplication.processEvents()
 
-         # Check if there is a result on the table remaining from a previous run
-        if confirmation and '/' in self.status.text():
-            ret_val = throw_message("warning", "Warning", "Are you sure you want to discard the test result?")
+    def reset_main_window(self, clear_tests=False, confirmation=True):
+
+        # Check if there is a result on the table remaining from a previous run
+        # TODO: Find more elegant way than checking '/' in the status label
+        if confirmation and '/' in self.label_status.text():
+            ret_val = throw_message(
+                MessageEnum.WARNING,
+                "Warning",
+                "Are you sure you want to discard the test result?"
+            )
             if ret_val == MessageEnum.NO:
                 return ret_val
-            
-        for row_index in range(self.table_test_suite.rowCount()):
-            self.colorize_table_row(row_index, ColorEnum.UI_FONT, ColorEnum.WHITE)
-            self.table_test_suite.item(row_index, self.table_test_suite.columnCount() - 1).setText('')
-            # if self.table_test_suite.item(row_index, 0).checkState() == Qt.Checked:
-            #     self.table_test_suite.item(row_index, 0).setCheckState(Qt.Unchecked)
 
-        self.status.setText(f"Test cases: {self.num_test_case}")
+        # Restore the status label
+        self.label_status.setText(f"Tests: {self.table_test_suite.rowCount()}")
+
+        # Restore the progress bar
         self.progress_bar.setProperty("value", 0)
         self.progress_bar.hide()
 
-
-    def get_checked_data_calls_indexes(self):
-
-        checked_data_calls_indexes = []
+        if clear_tests:
+            self.table_test_suite.clearContents()
+            self.table_test_suite.setRowCount(0)
+            self.label_status.setText("Tests: 0")
+            QApplication.processEvents()
+            return
 
         for row_index in range(self.table_test_suite.rowCount()):
-            if self.table_test_suite.item(row_index, 0).checkState() == Qt.Checked:
-                checked_data_calls_indexes.append(row_index)
+            self.colorize_table_row(
+                row_index,
+                ColorEnum.UI_FONT,
+                ColorEnum.WHITE,
+                False
+            )
 
-        return checked_data_calls_indexes
+            # Clear test outputs in each row
+            self.table_test_suite.item(
+                row_index,
+                self.table_test_suite.columnCount() - 1
+            ).setText('')
 
+            # TODO: Checkbox cleaning
+            # if self.table_test_suite.item(
+            #   row_index, 0).checkState() == Qt.Checked:
+            #   self.table_test_suite.item(
+            #       row_index, 0).setCheckState(Qt.Unchecked)
+
+        QApplication.processEvents()
+
+    def get_checked_row_indexes(self, return_all=True):
+        """
+        Returns the test case indexes checked by user
+        If param return_all = True and if none checked, returns all indexes
+        """
+
+        checked_row_indexes = []
+
+        for row_index in range(self.table_test_suite.rowCount()):
+            if self.table_test_suite.item(
+                row_index, 0
+            ).checkState() == Qt.Checked:
+                checked_row_indexes.append(row_index)
+
+        if return_all and not checked_row_indexes:
+            return list(range(self.table_test_suite.rowCount()))
+
+        return checked_row_indexes
+
+    # Combobox Slots
 
     def on_combobox_host_changed(self, combobox, port):
-        
+
         if combobox.currentText() == "Local Host":
             port.setText("8000")
         else:
             port.setText("")
             port.setPlaceholderText("Port")
 
+    # Button Slots
 
     def on_btn_new_test_click(self):
 
-        if ('/' in self.status.text() and 
-                self.reset_test_suite() != MessageEnum.NO) or \
-                    '/' not in self.status.text():
-            self.test_case_ui = TestCaseWindow(self)
-            self.test_case_ui.setup_ui()
-            self.test_case_ui.show()
-
+        # TODO: Find more elegant way than checking '/' in the status label
+        if ('/' in self.label_status.text() and
+                self.reset_main_window() != MessageEnum.NO) or \
+                    '/' not in self.label_status.text():
+            self.test_case_window_ui = TestCaseWindow(self)
+            self.test_case_window_ui.setup_ui()
 
     def on_btn_remove_test_click(self):
 
-        rows_to_remove = self.get_checked_data_calls_indexes()
+        rows_to_remove = self.get_checked_row_indexes()
 
         if not self.table_test_suite.rowCount():
-            throw_message("critical", "Error", "There is no test case to remove!")
+            throw_message(
+                MessageEnum.CRITICAL,
+                "Error",
+                "There is no test case to remove!"
+            )
             return
         elif not rows_to_remove:
-            throw_message("critical", "Error", "No test case selected!")
+            throw_message(
+                MessageEnum.CRITICAL,
+                "Error",
+                "No test case selected!"
+            )
             return
-        
-        if self.reset_test_suite() != MessageEnum.NO:
+
+        if self.reset_main_window() != MessageEnum.NO:
             for row_index in reversed(rows_to_remove):
                 self.table_test_suite.removeRow(row_index)
-                self.num_test_case -= 1
-                self.status.setText(f"Test cases: {self.num_test_case}")
-
+                self.label_status.setText(
+                    f"Tests: {self.table_test_suite.rowCount()}"
+                )
 
     def on_btn_load_test_click(self):
+        """Populates the table from TEST_CASES_PATH"""
 
         if self.table_test_suite.rowCount():
-            ret_val = throw_message("warning", "Warning", "Are you sure you want to override the test suite?")
+            ret_val = throw_message(
+                MessageEnum.WARNING,
+                "Warning",
+                "Are you sure you want to override the test suite?"
+            )
             if ret_val == MessageEnum.NO:
                 return
-            self.table_test_suite.clearContents()
-            self.table_test_suite.setRowCount(0)
-            self.num_test_case = 0
-            self.status.setText(f"Test cases: {self.num_test_case}")
 
-        self.progress_bar.hide()
+            self.reset_main_window(
+                clear_tests=True,
+                confirmation=False
+            )
 
         with open(TEST_CASES_PATH) as csv_file:
-            if csv_file.readline().strip() != "data_call,test_input,expected_output":
-                throw_message("critical", "Import Error", "The test suite is malformed!")
+            header = csv_file.readline().strip()
+            if header != "data_call,test_input,expected_output":
+                throw_message(
+                    MessageEnum.CRITICAL,
+                    "Import Error",
+                    "The test suite is malformed!"
+                )
                 return
             if len(csv_file.readlines()) < 1:
-                throw_message("critical", "Import Error", "There is no available test case to load!")
+                throw_message(
+                    MessageEnum.CRITICAL,
+                    "Import Error",
+                    "There is no available test case to load!"
+                )
                 return
-            
-        with open(TEST_CASES_PATH) as csv_file:
 
+        with open(TEST_CASES_PATH) as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
 
+            # Skip the header
             next(csv_reader)
 
             for index, row in enumerate(csv_reader):
+                csv_data_call, csv_test_input, csv_expected_output = row
+
+                # Insert a new row first
                 self.table_test_suite.setRowCount(index + 1)
 
-                item_data_call = QTableWidgetItem(row[0])
-                item_test_input = QTableWidgetItem(row[1].replace(';', "\n").replace('&', ','))
-                item_expected_output = QTableWidgetItem(row[2].replace(';', "\n").replace('&', ','))
-                item_test_output = QTableWidgetItem("")
+                # Create items for each column of the row
+                item_data_call = QTableWidgetItem(csv_data_call)
+                item_test_input = QTableWidgetItem(
+                    format_table_item(csv_test_input)
+                )
+                item_expected_output = QTableWidgetItem(
+                    format_table_item(csv_expected_output)
+                )
+                item_test_output = QTableWidgetItem('')
 
-                item_data_call.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsEditable)
+                item_data_call.setFlags(
+                    Qt.ItemIsUserCheckable |
+                    Qt.ItemIsEnabled |
+                    Qt.ItemIsEditable
+                )
                 item_data_call.setCheckState(Qt.Unchecked)
-                
+
                 self.table_test_suite.setItem(index, 0, item_data_call)
                 self.table_test_suite.setItem(index, 1, item_test_input)
                 self.table_test_suite.setItem(index, 2, item_expected_output)
@@ -265,174 +394,92 @@ class MainWindow():
 
                 self.table_test_suite.resizeRowsToContents()
 
-                self.num_test_case += 1
-                self.status.setText(f"Test cases: {self.num_test_case}")
-
+                self.label_status.setText(
+                    f"Tests: {self.table_test_suite.rowCount()}"
+                )
 
     def on_btn_save_test_click(self):
+        """Overrides TEST_CASES_PATH by using test cases in the table"""
 
         if not self.table_test_suite.rowCount():
-            throw_message("critical", "Save Error", "There is no available test case to save!")
+            throw_message(
+                MessageEnum.CRITICAL,
+                "Save Error",
+                "There is no available test case to save!"
+            )
             return
 
-        rows_to_save = self.get_checked_data_calls_indexes()
-        if not rows_to_save:
-            rows_to_save = [row_index for row_index in range(self.table_test_suite.rowCount())]
-
-        ret_val = throw_message("warning", "Warning", "Are you sure you want to override the test cases?")
+        ret_val = throw_message(
+            MessageEnum.WARNING,
+            "Warning",
+            "Are you sure you want to override the test cases?"
+        )
         if ret_val == MessageEnum.NO:
             return
 
         with open(TEST_CASES_PATH, 'w') as csv_file:
 
             csv_writer = csv.writer(csv_file, delimiter=',')
-            csv_writer.writerow(["data_call", "test_input" , "expected_output"])
+            csv_writer.writerow(["data_call", "test_input", "expected_output"])
 
-            for row_index in rows_to_save:
+            for row_index in self.get_checked_row_indexes():
                 data_call = self.table_test_suite.item(row_index, 0).text()
-                test_input = self.table_test_suite.item(row_index, 1).text().replace("\n", ';').replace(',', '&')
-                expected_output = self.table_test_suite.item(row_index, 2).text().replace("\n", ';').replace(',', '&')
+                test_input = format_table_item(
+                    self.table_test_suite.item(row_index, 1).text(),
+                    csv_to_table=False
+                )
+                expected_output = format_table_item(
+                    self.table_test_suite.item(row_index, 2).text(),
+                    csv_to_table=False
+                )
 
                 csv_writer.writerow([data_call, test_input, expected_output])
-        
 
     def on_btn_run_click(self):
+        """Runs all/selected test cases in the table"""
 
         if not self.table_test_suite.rowCount():
-            throw_message("critical", "Run Error", "There is no available test case to run!")
+            throw_message(
+                MessageEnum.CRITICAL,
+                "Run Error",
+                "There is no available test case to run!"
+            )
             return
-
-        tests_to_run = self.get_checked_data_calls_indexes()
-        # If there is no test case selected, run all
-        if not tests_to_run:
-            tests_to_run = [row_index for row_index in range(self.table_test_suite.rowCount())]
 
         host = self.combobox_host.currentText()
         port = None if not self.port.text() else self.port.text()
 
-        self.run_tests(tests_to_run, host, port)
-
-    
-    def run_tests(self, tests_to_run, host, port, return_failed_tests=False):
-
-        num_passed_tests = 0
-        num_tests_run = 0
-        num_total_tests = len(tests_to_run)
-        failed_tests = []
-
-        self.progress_bar.show()
-        self.progress_bar.setProperty("maximum", num_total_tests)
-        self.status.setText(f"{num_passed_tests} / {num_total_tests} passed")
-
-        teststat = TestStat(host, port)
-
-        for row_index in tests_to_run:
-
-            data_call = self.table_test_suite.item(row_index, 0).text()
-            test_input = self.table_test_suite.item(row_index, 1).text().replace("\n", '&').replace(' ', '')
-            
-            expected_output = {}
-            for param_value_pair in self.table_test_suite.item(row_index, 2).text().replace(' ', '').split("\n"):
-                param, value = param_value_pair.split('=', 1)
-                expected_output[param] = value
-
-            print(f"Test Case {row_index+1} ({num_tests_run+1}/{num_total_tests}):", end=' ')
-
-            test_output = teststat.run_test(data_call, test_input, expected_output)
-
-            if isinstance(test_output, str):
-                if test_output == "timeout":
-                    timed_out_item = QTableWidgetItem("Error: Connection timed out!")
-                    self.table_test_suite.setItem(row_index, 3, timed_out_item)
-                    self.colorize_table_row(row_index, ColorEnum.BLACK, ColorEnum.TIMEOUT)
-                    #throw_message("critical", f"Test Case {row_index+1}", f"Test Case {row_index+1} could not run because of time out!")
-                    num_tests_run += 1
-                    self.progress_bar.setProperty("value", num_tests_run)
-                    failed_tests.append(row_index)
-                    continue
-                else:
-                    throw_message("critical", "Connection Error", test_output)
-                    self.status.setText(f"Test cases: {self.num_test_case}")
-                    self.progress_bar.setProperty("value", 0)
-                    self.progress_bar.hide()
-                    return
-
-            num_tests_run += 1
-            self.progress_bar.setProperty("value", num_tests_run)
-
-            if not test_output:
-                num_passed_tests += 1
-                self.status.setText(f"{num_passed_tests} / {num_total_tests} passed")
-
-                self.colorize_table_row(row_index, ColorEnum.BLACK, ColorEnum.SUCCESS)
-            
-            else:
-                failed_tests.append(row_index)
-                failed_output = []
-                for param, value in test_output.items():
-                    failed_output.append(f"{param} = {value}")
-
-                item_failed_output = QTableWidgetItem("\n".join(failed_output))
-                self.table_test_suite.setItem(row_index, 3, item_failed_output)
-
-                self.table_test_suite.resizeRowsToContents()
-
-                self.colorize_table_row(row_index, ColorEnum.BLACK, ColorEnum.FAILURE)
-
-            QApplication.processEvents()
-
-        if return_failed_tests:
-            return failed_tests
-
+        self.run_tests(self.get_checked_row_indexes(), host, port)
 
     def on_btn_compare_click(self):
+        """Opens the comparison widget to choose a API source to compare"""
 
-        if self.reset_test_suite() != MessageEnum.NO:
+        if self.reset_main_window() != MessageEnum.NO:
 
             main_host = self.combobox_host.currentText()
 
             comparison_widget = QDialog()
             comparison_widget.setWindowTitle("Compare API Sources")
-            
+
+            horizontal_layout = QHBoxLayout(comparison_widget)
+            horizontal_layout.setContentsMargins(20, 60, 30, 100)
+
+            # Labels
+
             label_instruction = QLabel(comparison_widget)
             label_instruction.setText(
                 f"API Source to compare with {main_host}:"
             )
             label_instruction.setGeometry(QRect(20, 20, 350, 30))
 
-            horizontal_layout = QHBoxLayout(comparison_widget)
-            horizontal_layout.setContentsMargins(20, 60, 30, 100)
-
             label_second_host = QLabel()
             label_second_host.setText("API Source 2:")
             label_second_host.setStyleSheet("font-weight: bold;")
 
-
-            combobox_second_host = QComboBox()
-            hosts_but_main = [host for host in HOSTS if host != main_host]
-            combobox_second_host.addItems(hosts_but_main)
-
-            port_second_host = QLineEdit()
-            port_second_host.setStyleSheet("background-color: rgb(255, 255, 255);")
-            if combobox_second_host.currentText() == "Local Host":
-                port_second_host.setText("8000")
-            else:
-                port_second_host.setText("")
-                port_second_host.setPlaceholderText("Port")
-
-            combobox_second_host.currentIndexChanged.connect(
-                lambda: self.on_combobox_host_changed(
-                    combobox_second_host, 
-                    port_second_host
-                )
-            )
-
-            horizontal_layout.addWidget(label_second_host)
-            horizontal_layout.addWidget(combobox_second_host)
-            horizontal_layout.addWidget(port_second_host)
+            # Buttons
 
             btn_run_comparison = QPushButton(
-                comparison_widget, 
+                comparison_widget,
                 clicked=lambda: self.on_btn_run_comparison_click(
                     comparison_widget,
                     combobox_second_host.currentText(),
@@ -441,48 +488,87 @@ class MainWindow():
             )
             btn_run_comparison.setText("Compare")
             btn_run_comparison.setStyleSheet("font-weight: bold;")
-            # Temporary solution. This will be auto-arranged placement
             btn_run_comparison.setGeometry(QRect(155, 110, 111, 32))
+
+            # Comboboxes
+
+            combobox_second_host = QComboBox()
+            hosts_but_main = [host for host in HOSTS if host != main_host]
+            combobox_second_host.addItems(hosts_but_main)
+
+            # Line Edits
+
+            port_second_host = QLineEdit()
+            port_second_host.setStyleSheet(
+                "background-color: rgb(255, 255, 255);"
+            )
+            if combobox_second_host.currentText() == "Local Host":
+                port_second_host.setText("8000")
+            else:
+                port_second_host.setText("")
+                port_second_host.setPlaceholderText("Port")
+
+            combobox_second_host.currentIndexChanged.connect(
+                lambda: self.on_combobox_host_changed(
+                    combobox_second_host,
+                    port_second_host
+                )
+            )
+
+            horizontal_layout.addWidget(label_second_host)
+            horizontal_layout.addWidget(combobox_second_host)
+            horizontal_layout.addWidget(port_second_host)
 
             comparison_widget.exec()
 
+    def on_btn_run_comparison_click(
+        self,
+        widget,
+        second_host,
+        port_second_host
+    ):
+        """
+        Compares two API sources and lists only the test cases that
+        fail on one source and pass on the other and vice versa
+        """
 
-    def on_btn_run_comparison_click(self, widget, second_host, port_second_host):
-
+        # Close the widget first
         widget.close()
 
         if not self.table_test_suite.rowCount():
-            throw_message("critical", "Run Error", "There is no available test case to run!")
+            throw_message(
+                MessageEnum.CRITICAL,
+                "Run Error",
+                "There is no available test case to run!"
+            )
             return
 
-        tests_to_run = self.get_checked_data_calls_indexes()
-        # If there is no test case selected, run all
-        if not tests_to_run:
-            tests_to_run = [row_index for row_index in range(self.table_test_suite.rowCount())]
+        tests_to_run = self.get_checked_row_indexes()
 
         main_host = self.combobox_host.currentText()
         port_main_host = None if not self.port.text() else self.port.text()
         port_second_host = None if not port_second_host else port_second_host
 
         failed_tests_main_host = self.run_tests(
-            tests_to_run, 
-            main_host, 
+            tests_to_run,
+            main_host,
             port_main_host,
             return_failed_tests=True
         )
 
-        self.reset_test_suite(confirmation=False)
+        self.reset_main_window(confirmation=False)
 
+        # Change the combobox on main window to indicate the host of second run
         self.combobox_host.setCurrentIndex(HOSTS.index(second_host))
 
         failed_tests_second_host = self.run_tests(
-            tests_to_run, 
-            second_host, 
+            tests_to_run,
+            second_host,
             port_second_host,
             return_failed_tests=True
         )
 
-        self.reset_test_suite(confirmation=False)
+        self.reset_main_window(confirmation=False)
 
         failed_tests_main_host, failed_tests_second_host = (
             set(failed_tests_main_host) - set(failed_tests_second_host),
@@ -492,20 +578,123 @@ class MainWindow():
         for row_index in failed_tests_main_host:
             item_failed_output = QTableWidgetItem(f"Failed at {main_host}")
             self.table_test_suite.setItem(row_index, 3, item_failed_output)
-
-            self.table_test_suite.resizeRowsToContents()
-
-            self.colorize_table_row(row_index, ColorEnum.BLACK, ColorEnum.FAILURE)
-
-            QApplication.processEvents()
+            self.colorize_table_row(
+                row_index,
+                ColorEnum.BLACK,
+                ColorEnum.FAILURE
+            )
 
         for row_index in failed_tests_second_host:
             item_failed_output = QTableWidgetItem(f"Failed at {second_host}")
             self.table_test_suite.setItem(row_index, 3, item_failed_output)
+            self.colorize_table_row(
+                row_index,
+                ColorEnum.BLACK,
+                ColorEnum.FAILURE_SECOND_HOST
+            )
 
-            self.table_test_suite.resizeRowsToContents()
+        self.table_test_suite.resizeRowsToContents()
 
-            self.colorize_table_row(row_index, ColorEnum.BLACK, ColorEnum.FAILURE_SECOND_HOST)
+    def run_tests(self, tests_to_run, host, port, return_failed_tests=False):
 
-            QApplication.processEvents()
+        num_tests_run = 0
+        num_passed_tests = 0
+        num_total_tests = len(tests_to_run)
+        failed_tests = []
 
+        self.progress_bar.show()
+        self.progress_bar.setProperty("maximum", num_total_tests)
+        self.label_status.setText(
+            f"{num_passed_tests} / {num_total_tests} passed"
+        )
+
+        teststat = TestStat(host, port)
+
+        for row_index in tests_to_run:
+            data_call = self.table_test_suite.item(row_index, 0).text()
+            test_input = self.table_test_suite.item(row_index, 1).text()
+            expected_output = self.table_test_suite.item(row_index, 2).text()
+
+            # Format table items for the run_test method of the TestStat class
+            test_input = test_input.replace("\n", '&').replace(' ', '')
+            expected_pairs = expected_output.replace(' ', '').split("\n")
+
+            expected_output = {}
+            for param_value_pair in expected_pairs:
+                # Inputs may include more than one '='
+                param, value = param_value_pair.split('=', 1)
+                expected_output[param] = value
+
+            print(
+                f"Case {row_index+1} ({num_tests_run+1}/{num_total_tests}):",
+                end=' '
+            )
+
+            # test_output:
+            #   {}  -> test is successful
+            #   int -> test could not be executed (connection error, timeout)
+            #   {param: val} -> test output that does not match with expected
+            test_output = teststat.run_test(
+                data_call,
+                test_input,
+                expected_output
+            )
+
+            # Error handling
+
+            if test_output == MessageEnum.TIMEOUT:
+                num_tests_run += 1
+                self.progress_bar.setProperty("value", num_tests_run)
+
+                timed_out_item = QTableWidgetItem(
+                    "Error: Connection timed out!"
+                )
+                self.table_test_suite.setItem(row_index, 3, timed_out_item)
+
+                self.colorize_table_row(
+                    row_index,
+                    ColorEnum.BLACK,
+                    ColorEnum.TIMEOUT
+                )
+
+                failed_tests.append(row_index)
+                continue
+            elif test_output == MessageEnum.CONNECTION_ERROR:
+                throw_message(
+                    MessageEnum.CRITICAL,
+                    "Connection Error",
+                    test_output
+                )
+                self.reset_main_window(confirmation=False)
+                return
+
+            num_tests_run += 1
+            self.progress_bar.setProperty("value", num_tests_run)
+
+            if not test_output:
+                num_passed_tests += 1
+                self.label_status.setText(
+                    f"{num_passed_tests} / {num_total_tests} passed"
+                )
+                self.colorize_table_row(
+                    row_index,
+                    ColorEnum.BLACK,
+                    ColorEnum.SUCCESS
+                )
+            else:
+                failed_tests.append(row_index)
+                failed_output = []
+                for param, value in test_output.items():
+                    failed_output.append(f"{param} = {value}")
+
+                item_failed_output = QTableWidgetItem("\n".join(failed_output))
+                self.table_test_suite.setItem(row_index, 3, item_failed_output)
+                self.table_test_suite.resizeRowsToContents()
+                self.colorize_table_row(
+                    row_index,
+                    ColorEnum.BLACK,
+                    ColorEnum.FAILURE
+                )
+
+        if return_failed_tests:
+            return failed_tests
