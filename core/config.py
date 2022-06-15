@@ -1,3 +1,44 @@
+# The GUI populates the test case creation panel based on DATA_CALL_MAP below
+
+# When tests run, for each test case:
+# TESTstat compares each output param's expected value with the real output
+# based on the flags of that param in this map:
+#   if the first flag is ANY -> if any of the following flags matches,
+#       the test passes for that param
+#   if the first flag is ALL -> if all of the following flags matches,
+#       the test passes for that param
+#   flags that come before ANY/ALL is applied first to filter corresponding
+#       param's expected value typed by user
+
+# If a parameter is covered by NESTED_PARAMS, test logic behaves differently:
+# Those params can include same set of keys multiple times with different
+# values. In such case, a test passes if TESTstat can find an element that
+# matches all the expected output values typed by user with one of the nested
+# items in e.g. "exact" param of response. Otherwise, it returns an error
+# "<param>: No item matching all the expected inputs found!".
+#   https://stat.ripe.net/data/address-space-hierarchy/data.json?resource=110/4
+
+# Conditional Flags
+ALL = "All following are True"
+ANY = "At least one of following is True"
+COMPARE = "Compare quantitatively (<[=] >[=])"
+INCLUDE = (
+    "Check if a parameter of the response is not empty, without dealing with"
+    "the value. If a user types 'not empty' for any slot, or checks Not Empty"
+    "checkbox for any nested parameter group, and if corresponding parameter"
+    "includes this flag, test passes if the response's param is not empty."
+)
+INCLUDE_KEYS = (
+    "If a parameter in response includes key-value pairs in that slot, test"
+    "passes if its keys include all values in expected param."
+)
+MATCH = (
+    "Check any given data field in response if it matches with the expected"
+    "output for that field"
+)
+NOT_EMPTY = "Check any given data field in response is empty or not"
+TRIM_AS = "If resource starts with 'as', trim it"
+
 # NESTED_PARAMS keeps the parameters that contain list of parameters
 NESTED_PARAMS = [
     "exact",
@@ -21,25 +62,8 @@ NESTED_PARAMS = [
 ]
 
 
-# Conditional Flags
-ALL = "All following are True"
-ANY = "At least one of following is True"
-
-INCLUDE = "assert all([p in test_output['data'][param] for p in expected_output[param].split(',')])"
-INCLUDE_KEYS = "assert all([p in test_output['data'][param].keys() for p in expected_output[param].split(',')])"
-MATCH = "assert expected_output[param] == test_output['data'][param]"
-COMPARE = "quantative comparisons"
-TRIM_AS = (
-    "if expected_output[param].startswith('as'):"
-        "expected_output[param] = expected_output[param][2:]"
-)
-NOT_EMPTY = (
-    "if expected_output[param] == 'not empty':"
-        "assert test_output['data'][param]"
-)
-
-
 class CommonParamsEnum():
+    """Contains parameter groups shared across different data calls/fields"""
 
     WHOIS_PARAMS = {
         "inetnum": [ANY, NOT_EMPTY, MATCH],
@@ -88,30 +112,6 @@ class CommonParamsEnum():
         "count": []
     }
 
-
-##############################################################################
-# The GUI populates the test case creation panel based on this map
-
-##### When tests run, for each test case:
-# App compares each output param's expected value with the real output based on the flags of that param in this map:
-#   if the first flag is ANY -> if any of the following flags matches, the test passes for that param
-#   if the first flag is ALL -> if all of the following flags matches, the test passes for that param
-#   flags that come before ANY/ALL is applied first to filter corresponding param's expected value typed by user
-
-##### FLAGS:
-# NOT_EMPTY: This flag is just to check if a parameter of the response is not empty, without dealing with the value.
-#            If user types "not empty" for any slot, or checks "Not Empty" checkbox for any nested parameter group,
-#            and if corresponding parameter includes this flag, test passes if the response's param is not empty.
-# MATCH:     Test passes should an expected value of a param typed by user matches with the real value.
-# INCLUDE:   Test passes if value of a param in response includes all values in expected param.
-# INCLUDE_KEYS: If param in response includes key-value pairs in that slot, test passes if its keys include all values in expected param.
-# COMPARE:   Quantative comparisons: <[=] >[=]
-
-##### If a param is covered by NESTED_PARAMS, test control logic behaves slightly different:
-# e.g. https://stat.ripe.net/data/address-space-hierarchy/data.json?resource=110/4
-# Those params can include same set of keys multiple times with different values.
-# In such case, test passes if app can find an element that matches all the expected output values typed by user with one of the nested items in e.g. "exact" param of response.
-# Otherwise, it returns an error "<param>: No item matching all the expected inputs found!"
 
 DATA_CALL_MAP = {
 
@@ -211,7 +211,7 @@ DATA_CALL_MAP = {
         }
     },
 
-    # TODO: Test cases are missing
+    # Test cases are missing
     "as-overview": {
         "data_call_name": "AS Overview",
         "required_params": ["resource"],
@@ -266,7 +266,7 @@ DATA_CALL_MAP = {
             "resource": [ANY, NOT_EMPTY, MATCH]
         }
     },
-    
+
     "asn-neighbours": {
         "data_call_name": "ASN Neighbours",
         "required_params": ["resource"],
@@ -440,7 +440,14 @@ DATA_CALL_MAP = {
     "bgp-update-activity": {
         "data_call_name": "BGP Update Activity",
         "required_params": ["resource"],
-        "optional_params": ["starttime", "endtime", "max_samples", "min_sampling_period", "num_hours", "hide_empty_samples"],
+        "optional_params": [
+            "starttime",
+            "endtime",
+            "max_samples",
+            "min_sampling_period",
+            "num_hours",
+            "hide_empty_samples"
+        ],
         "output_params": {
             "updates": {
                 "announcements": [],
@@ -558,7 +565,8 @@ DATA_CALL_MAP = {
             "lod": [],
             "latest_time": [],
             "query_time": [],
-            "resource": []  #BEWARE! This is different than other resource params.
+            # This is different than other resource params!
+            "resource": []
         }
     },
 
@@ -618,8 +626,10 @@ DATA_CALL_MAP = {
                     "value": "AS3333"
                 }
             },
-            "referencing": [],  # Beware, different implementation. https://stat.ripe.net/data/historical-whois/data.json?resource=3333
-            "referenced_by": [], # probably nested. Couldn't find an example.
+            # Beware, different implementation (e.g. resource=3333)
+            "referencing": [],
+            # Probably nested. Couldn't find an example.
+            "referenced_by": [],
             "access": [],
             "suggestions": {
                 "type": [],
@@ -836,7 +846,12 @@ DATA_CALL_MAP = {
     "prefix-count": {
         "data_call_name": "Prefix Count",
         "required_params": ["resource"],
-        "optional_params": ["starttime", "endtime", "min_peers_seeing", "resolution"],
+        "optional_params": [
+            "starttime",
+            "endtime",
+            "min_peers_seeing",
+            "resolution"
+        ],
         "output_params": {
             "ipv4": CommonParamsEnum.PREFIX_CHANGES_PER_TIMESTAMP,
             "ipv6": CommonParamsEnum.PREFIX_CHANGES_PER_TIMESTAMP,
@@ -859,7 +874,6 @@ DATA_CALL_MAP = {
             "is_less_specific": [],
             "announced": [],
             "related_prefixes": [],
-            "resource": [],
             "type": [],
             "block": {
                 "resource": [],
@@ -980,7 +994,7 @@ DATA_CALL_MAP = {
             "resource": []
         }
     },
-    
+
     "rir-geo": {
         "data_call_name": "RIR Geo",
         "required_params": ["resource"],
@@ -1037,7 +1051,7 @@ DATA_CALL_MAP = {
         }
     },
 
-    # Beware! Output structure changes based on inputs for list_asns and asn_types
+    # Output structure changes based on inputs for list_asns and asn_types
     "ris-asns": {
         "data_call_name": "RIS ASNs",
         "required_params": [],
@@ -1077,7 +1091,12 @@ DATA_CALL_MAP = {
     "ris-peer-count": {
         "data_call_name": "RIS Peer Count",
         "required_params": [],
-        "optional_params": ["starttime", "endtime", "v4_full_prefix_threshold", "v6_full_prefix_threshold"],
+        "optional_params": [
+            "starttime",
+            "endtime",
+            "v4_full_prefix_threshold",
+            "v6_full_prefix_threshold"
+        ],
         "output_params": {
             "peer_count": {
                 "v4": {
@@ -1146,7 +1165,8 @@ DATA_CALL_MAP = {
         "required_params": [],
         "optional_params": ["query_time"],
         "output_params": {
-            "peers": [],    #INCLUDE_KEYS
+            # INCLUDE_KEYS
+            "peers": [],
             "earliest_time": [],
             "latest_time": [],
             "parameters": {
@@ -1155,11 +1175,17 @@ DATA_CALL_MAP = {
         }
     },
 
-    # Beware! Output structure changes based on inputs for params
+    # Output structure changes based on inputs for params
     "ris-prefixes": {
         "data_call_name": "RIS Peers",
         "required_params": ["resource"],
-        "optional_params": ["query_time", "list_prefixes", "types", "af", "noise"],
+        "optional_params": [
+            "query_time",
+            "list_prefixes",
+            "types",
+            "af",
+            "noise"
+        ],
         "output_params": {
             "counts": {
                 "v4": [],
@@ -1179,7 +1205,14 @@ DATA_CALL_MAP = {
     "routing-history": {
         "data_call_name": "Routing History",
         "required_params": ["resource"],
-        "optional_params": ["max_rows", "include_first_hop", "normalise_visibility", "min_peers", "starttime", "endtime"],
+        "optional_params": [
+            "max_rows",
+            "include_first_hop",
+            "normalise_visibility",
+            "min_peers",
+            "starttime",
+            "endtime"
+        ],
         "output_params": {
             "by_origin": {
                 "origin": [],
@@ -1244,7 +1277,7 @@ DATA_CALL_MAP = {
         }
     },
 
-    # Beware! Output structure changes based on inputs for params
+    # Output structure changes based on inputs for params
     "rpki-history": {
         "data_call_name": "RPKI History",
         "required_params": ["resource"],
