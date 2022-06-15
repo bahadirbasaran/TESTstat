@@ -2,14 +2,12 @@ import requests
 
 from core.config import *
 from core.utils import filter_param_set, reshape_param_set
-from gui.utils import throw_message
+from gui.utils import throw_message, MessageEnum
 
 
 class TestStat():
 
     def __init__(self, host, port, with_tls=True):
-
-        self.host = host
 
         protocol = "https" if with_tls else "http"
 
@@ -25,7 +23,7 @@ class TestStat():
             self.raw_query = f"{protocol}://{host}:{port}/data/"
 
         else:
-            throw_message("critical", "Port Error", "Port cannot include characters!")
+            throw_message(MessageEnum.CRITICAL, "Port Error", "Port cannot include characters!")
 
     
     def evaluate_result(self, data_call, test_output, expected_output):
@@ -203,10 +201,10 @@ class TestStat():
             response = requests.get(request, timeout=30)
 
         except requests.exceptions.ConnectionError:
-            return f"Connection to {self.host} could not be established!"
+            return MessageEnum.CONNECTION_ERROR
         
         except (requests.exceptions.Timeout, requests.exceptions.JSONDecodeError) as e:
-            return "timeout"
+            return MessageEnum.TIMEOUT
 
         test_result = self.evaluate_result(data_call, response.json(), expected_output)
 

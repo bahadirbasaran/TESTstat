@@ -39,11 +39,13 @@ class MainWindow():
             "color: rgb(66, 77, 112);"
         ))
 
-        self.font = QFont()
-        self.font.setBold(True)
+        # Active test results on the table
+        self.previous_results = False
 
     def setup_ui(self):
         """Sets main window up"""
+
+        # Containers
 
         central_widget = QWidget(self.main_window)
 
@@ -53,8 +55,13 @@ class MainWindow():
         layout_widget = QWidget(groupbox_config)
         layout_widget.setGeometry(QRect(20, 20, 389, 32))
 
-        horizontal_layout = QHBoxLayout(layout_widget)
-        horizontal_layout.setContentsMargins(0, 0, 0, 0)
+        hbox_host_port = QHBoxLayout(layout_widget)
+        hbox_host_port.setContentsMargins(0, 0, 0, 0)
+
+        # Font
+
+        self.font = QFont()
+        self.font.setBold(True)
 
         # Test cases table
 
@@ -175,13 +182,11 @@ class MainWindow():
 
         # Set the main window UI up
 
-        horizontal_layout.addWidget(label_host)
-        horizontal_layout.addWidget(self.combobox_host)
-        horizontal_layout.addWidget(self.port)
+        hbox_host_port.addWidget(label_host)
+        hbox_host_port.addWidget(self.combobox_host)
+        hbox_host_port.addWidget(self.port)
 
         self.main_window.setCentralWidget(central_widget)
-
-        QMetaObject.connectSlotsByName(self.main_window)
 
         self.main_window.show()
 
@@ -211,9 +216,7 @@ class MainWindow():
 
     def reset_main_window(self, clear_tests=False, confirmation=True):
 
-        # Check if there is a result on the table remaining from a previous run
-        # TODO: Find more elegant way than checking '/' in the status label
-        if confirmation and '/' in self.label_status.text():
+        if confirmation and self.previous_results:
             ret_val = throw_message(
                 MessageEnum.WARNING,
                 "Warning",
@@ -221,6 +224,8 @@ class MainWindow():
             )
             if ret_val == MessageEnum.NO:
                 return ret_val
+
+        self.previous_results = False
 
         # Restore the status label
         self.label_status.setText(f"Tests: {self.table_test_suite.rowCount()}")
@@ -250,11 +255,10 @@ class MainWindow():
                 self.table_test_suite.columnCount() - 1
             ).setText('')
 
-            # TODO: Checkbox cleaning
-            # if self.table_test_suite.item(
-            #   row_index, 0).checkState() == Qt.Checked:
-            #   self.table_test_suite.item(
-            #       row_index, 0).setCheckState(Qt.Unchecked)
+            # Clear checkboxes
+            checkbox = self.table_test_suite.item(row_index, 0)
+            if checkbox.checkState() == Qt.Checked:
+                checkbox.setCheckState(Qt.Unchecked)
 
         QApplication.processEvents()
 
@@ -277,7 +281,7 @@ class MainWindow():
 
         return checked_row_indexes
 
-    # Combobox Slots
+    # Combobox slots
 
     def on_combobox_host_changed(self, combobox, port):
 
@@ -287,20 +291,19 @@ class MainWindow():
             port.setText("")
             port.setPlaceholderText("Port")
 
-    # Button Slots
+    # Button slots
 
     def on_btn_new_test_click(self):
 
-        # TODO: Find more elegant way than checking '/' in the status label
-        if ('/' in self.label_status.text() and
-                self.reset_main_window() != MessageEnum.NO) or \
-                    '/' not in self.label_status.text():
+        if not self.previous_results or \
+                (self.previous_results and
+                    self.reset_main_window() != MessageEnum.NO):
             self.test_case_window_ui = TestCaseWindow(self)
             self.test_case_window_ui.setup_ui()
 
     def on_btn_remove_test_click(self):
 
-        rows_to_remove = self.get_checked_row_indexes()
+        rows_to_remove = self.get_checked_row_indexes(return_all=False)
 
         if not self.table_test_suite.rowCount():
             throw_message(
@@ -461,8 +464,8 @@ class MainWindow():
             comparison_widget = QDialog()
             comparison_widget.setWindowTitle("Compare API Sources")
 
-            horizontal_layout = QHBoxLayout(comparison_widget)
-            horizontal_layout.setContentsMargins(20, 60, 30, 100)
+            hbox_host_port = QHBoxLayout(comparison_widget)
+            hbox_host_port.setContentsMargins(20, 60, 30, 100)
 
             # Labels
 
@@ -515,9 +518,9 @@ class MainWindow():
                 )
             )
 
-            horizontal_layout.addWidget(label_second_host)
-            horizontal_layout.addWidget(combobox_second_host)
-            horizontal_layout.addWidget(port_second_host)
+            hbox_host_port.addWidget(label_second_host)
+            hbox_host_port.addWidget(combobox_second_host)
+            hbox_host_port.addWidget(port_second_host)
 
             comparison_widget.exec()
 
@@ -639,6 +642,8 @@ class MainWindow():
                 test_input,
                 expected_output
             )
+
+            self.previous_results = True
 
             # Error handling
 

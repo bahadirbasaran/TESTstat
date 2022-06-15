@@ -15,6 +15,5 @@ if __name__ == "__main__":
 
     ui = MainWindow()
     ui.setup_ui()
-    ui.show()
 
     sys.exit(app.exec_())
