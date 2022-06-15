@@ -4,7 +4,7 @@ from gui.test_case_window import TestCaseWindow
 from core.teststat import TestStat
 from gui.utils import MessageEnum, ColorEnum, throw_message, format_table_item
 
-from PyQt5.QtCore import Qt, QRect, QMetaObject
+from PyQt5.QtCore import Qt, QRect
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QMainWindow, QWidget, QGroupBox, QHBoxLayout, \
                             QLabel, QPushButton, QComboBox, QTableWidget, \
