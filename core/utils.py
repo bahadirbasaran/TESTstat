@@ -1,75 +1,100 @@
+def get_innermost_value(param, param_set):
+    """Returns innermost value of nested parameters"""
+
+    if "->" in param:
+        for index, inner_param in enumerate(param.split("->")):
+            if index == 0:
+                inner_param_value = param_set[inner_param]
+            else:
+                inner_param_value = inner_param_value[inner_param]
+    else:
+        inner_param_value = param_set[param]
+
+    return inner_param_value
+
+
 def filter_param_set(param_set, filtered_param_set={}, current_level=None):
+    """
+    Makes all parameter-value pairs of param_set lower case, trims whitespaces,
+    convert bools&numbers into string representations.
+    """
 
-    def _filter(val):
-        return val.lower().replace(' ', '')
+    def _f(input): return input.lower().replace(' ', '')
 
-    for k, v in param_set.items():
+    for param, value in param_set.items():
 
-        if isinstance(v, str):
+        if isinstance(value, str):
             if current_level:
-                filtered_param_set[current_level][_filter(k)] = _filter(v)
+                filtered_param_set[current_level][_f(param)] = _f(value)
             else:
-                filtered_param_set[_filter(k)] = _filter(v)
+                filtered_param_set[_f(param)] = _f(value)
 
-        # bools should be checked first, since boolean is a subclass of int,
-        # any bool variable matches with the following isinstance too!
-        elif isinstance(v, bool):
+        # Bools should be checked first, since Boolean is a subclass of int,
+        # any bool variable matches with the following isinstance too.
+        elif isinstance(value, bool):
             if current_level:
-                filtered_param_set[current_level][_filter(k)] = "true" if v else "false"
+                filtered_param_set[current_level][_f(param)] = "true" if value\
+                    else "false"
             else:
-                filtered_param_set[_filter(k)] = "true" if v else "false"
+                filtered_param_set[_f(param)] = "true" if value else "false"
 
-        elif isinstance(v, (int, float)):
+        elif isinstance(value, (int, float)):
             if current_level:
-                filtered_param_set[current_level][_filter(k)] = str(v)
+                filtered_param_set[current_level][_f(param)] = str(value)
             else:
-                filtered_param_set[_filter(k)] = str(v)
+                filtered_param_set[_f(param)] = str(value)
 
-        elif v is None:
+        elif value is None:
             if current_level:
-                filtered_param_set[current_level][_filter(k)] = "none"
+                filtered_param_set[current_level][_f(param)] = "none"
             else:
-                filtered_param_set[_filter(k)] = "none"
+                filtered_param_set[_f(param)] = "none"
 
-        elif isinstance(v, list):
-            v_new = []
-            for list_item in v:
+        elif isinstance(value, list):
+            new_value = []
+
+            for list_item in value:
                 if isinstance(list_item, str):
-                    v_new.append(_filter(list_item))
+                    new_value.append(_f(list_item))
                 elif isinstance(list_item, bool) and list_item:
-                    v_new.append("true")
+                    new_value.append("true")
                 elif isinstance(list_item, bool):
-                    v_new.append("false")
+                    new_value.append("false")
                 elif isinstance(list_item, (int, float)):
-                    v_new.append(str(list_item))
+                    new_value.append(str(list_item))
                 elif list_item is None:
-                    v_new.append("none")
+                    new_value.append("none")
                 elif isinstance(list_item, list):
-                    v_inner = []
+                    new_list_item = []
                     for inner_item in list_item:
-                        v_inner.append(
+                        new_list_item.append(
                             filter_param_set(inner_item, {})
                         )
-                    v_new.append(v_inner)
+                    new_value.append(new_list_item)
                 else:
-                    v_new.append(
+                    new_value.append(
                         filter_param_set(list_item, {})
                     )
 
             if current_level:
-                filtered_param_set[current_level][_filter(k)] = v_new
+                filtered_param_set[current_level][_f(param)] = new_value
             else:
-                filtered_param_set[_filter(k)] = v_new
-        
+                filtered_param_set[_f(param)] = new_value
+
         else:
-            filtered_param_set[k] = {}
-            filtered_param_set = filter_param_set(v, filtered_param_set, k)
+            filtered_param_set[param] = {}
+            filtered_param_set = filter_param_set(
+                value,
+                filtered_param_set,
+                param
+            )
 
     return filtered_param_set
 
 
 def reshape_param_set(param_set):
-    """ param_set:
+    """
+    param_set:
             param = 'exact->inetnum'          value = 'a'
             param = 'exact->netname'          value = 'b'
             param = 'more_specific'           value = 'notempty'
@@ -79,7 +104,7 @@ def reshape_param_set(param_set):
     =>> reshaped_param_set = {
             'exact': {
                 'inetnum': 'a',
-                'netname': 'b'                              
+                'netname': 'b'
             },
 
             'more_specific': "notempty",
@@ -91,7 +116,7 @@ def reshape_param_set(param_set):
                 },
                 'unstripped': {
                     'avg': 'e'
-                }                            
+                }
             }
         }
     """
@@ -107,7 +132,6 @@ def reshape_param_set(param_set):
 
             if part not in current_dict:
                 current_dict[part] = {}
-
             current_dict = current_dict[part]
 
         current_dict[last] = value
