@@ -34,7 +34,11 @@ def run_tests():
 
             print(f"Test Case {row_index}:", end=' ')
 
-            test_output = teststat.run_test(data_call, test_input, expected_output)
+            test_output = teststat.run_test(
+                data_call,
+                test_input,
+                expected_output
+            )
 
             print("----> Expected: ", row[2].replace(';', ' | '), end='\n\n')
 
@@ -49,7 +53,12 @@ def run_tests():
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--host', dest='host', type=str, help='Host to connect. default: stat.ripe.net')
+    parser.add_argument(
+        '--host',
+        dest='host',
+        type=str,
+        help='Host to connect. default: stat.ripe.net'
+    )
     args = parser.parse_args()
 
     host = args.host if args.host else "stat.ripe.net"
@@ -57,6 +66,3 @@ if __name__ == "__main__":
     print(f"The host: {host}")
 
     run_tests()
-
-
-    
