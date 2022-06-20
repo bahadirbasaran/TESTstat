@@ -9,7 +9,7 @@ TEST_CASES_PATH = "data/cicd_test_cases.csv"
 
 def run_cicd_tests(host):
 
-    teststat = TestStat(host)
+    teststat = TestStat(host, cicd=True)
 
     with open(TEST_CASES_PATH) as csv_file:
 
