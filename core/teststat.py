@@ -13,7 +13,7 @@ from core.config import DATA_CALL_MAP, NESTED_PARAMS
 
 class TestStat():
 
-    def __init__(self, host, port, with_tls=True):
+    def __init__(self, host, port=None, with_tls=True):
 
         protocol = "https" if with_tls else "http"
         host = host.lower().replace(' ', '')

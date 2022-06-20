@@ -1,7 +1,7 @@
 import csv
 
-from gui.test_case_window import TestCaseWindow
 from core.teststat import TestStat
+from gui.test_case_window import TestCaseWindow
 from gui.utils import MessageEnum, ColorEnum, throw_message, format_table_item
 
 from PyQt5.QtCore import Qt, QRect
