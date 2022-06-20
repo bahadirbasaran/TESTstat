@@ -4,11 +4,6 @@ import argparse
 
 sys.path.append(os.path.abspath("."))
 
-from gui.main_window import MainWindow
-from scripts.cicd import run_cicd_tests
-
-from PyQt5.QtWidgets import QApplication
-
 
 if __name__ == "__main__":
 
@@ -19,14 +14,20 @@ if __name__ == "__main__":
         '--host',
         dest='host',
         type=str,
-        help='Host to connect. default: stat.ripe.net'
+        help='Host to connect. Default: stat.ripe.net'
     )
     args = parser.parse_args()
 
     if args.host:
+        from scripts.cicd import run_cicd_tests
+
         print(f"Host: {args.host}")
         run_cicd_tests(args.host)
+
     else:
+        from PyQt5.QtWidgets import QApplication
+        from gui.main_window import MainWindow
+
         app = QApplication(sys.argv)
         app.setStyle("fusion")
 
