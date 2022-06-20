@@ -1,5 +1,8 @@
+import os
 import sys
 import argparse
+
+sys.path.append(os.path.abspath("."))
 
 from gui.main_window import MainWindow
 from scripts.cicd import run_cicd_tests

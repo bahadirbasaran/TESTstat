@@ -1,17 +1,13 @@
-import os
 import sys
 import csv
-import argparse
-
-sys.path.append(os.path.abspath(".."))
 
 from core.teststat import TestStat
 
 
-TEST_CASES_PATH = "../data/cicd_test_cases.csv"
+TEST_CASES_PATH = "data/cicd_test_cases.csv"
 
 
-def run_tests():
+def run_cicd_tests(host):
 
     teststat = TestStat(host)
 
@@ -47,22 +43,4 @@ def run_tests():
                     print(f"Parameter {param}:")
                     print(f"Expected: {value} - Actual: {test_output[param]}")
 
-                sys.exit(f"Job failed for Test Case {row_index}!")
-
-
-if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '--host',
-        dest='host',
-        type=str,
-        help='Host to connect. default: stat.ripe.net'
-    )
-    args = parser.parse_args()
-
-    host = args.host if args.host else "stat.ripe.net"
-
-    print(f"The host: {host}")
-
-    run_tests()
+                sys.exit(f"Job failed at Test Case {row_index}!")
