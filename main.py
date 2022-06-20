@@ -2,7 +2,12 @@ import os
 import sys
 import argparse
 
-sys.path.append(os.path.abspath("."))
+if os.path.abspath(".") not in sys.path:
+    sys.path.append(os.path.abspath('.'))
+
+from scripts.cicd import run_cicd_tests
+from PyQt5.QtWidgets import QApplication
+from gui.main_window import MainWindow
 
 
 if __name__ == "__main__":
@@ -19,15 +24,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.host:
-        from scripts.cicd import run_cicd_tests
-
         print(f"Host: {args.host}")
         run_cicd_tests(args.host)
-
     else:
-        from PyQt5.QtWidgets import QApplication
-        from gui.main_window import MainWindow
-
         app = QApplication(sys.argv)
         app.setStyle("fusion")
 
