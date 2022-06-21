@@ -9,6 +9,8 @@ from core.config import ALL, ANY, COMPARE, INCLUDE, INCLUDE_KEYS, \
 # Import parameter related definitions
 from core.config import DATA_CALL_MAP, NESTED_PARAMS
 
+from gui.utils import MessageEnum
+
 
 class TestStat():
 

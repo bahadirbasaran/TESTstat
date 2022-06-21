@@ -132,7 +132,9 @@ def reshape_param_set(param_set):
 
             if part not in current_dict:
                 current_dict[part] = {}
-            current_dict = current_dict[part]
+                
+            if isinstance(current_dict[part], dict):
+                current_dict = current_dict[part]
 
         current_dict[last] = value
 

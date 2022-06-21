@@ -215,7 +215,8 @@ class TestCaseWindow():
 
                     setattr(self, cb_label, QLabel(label_identifier))
                     reference_to_label = getattr(self, cb_label)
-                    reference_to_label.setStyleSheet("font-weight: bold;")
+                    if not parent_label:
+                        reference_to_label.setStyleSheet("font-weight: bold;")
                     self.items_in_previous_view.append(reference_to_label)
 
                     setattr(self, cb_input_name, QCheckBox("Not Empty"))
@@ -450,3 +451,8 @@ class TestCaseWindow():
                         reference_to_input.setStyleSheet(
                             "background-color: rgb(255, 255, 255);"
                         )
+                elif input_name.startswith(checkbox_name + '_'):
+                    if getattr(self, checkbox_name).isChecked():
+                        reference_to_input.setChecked(True)
+
+
