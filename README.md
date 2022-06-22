@@ -24,7 +24,7 @@ pip install -r requirements.txt
 
 # Run the app
 python main.py
-
+```
 
 
 ## Workflow for virtual environment for M1 chip 
