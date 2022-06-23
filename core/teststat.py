@@ -125,7 +125,7 @@ class TestStat():
             for field in current_level:
 
                 if not isinstance(current_level[field], dict):
-
+                    
                     field_flags = get_innermost_value(
                         f"{current_identifier}->{field}",
                         DATA_CALL_MAP[data_call]["output_params"]
@@ -237,6 +237,12 @@ class TestStat():
 
             # If a checkbox "Not Empty" is checked for a nested parameter,
             # check if the corresponding response list of parameter is empty
+            if isinstance(fields, dict):
+                nested_param_l2 = list(fields.keys())[0]
+                if fields[nested_param_l2] == "notempty":
+                    if not test_output["data"][nested_param][0][nested_param_l2]:
+                        failed_params[nested_param][nested_param_l2] = []
+                    continue                                        
             if fields == "notempty":
                 if not test_output["data"][nested_param]:
                     failed_params[nested_param] = []
