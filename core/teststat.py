@@ -135,14 +135,14 @@ class TestStat():
                     criteria = field_flags.pop(0)
 
                     if "->" in current_identifier:
-                        current_identifier = "->".join(
+                        current_identifier_short = "->".join(
                             current_identifier.split("->")[1:] + [field]
                         )
                         output_value = get_innermost_value(
-                            current_identifier,
+                            current_identifier_short,
                             block
                         )
-                        expected = fields[current_identifier.split("->")[0]]
+                        expected = fields[current_identifier_short.split("->")[0]]
                     else:
                         output_value = get_innermost_value(field, block)
                         expected = fields
