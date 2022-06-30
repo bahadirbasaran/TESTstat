@@ -125,12 +125,13 @@ class TestStat():
             for field in current_level:
 
                 if not isinstance(current_level[field], dict):
-                    
+
                     field_flags = get_innermost_value(
                         f"{current_identifier}->{field}",
                         DATA_CALL_MAP[data_call]["output_params"]
                     )
                     field_flags = field_flags.copy()
+
                     criteria = field_flags.pop(0)
 
                     if "->" in current_identifier:
@@ -160,6 +161,11 @@ class TestStat():
                         resulting_bools.append(any(bools))
                     elif criteria == ALL:
                         resulting_bools.append(all(bools))
+
+                    # if any of parameters is false --> test unsuccessfull
+                    if any(resulting_bools) == False:
+                        break
+                    
                 else:
                     _check_current_level(
                         current_level[field],
@@ -272,11 +278,10 @@ class TestStat():
                     break
                 else:
                     resulting_bools.clear()
+                    failed_params[nested_param] = (
+                    "No item matching all "
+                    "the expected inputs found!")
+                    break
 
-            if not is_match:
-                failed_params[nested_param] = (
-                    "No item matching all"
-                    "the expected inputs found!"
-                )
 
         return failed_params
