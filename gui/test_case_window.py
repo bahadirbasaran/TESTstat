@@ -225,7 +225,7 @@ class TestCaseWindow():
                     self.input_names_in_previous_view.append(cb_input_name)
                     self.items_in_previous_view.append(reference_to_input)
 
-                    reference_to_input.clicked.connect(
+                    reference_to_input.stateChanged.connect(
                          lambda: self.on_checkbox_change()
                     )
 
@@ -433,7 +433,7 @@ class TestCaseWindow():
 
         for checkbox_name in checkbox_names:
 
-            getattr(self, checkbox_name).stateChanged.connect(lambda state, checkbox = getattr(self, checkbox_name), all_inputs=self.input_names_in_previous_view: self.execute_change(checkbox, all_inputs))
+            getattr(self, checkbox_name).clicked.connect(lambda state, checkbox = getattr(self, checkbox_name), all_inputs=self.input_names_in_previous_view: self.execute_change(checkbox, all_inputs))
 
         
     def execute_change(self, checkbox, all_input_fieleds):
