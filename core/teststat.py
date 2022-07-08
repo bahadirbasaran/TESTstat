@@ -161,10 +161,6 @@ class TestStat():
                         resulting_bools.append(any(bools))
                     elif criteria == ALL:
                         resulting_bools.append(all(bools))
-
-                    # if any of parameters is false --> test unsuccessfull
-                    if any(resulting_bools) == False:
-                        break
                     
                 else:
                     _check_current_level(
