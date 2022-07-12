@@ -1,5 +1,4 @@
 data_call,test_input,expected_output
-abuse-contact-finder,resource = loremipsum,status_code = 200
 abuse-contact-finder,resource = 3333,status_code = 200
 abuse-contact-finder,resource = as3333,status_code = 200;parameters->resource = 3333
 abuse-contact-finder,resource = 3333,status_code = 200;abuse_contacts = not empty
