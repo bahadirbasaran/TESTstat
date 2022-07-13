@@ -123,7 +123,7 @@ class TestStat():
             """
 
             for field in current_level:
-
+                
                 if not isinstance(current_level[field], dict):
                     
                     # Get the output value from the data call response block
@@ -178,7 +178,9 @@ class TestStat():
                             resulting_bools.append(any(bools))
                         elif criteria == ALL:
                             resulting_bools.append(all(bools))
-                                       
+                        
+                        if not all(resulting_bools):
+                            break                    
                 else:
                     _check_current_level(
                         current_level[field],
