@@ -125,43 +125,60 @@ class TestStat():
             for field in current_level:
 
                 if not isinstance(current_level[field], dict):
-
-                    field_flags = get_innermost_value(
-                        f"{current_identifier}->{field}",
-                        DATA_CALL_MAP[data_call]["output_params"]
-                    )
-                    field_flags = field_flags.copy()
-
-                    criteria = field_flags.pop(0)
-
-                    if "->" in current_identifier:
-                        current_identifier_short = "->".join(
-                            current_identifier.split("->")[1:] + [field]
-                        )
-                        output_value = get_innermost_value(
-                            current_identifier_short,
-                            block
-                        )
-                        expected = fields[current_identifier_short.split("->")[0]]
-                    else:
-                        output_value = get_innermost_value(field, block)
-                        expected = fields
-
-                    # Apply filters before ANY/ALL if there are such
-                    while criteria not in [ANY, ALL]:
-                        _apply_flag(criteria, expected, field, output_value)
-                        criteria = param_flags.pop(0)
-
-                    bools = [
-                        _apply_flag(flag, expected, field, output_value)
-                        for flag in field_flags
-                    ]
-
-                    if criteria == ANY:
-                        resulting_bools.append(any(bools))
-                    elif criteria == ALL:
-                        resulting_bools.append(all(bools))
                     
+                    # Get the output value from the data call response block
+                    if "->" in current_identifier:
+                            current_identifier_short = "->".join(
+                                current_identifier.split("->")[1:] + [field]
+                            )
+                            output_value = get_innermost_value(
+                                current_identifier_short,
+                                block
+                            )
+                    else:
+                            output_value = get_innermost_value(field, block)
+
+                    # Checking for the "notempty" flag or the output and expected parameters
+                    # "notempty" could be applied to a nested parameter, such as  "prefix->timelines"
+                    # In this case the output_value is a list
+                    # Alternatively, "notempty" could be applied to a non-nested parameter
+                    # In this case the output_value is a string
+                    # To satisfy both possibilities above, the length of the output_value is checked
+                    if current_level[field] == "notempty":
+                        if len(output_value) > 0 : 
+                            resulting_bools.append(True)
+                        else:
+                           resulting_bools.append(False) 
+                    else:
+
+                        field_flags = get_innermost_value(
+                            f"{current_identifier}->{field}",
+                            DATA_CALL_MAP[data_call]["output_params"]
+                        )
+                        field_flags = field_flags.copy()
+
+                        criteria = field_flags.pop(0)
+
+                        if "->" in current_identifier:
+                            expected = fields[current_identifier_short.split("->")[0]]
+                        else:
+                            expected = fields
+
+                        # Apply filters before ANY/ALL if there are such
+                        while criteria not in [ANY, ALL]:
+                            _apply_flag(criteria, expected, field, output_value)
+                            criteria = param_flags.pop(0)
+
+                        bools = [
+                            _apply_flag(flag, expected, field, output_value)
+                            for flag in field_flags
+                        ]
+
+                        if criteria == ANY:
+                            resulting_bools.append(any(bools))
+                        elif criteria == ALL:
+                            resulting_bools.append(all(bools))
+                                       
                 else:
                     _check_current_level(
                         current_level[field],
@@ -234,22 +251,18 @@ class TestStat():
             failed_params[param] = test_output_value
 
         # After dealing with all regular parameters, nested parameters are
-        # evaluated below.
+        # evaluated below. The following evaluation is based on the highest 
+        # nested parameter in the hierarchy.
+        # Example: for prefixes->timelines->startdate the nested param is prefixes
         for nested_param, fields in reshape_param_set(nested_params).items():
 
             # If a checkbox "Not Empty" is checked for a nested parameter,
             # check if the corresponding response list of parameter is empty
-            if isinstance(fields, dict):
-                nested_param_l2 = list(fields.keys())[0]
-                if fields[nested_param_l2] == "notempty":
-                    if not test_output["data"][nested_param][0][nested_param_l2]:
-                        failed_params[nested_param][nested_param_l2] = []
-                    continue                                        
             if fields == "notempty":
                 if not test_output["data"][nested_param]:
                     failed_params[nested_param] = []
                 continue
-
+                
             is_match = False
             resulting_bools = []
 
@@ -274,10 +287,11 @@ class TestStat():
                     break
                 else:
                     resulting_bools.clear()
-                    failed_params[nested_param] = (
-                    "No item matching all "
-                    "the expected inputs found!")
-                    break
-
+            
+            if not is_match:
+                failed_params[nested_param] = (
+                    "No item matching all"
+                    "the expected inputs found!"
+                )
 
         return failed_params
