@@ -9,7 +9,7 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QMainWindow, QWidget, QGroupBox, QHBoxLayout, \
                             QLabel, QPushButton, QComboBox, QTableWidget, \
                             QTableWidgetItem, QProgressBar, QLineEdit, \
-                            QApplication, QDialog
+                            QApplication, QDialog, QCheckBox
 
 
 TEST_CASES_PATH = "data/test_cases.csv"
@@ -50,7 +50,7 @@ class MainWindow():
         central_widget = QWidget(self.main_window)
 
         groupbox_config = QGroupBox(central_widget)
-        groupbox_config.setGeometry(QRect(50, 44, 430, 130))
+        groupbox_config.setGeometry(QRect(50, 44, 600, 130))
 
         layout_widget = QWidget(groupbox_config)
         layout_widget.setGeometry(QRect(20, 20, 389, 32))
@@ -91,7 +91,7 @@ class MainWindow():
         label_host.setStyleSheet("font-weight: bold;")
 
         self.label_status = QLabel(groupbox_config)
-        self.label_status.setGeometry(QRect(255, 70, 150, 32))
+        self.label_status.setGeometry(QRect(392, 70, 150, 32))
         self.label_status.setText(f"Tests: {self.table_test_suite.rowCount()}")
 
         self.font.setPointSize(14)
@@ -172,6 +172,14 @@ class MainWindow():
             )
         )
 
+        # Searchbar
+
+        self.searchbar = QLineEdit(central_widget)
+        self.searchbar.setGeometry(QRect(700, 100, 520, 32))
+        self.searchbar.setStyleSheet("background-color: rgb(255, 255, 255);")
+        self.searchbar.textChanged.connect(self.update_display)
+
+
         # Line Edits
 
         self.port = QLineEdit(layout_widget)
@@ -200,6 +208,16 @@ class MainWindow():
         self.main_window.show()
 
     # Utilization methods
+
+    def update_display(self, text):
+
+        column = 0
+        for row in range(self.table_test_suite.rowCount()):
+            if text.lower() in self.table_test_suite.item(row, column).text().lower():
+                self.table_test_suite.showRow(row)
+            else:
+                self.table_test_suite.hideRow(row)
+
 
     def colorize_table_row(
         self,
