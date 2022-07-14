@@ -160,6 +160,16 @@ class MainWindow():
         btn_clear_outputs.setGeometry(QRect(1090, 150, 130, 32))
         btn_clear_outputs.setStyleSheet("font-weight: bold;")
 
+        # Checkboxes
+
+        self.checkbox_select_all = QCheckBox(
+            groupbox_config,
+            clicked=lambda: self.on_checkbox_select_all()
+        )
+        self.checkbox_select_all.setText("Select All")
+        self.checkbox_select_all.setChecked(False)
+        self.checkbox_select_all.setStyleSheet("font-weight: bold;")
+        self.checkbox_select_all.setGeometry(QRect(268, 70, 111, 32))
 
         # Comboboxes
 
@@ -210,7 +220,11 @@ class MainWindow():
     # Utilization methods
 
     def update_display(self, text):
+        """Dynamically update table with tests corresponding to the string in the searchbar.
+        Set the Select_all checkbox unchecked with any change in the search string, 
+        so any resulting tests can be selected in bulk."""       
 
+        self.checkbox_select_all.setChecked(False)
         column = 0
         for row in range(self.table_test_suite.rowCount()):
             if text.lower() in self.table_test_suite.item(row, column).text().lower():
@@ -470,6 +484,21 @@ class MainWindow():
                 )
 
                 csv_writer.writerow([data_call, test_input, expected_output])
+    
+    def on_checkbox_select_all(self):
+        """Selects or deselects all the currently visible tests.
+        Applicable while searching for tests using the searchbar and selecting all 
+        found tests in bulk."""
+        
+        column = 0
+        if self.checkbox_select_all.isChecked():
+            for row in range(self.table_test_suite.rowCount()):
+                if not self.table_test_suite.isRowHidden(row):
+                    self.table_test_suite.item(row, column).setCheckState(Qt.Checked)
+        else:
+            for row in range(self.table_test_suite.rowCount()):
+                if not self.table_test_suite.isRowHidden(row):
+                    self.table_test_suite.item(row, column).setCheckState(Qt.Unchecked)
 
     def on_btn_run_click(self):
         """Runs all/selected test cases in the table"""
