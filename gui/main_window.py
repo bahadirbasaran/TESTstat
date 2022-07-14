@@ -681,6 +681,7 @@ class MainWindow():
                 self.label_status.setText(
                     f"{num_passed_tests} / {num_total_tests} passed"
                 )
+                self.table_test_suite.setItem(row_index, 3, QTableWidgetItem(""))
                 self.colorize_table_row(
                     row_index,
                     ColorEnum.BLACK,
