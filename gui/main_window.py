@@ -152,6 +152,15 @@ class MainWindow():
         btn_save_test.setGeometry(QRect(170, 700, 111, 32))
         btn_save_test.setStyleSheet("font-weight: bold;")
 
+        btn_clear_outputs = QPushButton(
+            central_widget,
+            clicked=lambda: self.on_btn_clear_outputs_click()
+        )
+        btn_clear_outputs.setText("Clear All Outputs")
+        btn_clear_outputs.setGeometry(QRect(1090, 150, 130, 32))
+        btn_clear_outputs.setStyleSheet("font-weight: bold;")
+
+
         # Comboboxes
 
         self.combobox_host = QComboBox(layout_widget)
@@ -400,6 +409,12 @@ class MainWindow():
                 self.label_status.setText(
                     f"Tests: {self.table_test_suite.rowCount()}"
                 )
+
+    def on_btn_clear_outputs_click(self):
+        self.reset_main_window(
+                clear_tests=False,
+                confirmation=False
+            )
 
     def on_btn_save_test_click(self):
         """Overrides TEST_CASES_PATH by using test cases in the table"""
