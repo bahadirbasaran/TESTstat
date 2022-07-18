@@ -3,13 +3,10 @@ import requests
 from core.utils import filter_param_set, reshape_param_set, get_innermost_value
 
 # Import conditional flags
-from core.config import ALL, ANY, COMPARE, INCLUDE, INCLUDE_KEYS, \
-                        MATCH, NOT_EMPTY, TRIM_AS
+from core.config import ALL, ANY, COMPARE, INCLUDE, INCLUDE_KEYS, MATCH, NOT_EMPTY, TRIM_AS
 
 # Import parameter related definitions
 from core.config import DATA_CALL_MAP, NESTED_PARAMS
-
-from gui.utils import MessageEnum
 
 
 class TestStat():
@@ -35,11 +32,7 @@ class TestStat():
             self.raw_query = f"{protocol}://{host}:{port}/data/"
 
         else:
-            throw_message(
-                MessageEnum.CRITICAL,
-                "Port Error",
-                "Port cannot include characters!"
-            )
+            throw_message(MessageEnum.CRITICAL, "Port Error", "Port cannot include characters!")
 
     def run_test(self, data_call, test_input, expected_output):
 
@@ -53,11 +46,7 @@ class TestStat():
         except requests.exceptions.Timeout:
             return MessageEnum.TIMEOUT
 
-        test_result = self.evaluate_result(
-            data_call,
-            response.json(),
-            expected_output
-        )
+        test_result = self.evaluate_result(data_call, response.json(), expected_output)
 
         return test_result
 
@@ -84,16 +73,10 @@ class TestStat():
                 return param_set[param] == "notempty" and output_value
 
             elif flag == INCLUDE:
-                return all(
-                    [val in output_value
-                        for val in param_set[param].split(',')]
-                )
+                return all([val in output_value for val in param_set[param].split(',')])
 
             elif flag == INCLUDE_KEYS:
-                return all(
-                    [val in output_value.keys()
-                        for val in param_set[param].split(',')]
-                )
+                return all([val in output_value.keys() for val in param_set[param].split(',')])
 
             elif flag == MATCH:
                 return param_set[param] == output_value
@@ -131,10 +114,7 @@ class TestStat():
                         current_identifier_short = "->".join(
                             current_identifier.split("->")[1:] + [field]
                         )
-                        output_value = get_innermost_value(
-                            current_identifier_short,
-                            block
-                        )
+                        output_value = get_innermost_value(current_identifier_short, block)
                     else:
                         output_value = get_innermost_value(field, block)
 
@@ -160,9 +140,7 @@ class TestStat():
                         rule = field_flags.pop(0)
 
                         if "->" in current_identifier:
-                            expected = fields[
-                                current_identifier_short.split("->")[0]
-                            ]
+                            expected = fields[current_identifier_short.split("->")[0]]
                         else:
                             expected = fields
 
@@ -172,8 +150,7 @@ class TestStat():
                             rule = param_flags.pop(0)
 
                         bools = [
-                            _apply_flag(flag, expected, field, output_value)
-                            for flag in field_flags
+                            _apply_flag(flag, expected, field, output_value) for flag in field_flags
                         ]
 
                         if rule == ANY:
@@ -184,10 +161,7 @@ class TestStat():
                         if not all(resulting_bools):
                             break
                 else:
-                    _check_current_level(
-                        current_level[field],
-                        f"{current_identifier}->{field}"
-                    )
+                    _check_current_level(current_level[field], f"{current_identifier}->{field}")
 
         failed_params = {}
 
@@ -226,30 +200,20 @@ class TestStat():
                 continue
 
             test_output_value = get_innermost_value(param, test_output["data"])
-            param_flags = get_innermost_value(
-                param,
-                DATA_CALL_MAP[data_call]["output_params"]
-            )
+            param_flags = get_innermost_value(param, DATA_CALL_MAP[data_call]["output_params"])
             param_flags = param_flags.copy()
             rule = param_flags.pop(0)
 
             # Apply filters before ANY/ALL if there are such
             while rule not in [ANY, ALL]:
-                _apply_flag(
-                    rule,
-                    expected_output,
-                    param,
-                    test_output_value
-                )
+                _apply_flag(rule, expected_output, param, test_output_value)
                 rule = param_flags.pop(0)
 
             resulting_bools = [
-                _apply_flag(flag, expected_output, param, test_output_value)
-                for flag in param_flags
+                _apply_flag(flag, expected_output, param, test_output_value) for flag in param_flags
             ]
 
-            if (rule == ANY and any(resulting_bools)) or \
-                    (rule == ALL and all(resulting_bools)):
+            if (rule == ANY and any(resulting_bools)) or (rule == ALL and all(resulting_bools)):
                 continue
 
             failed_params[param] = test_output_value
@@ -293,9 +257,6 @@ class TestStat():
                     resulting_bools.clear()
 
             if not is_match:
-                failed_params[nested_param] = (
-                    "No item matching all"
-                    "the expected inputs found!"
-                )
+                failed_params[nested_param] = "No item matching all the expected inputs found!"
 
         return failed_params
