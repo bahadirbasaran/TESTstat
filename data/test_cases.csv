@@ -37,6 +37,8 @@ announced-prefixes,resource = 3333,status_code = 200;prefixes->prefix = 193.0.18
 as-overview,resource = 1111,status_code = 200
 as-overview,resource = 127.0.0.1,status_code = 200
 as-overview,resource = 140.78/16,status_code = 200
+as-overview,resource = 3333,status_code = 200;block->resource = 3154-3353
+as-overview,resource = 3333;query_time = 2020-12-12T12:00,status_code = 200;query_starttime = 2020-12-12t12:00:00;query_endtime = 2020-12-12t12:00:00
 as-overview,resource = loremipsum,status_code = 200
 as-path-length,resource = 1111,status_code = 200
 as-path-length,resource = loremipsum,status_code = 200

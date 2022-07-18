@@ -400,7 +400,7 @@ class TestCaseWindow():
             Qt.ItemIsUserCheckable |
             Qt.ItemIsEnabled |
             Qt.ItemIsEditable
-        )#
+        )
         item_data_call.setCheckState(Qt.Unchecked)
 
         # Set table items
@@ -430,42 +430,43 @@ class TestCaseWindow():
             cb for cb in self.input_names_in_previous_view if "checkbox" in cb
         ]
 
+        for cb in checkbox_names:
+            getattr(self, cb).clicked.connect(
+                lambda state,
+                checkbox=getattr(self, cb),
+                all_inputs=self.input_names_in_previous_view:
+                    self.execute_checkbox_changes(checkbox, all_inputs)
+            )
 
-        for checkbox_name in checkbox_names:
+    def execute_checkbox_changes(self, checkbox, all_input_fields):
 
-            getattr(self, checkbox_name).clicked.connect(lambda state, checkbox = getattr(self, checkbox_name), all_inputs=self.input_names_in_previous_view: self.execute_change(checkbox, all_inputs))
+        checkbox_name = checkbox.objectName()
 
-        
-    def execute_change(self, checkbox, all_input_fieleds):
+        for input_name in all_input_fields:
 
-                checkbox_name = checkbox.objectName()
-                for input_name in all_input_fieleds:
+            reference_to_input = getattr(self, input_name)
 
-                    reference_to_input = getattr(self, input_name)
+            if input_name.startswith(
+                checkbox_name.replace("checkbox", "expected") + '_'
+            ):
 
-                    if input_name.startswith(
-                        checkbox_name.replace("checkbox", "expected") + '_'
-                    ):
+                if getattr(self, checkbox_name).isChecked():
+                    reference_to_input.setEnabled(False)
+                    reference_to_input.setText('')
+                    reference_to_input.setStyleSheet(
+                        "background-color: rgb(225, 226, 232);"
+                    )
+                else:
+                    reference_to_input.setEnabled(True)
+                    reference_to_input.setStyleSheet(
+                        "background-color: rgb(255, 255, 255);"
+                    )
 
-                        if getattr(self, checkbox_name).isChecked():
-                            reference_to_input.setEnabled(False)
-                            reference_to_input.setText('')
-                            reference_to_input.setStyleSheet(
-                                "background-color: rgb(225, 226, 232);"
-                            )
-                        else:
-                            reference_to_input.setEnabled(True)
-                            reference_to_input.setStyleSheet(
-                                "background-color: rgb(255, 255, 255);"
-                            )
-                    
-                    elif input_name.startswith(checkbox_name + '_'):
+            elif input_name.startswith(checkbox_name + '_'):
 
-                        if getattr(self, checkbox_name).isChecked():
-                                reference_to_input.setChecked(True)
-                                reference_to_input.setEnabled(False)
-                        else:
-                            reference_to_input.setEnabled(True)
-                            reference_to_input.setChecked(False) 
-                        
-
+                if getattr(self, checkbox_name).isChecked():
+                    reference_to_input.setChecked(True)
+                    reference_to_input.setEnabled(False)
+                else:
+                    reference_to_input.setEnabled(True)
+                    reference_to_input.setChecked(False)
