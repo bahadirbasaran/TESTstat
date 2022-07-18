@@ -34,4 +34,5 @@ if __name__ == "__main__":
         ui = MainWindow()
         ui.setup_ui()
 
-        sys.exit(app.exec_()) # may be do not exit the app, but reset the window
+        # May not exit the app, but reset the window
+        sys.exit(app.exec_())

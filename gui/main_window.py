@@ -154,7 +154,10 @@ class MainWindow():
 
         btn_clear_outputs = QPushButton(
             central_widget,
-            clicked=lambda: self.on_btn_clear_outputs_click()
+            clicked=lambda: self.reset_main_window(
+                clear_tests=False,
+                confirmation=False
+            )
         )
         btn_clear_outputs.setText("Clear All Outputs")
         btn_clear_outputs.setGeometry(QRect(1090, 150, 130, 32))
@@ -187,8 +190,7 @@ class MainWindow():
         self.searchbar = QLineEdit(central_widget)
         self.searchbar.setGeometry(QRect(700, 100, 520, 32))
         self.searchbar.setStyleSheet("background-color: rgb(255, 255, 255);")
-        self.searchbar.textChanged.connect(self.update_display)
-
+        self.searchbar.textChanged.connect(self.update_table_test_suite)
 
         # Line Edits
 
@@ -219,19 +221,20 @@ class MainWindow():
 
     # Utilization methods
 
-    def update_display(self, text):
-        """Dynamically update table with tests corresponding to the string in the searchbar.
-        Set the Select_all checkbox unchecked with any change in the search string, 
-        so any resulting tests can be selected in bulk."""       
+    def update_table_test_suite(self, text):
+        """
+        Dynamically update the table with tests corresponding to the string in
+        the searchbar. Set the "Select All" checkbox unchecked with any change
+        in search string, so any resulting tests can be selected in bulk.
+        """
 
         self.checkbox_select_all.setChecked(False)
-        column = 0
+
         for row in range(self.table_test_suite.rowCount()):
-            if text.lower() in self.table_test_suite.item(row, column).text().lower():
+            if text.lower() in self.table_test_suite.item(row, 0).text():
                 self.table_test_suite.showRow(row)
             else:
                 self.table_test_suite.hideRow(row)
-
 
     def colorize_table_row(
         self,
@@ -442,12 +445,6 @@ class MainWindow():
                     f"Tests: {self.table_test_suite.rowCount()}"
                 )
 
-    def on_btn_clear_outputs_click(self):
-        self.reset_main_window(
-                clear_tests=False,
-                confirmation=False
-            )
-
     def on_btn_save_test_click(self):
         """Overrides TEST_CASES_PATH by using test cases in the table"""
 
@@ -484,21 +481,22 @@ class MainWindow():
                 )
 
                 csv_writer.writerow([data_call, test_input, expected_output])
-    
+
     def on_checkbox_select_all(self):
-        """Selects or deselects all the currently visible tests.
-        Applicable while searching for tests using the searchbar and selecting all 
-        found tests in bulk."""
-        
-        column = 0
+        """
+        Selects or deselects all the currently visible tests.
+        Applicable while searching for tests using the searchbar and selecting
+        all found tests in bulk.
+        """
+
         if self.checkbox_select_all.isChecked():
             for row in range(self.table_test_suite.rowCount()):
                 if not self.table_test_suite.isRowHidden(row):
-                    self.table_test_suite.item(row, column).setCheckState(Qt.Checked)
+                    self.table_test_suite.item(row, 0).setCheckState(Qt.Checked)
         else:
             for row in range(self.table_test_suite.rowCount()):
                 if not self.table_test_suite.isRowHidden(row):
-                    self.table_test_suite.item(row, column).setCheckState(Qt.Unchecked)
+                    self.table_test_suite.item(row, 0).setCheckState(Qt.Unchecked)
 
     def on_btn_run_click(self):
         """Runs all/selected test cases in the table"""
@@ -743,7 +741,11 @@ class MainWindow():
                 self.label_status.setText(
                     f"{num_passed_tests} / {num_total_tests} passed"
                 )
-                self.table_test_suite.setItem(row_index, 3, QTableWidgetItem(""))
+                self.table_test_suite.setItem(
+                    row_index,
+                    3,
+                    QTableWidgetItem("")
+                )
                 self.colorize_table_row(
                     row_index,
                     ColorEnum.BLACK,

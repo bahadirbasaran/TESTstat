@@ -6,7 +6,9 @@ def get_innermost_value(param, param_set):
             if index == 0:
                 inner_param_value = param_set[inner_param]
             else:
-                if isinstance(inner_param_value, list): inner_param_value = inner_param_value[0]
+                if isinstance(inner_param_value, list):
+                    inner_param_value = inner_param_value[0]
+
                 inner_param_value = inner_param_value[inner_param]
     else:
         inner_param_value = param_set[param]
@@ -129,7 +131,9 @@ def reshape_param_set(param_set):
         current_dict = reshaped_param_set
         *parts, last = key.split('->')
 
-        if len(parts)>0 and parts[0] in current_dict and current_dict[parts[0]]=="notempty":
+        if len(parts) > 0 and \
+            parts[0] in current_dict and \
+                current_dict[parts[0]] == "notempty":
             continue
         else:
             for part in parts:
