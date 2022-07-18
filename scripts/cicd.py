@@ -30,11 +30,7 @@ def run_cicd_tests(host):
 
             print(f"Test Case {row_index}:", end=' ')
 
-            test_output = teststat.run_test(
-                data_call,
-                test_input,
-                expected_output
-            )
+            test_output = teststat.run_test(data_call, test_input, expected_output)
 
             print("----> Expected: ", row[2].replace(';', ' | '), end='\n\n')
 

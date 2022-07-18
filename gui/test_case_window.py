@@ -3,9 +3,8 @@ from core.config import DATA_CALL_MAP, NESTED_PARAMS
 
 from PyQt5.QtCore import Qt, QRect
 from PyQt5.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QPushButton, \
-                            QLabel, QComboBox, QTableWidgetItem, QCheckBox, \
-                            QLineEdit, QFormLayout, QScrollArea
-
+    QLabel, QComboBox, QTableWidgetItem, QCheckBox, QLineEdit, QFormLayout, QScrollArea
+                            
 
 class TestCaseWindow():
 
@@ -46,9 +45,7 @@ class TestCaseWindow():
         hbox_cancel_save.setContentsMargins(0, 0, 0, 0)
 
         scroll_area_input_container = QWidget()
-        scroll_area_input_container.setObjectName(
-            "scroll_area_input_container"
-        )
+        scroll_area_input_container.setObjectName("scroll_area_input_container")
         scroll_area_input = QScrollArea(central_widget)
         scroll_area_input.setWidgetResizable(True)
         scroll_area_input.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
@@ -56,9 +53,7 @@ class TestCaseWindow():
         scroll_area_input.setGeometry(QRect(50, 110, 370, 310))
 
         scroll_area_output_container = QWidget()
-        scroll_area_output_container.setObjectName(
-            "scroll_area_output_container"
-        )
+        scroll_area_output_container.setObjectName("scroll_area_output_container")
         scroll_area_output = QScrollArea(central_widget)
         scroll_area_output.setWidgetResizable(True)
         scroll_area_output.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
@@ -107,16 +102,10 @@ class TestCaseWindow():
         combobox_data_call = QComboBox()
         combobox_data_call.setStyleSheet("QComboBox { combobox-popup: 0; }")
         combobox_data_call.setMaxVisibleItems(15)
-        combobox_data_call.view().setVerticalScrollBarPolicy(
-            Qt.ScrollBarAsNeeded
-        )
-        combobox_data_call.addItems(
-            [specs["data_call_name"] for _, specs in DATA_CALL_MAP.items()]
-        )
+        combobox_data_call.view().setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        combobox_data_call.addItems([specs["data_call_name"] for _, specs in DATA_CALL_MAP.items()])
         combobox_data_call.currentIndexChanged.connect(
-            lambda: self.on_combobox_data_call_changed(
-                combobox_data_call.currentText()
-            )
+            lambda: self.on_combobox_data_call_changed(combobox_data_call.currentText())
         )
 
         # Line Edits
@@ -168,19 +157,11 @@ class TestCaseWindow():
                 reference_to_input = getattr(self, f"test_input_{param}")
                 reference_to_input.setObjectName(f"test_input_{param}")
                 self.items_in_previous_view.append(reference_to_input)
-                reference_to_input.setStyleSheet(
-                    "background-color: rgb(255,255,255);"
-                )
-                self.form_layout_input.addRow(
-                    reference_to_label,
-                    reference_to_input
-                )
+                reference_to_input.setStyleSheet("background-color: rgb(255,255,255);")
 
-        def _populate_output_area(
-            param_set,
-            parent_label=None,
-            parent_var=None
-        ):
+                self.form_layout_input.addRow(reference_to_label, reference_to_input)
+
+        def _populate_output_area(param_set, parent_label=None, parent_var=None):
             """
             There are 3 possible scenarios for a parameter in DATA_CALL_MAP:
                 1) It carries a list of conditional flags used while testing:
@@ -202,8 +183,7 @@ class TestCaseWindow():
 
                 # Create first a checkbox "Not Empty" for nested parameters
                 if isinstance(value, dict) and \
-                    (param in NESTED_PARAMS or
-                        f"{parent_label}->{param}" in NESTED_PARAMS):
+                    (param in NESTED_PARAMS or f"{parent_label}->{param}" in NESTED_PARAMS):
 
                     label_identifier = f"{param}:" if not parent_label \
                         else f"{parent_label}->{param}:"
@@ -225,14 +205,9 @@ class TestCaseWindow():
                     self.input_names_in_previous_view.append(cb_input_name)
                     self.items_in_previous_view.append(reference_to_input)
 
-                    reference_to_input.stateChanged.connect(
-                         lambda: self.on_checkbox_change()
-                    )
+                    reference_to_input.stateChanged.connect(lambda: self.on_checkbox_change())
 
-                    self.form_layout_output.addRow(
-                        reference_to_label,
-                        reference_to_input
-                    )
+                    self.form_layout_output.addRow(reference_to_label, reference_to_input)
 
                 # Regular label-input fields creation
 
@@ -249,16 +224,9 @@ class TestCaseWindow():
                     reference_to_input = getattr(self, f"expected_input_{var}")
                     reference_to_input.setObjectName(f"expected_input_{var}")
                     self.items_in_previous_view.append(reference_to_input)
-                    self.input_names_in_previous_view.append(
-                        f"expected_input_{var}"
-                    )
-                    reference_to_input.setStyleSheet(
-                        "background-color: rgb(255,255,255);"
-                    )
-                    self.form_layout_output.addRow(
-                        reference_to_label,
-                        reference_to_input
-                    )
+                    self.input_names_in_previous_view.append(f"expected_input_{var}")
+                    reference_to_input.setStyleSheet("background-color: rgb(255,255,255);")
+                    self.form_layout_output.addRow(reference_to_label, reference_to_input)
                 # Scenario 2
                 else:
                     _populate_output_area(param_set[param], label, var)
@@ -314,12 +282,8 @@ class TestCaseWindow():
 
             return test_input
 
-        def _get_output_params(
-            param_set,
-            output_params,
-            parent_label=None,
-            parent_var=None
-        ):
+        def _get_output_params(param_set, output_params, parent_label=None, parent_var=None):
+
             for param, value in param_set.items():
 
                 label = parent_label + "->" + param if parent_label else param
@@ -346,12 +310,7 @@ class TestCaseWindow():
 
                 # Scenario 2 described in the function _populate_output_area
                 else:
-                    output_params = _get_output_params(
-                        param_set[param],
-                        output_params,
-                        label,
-                        var
-                    )
+                    output_params = _get_output_params(param_set[param], output_params, label, var)
 
             return output_params
 
@@ -359,11 +318,7 @@ class TestCaseWindow():
         for param in DATA_CALL_MAP[self.data_call]["required_params"]:
             reference_to_input = getattr(self, f"test_input_{param}")
             if reference_to_input.text() == '':
-                throw_message(
-                    MessageEnum.CRITICAL,
-                    "Error",
-                    "Missing required parameters!"
-                )
+                throw_message(MessageEnum.CRITICAL, "Error", "Missing required parameters!")
                 return
 
         # Create a new row in the table
@@ -371,8 +326,8 @@ class TestCaseWindow():
         self.main_ui.table_test_suite.setRowCount(row_count + 1)
 
         test_input = _get_input_params(
-            DATA_CALL_MAP[self.data_call]["required_params"] +
-            DATA_CALL_MAP[self.data_call]["optional_params"]
+            DATA_CALL_MAP[self.data_call]["required_params"]
+            + DATA_CALL_MAP[self.data_call]["optional_params"]
         )
 
         # If user does not type an input for status code, it is 200 by default
@@ -396,29 +351,19 @@ class TestCaseWindow():
         item_expected_output = QTableWidgetItem(expected_output)
         item_test_output = QTableWidgetItem("")
 
-        item_data_call.setFlags(
-            Qt.ItemIsUserCheckable |
-            Qt.ItemIsEnabled |
-            Qt.ItemIsEditable
-        )
+        item_data_call.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsEditable)
         item_data_call.setCheckState(Qt.Unchecked)
 
         # Set table items
         self.main_ui.table_test_suite.setItem(row_count, 0, item_data_call)
         self.main_ui.table_test_suite.setItem(row_count, 1, item_test_input)
-        self.main_ui.table_test_suite.setItem(
-            row_count,
-            2,
-            item_expected_output
-        )
+        self.main_ui.table_test_suite.setItem(row_count, 2, item_expected_output)
         self.main_ui.table_test_suite.setItem(row_count, 3, item_test_output)
 
         self.main_ui.table_test_suite.resizeRowsToContents()
 
         # Update test case count in the main window
-        self.main_ui.label_status.setText(
-            f"Tests: {self.main_ui.table_test_suite.rowCount()}"
-        )
+        self.main_ui.label_status.setText(f"Tests: {self.main_ui.table_test_suite.rowCount()}")
 
         self.test_case_window.close()
 
@@ -426,9 +371,7 @@ class TestCaseWindow():
 
     def on_checkbox_change(self):
 
-        checkbox_names = [
-            cb for cb in self.input_names_in_previous_view if "checkbox" in cb
-        ]
+        checkbox_names = [cb for cb in self.input_names_in_previous_view if "checkbox" in cb]
 
         for cb in checkbox_names:
             getattr(self, cb).clicked.connect(
@@ -446,24 +389,15 @@ class TestCaseWindow():
 
             reference_to_input = getattr(self, input_name)
 
-            if input_name.startswith(
-                checkbox_name.replace("checkbox", "expected") + '_'
-            ):
-
+            if input_name.startswith(checkbox_name.replace("checkbox", "expected") + '_'):
                 if getattr(self, checkbox_name).isChecked():
                     reference_to_input.setEnabled(False)
                     reference_to_input.setText('')
-                    reference_to_input.setStyleSheet(
-                        "background-color: rgb(225, 226, 232);"
-                    )
+                    reference_to_input.setStyleSheet("background-color: rgb(225, 226, 232);")
                 else:
                     reference_to_input.setEnabled(True)
-                    reference_to_input.setStyleSheet(
-                        "background-color: rgb(255, 255, 255);"
-                    )
-
+                    reference_to_input.setStyleSheet("background-color: rgb(255, 255, 255);")
             elif input_name.startswith(checkbox_name + '_'):
-
                 if getattr(self, checkbox_name).isChecked():
                     reference_to_input.setChecked(True)
                     reference_to_input.setEnabled(False)
