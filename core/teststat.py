@@ -9,6 +9,8 @@ from core.config import ALL, ANY, COMPARE, INCLUDE, INCLUDE_KEYS, \
 # Import parameter related definitions
 from core.config import DATA_CALL_MAP, NESTED_PARAMS
 
+from gui.utils import MessageEnum
+
 
 class TestStat():
 
@@ -115,7 +117,7 @@ class TestStat():
 
         def _check_current_level(current_level, current_identifier):
             """
-            Checks if all block fields match with the comparison criteria
+            Checks if all block fields match with the comparison rule
             from top to bottom node, level by level and populates the list
             resulting_bools with evaluation results.
             """
@@ -124,40 +126,63 @@ class TestStat():
 
                 if not isinstance(current_level[field], dict):
 
-                    field_flags = get_innermost_value(
-                        f"{current_identifier}->{field}",
-                        DATA_CALL_MAP[data_call]["output_params"]
-                    )
-                    field_flags = field_flags.copy()
-                    criteria = field_flags.pop(0)
-
+                    # Get the output value from the data call response block
                     if "->" in current_identifier:
-                        current_identifier = "->".join(
+                        current_identifier_short = "->".join(
                             current_identifier.split("->")[1:] + [field]
                         )
                         output_value = get_innermost_value(
-                            current_identifier,
+                            current_identifier_short,
                             block
                         )
-                        expected = fields[current_identifier.split("->")[0]]
                     else:
                         output_value = get_innermost_value(field, block)
-                        expected = fields
 
-                    # Apply filters before ANY/ALL if there are such
-                    while criteria not in [ANY, ALL]:
-                        _apply_flag(criteria, expected, field, output_value)
-                        criteria = param_flags.pop(0)
+                    # Checking for the "notempty" flag or the output and
+                    # expected parameters "notempty" could be applied to a
+                    # nested parameter, such as "prefix->timelines". In this
+                    # case the output_value is a list. Alternatively, notempty
+                    # could be applied to a non-nested parameter. In this case
+                    # the output_value is a string to satisfy the possibilities
+                    # above, the length of the output_value is checked.
+                    if current_level[field] == "notempty":
+                        if len(output_value) > 0:
+                            resulting_bools.append(True)
+                        else:
+                            resulting_bools.append(False)
+                    else:
+                        field_flags = get_innermost_value(
+                            f"{current_identifier}->{field}",
+                            DATA_CALL_MAP[data_call]["output_params"]
+                        )
+                        field_flags = field_flags.copy()
 
-                    bools = [
-                        _apply_flag(flag, expected, field, output_value)
-                        for flag in field_flags
-                    ]
+                        rule = field_flags.pop(0)
 
-                    if criteria == ANY:
-                        resulting_bools.append(any(bools))
-                    elif criteria == ALL:
-                        resulting_bools.append(all(bools))
+                        if "->" in current_identifier:
+                            expected = fields[
+                                current_identifier_short.split("->")[0]
+                            ]
+                        else:
+                            expected = fields
+
+                        # Apply filters before ANY/ALL if there are such
+                        while rule not in [ANY, ALL]:
+                            _apply_flag(rule, expected, field, output_value)
+                            rule = param_flags.pop(0)
+
+                        bools = [
+                            _apply_flag(flag, expected, field, output_value)
+                            for flag in field_flags
+                        ]
+
+                        if rule == ANY:
+                            resulting_bools.append(any(bools))
+                        elif rule == ALL:
+                            resulting_bools.append(all(bools))
+
+                        if not all(resulting_bools):
+                            break
                 else:
                     _check_current_level(
                         current_level[field],
@@ -206,31 +231,33 @@ class TestStat():
                 DATA_CALL_MAP[data_call]["output_params"]
             )
             param_flags = param_flags.copy()
-            criteria = param_flags.pop(0)
+            rule = param_flags.pop(0)
 
             # Apply filters before ANY/ALL if there are such
-            while criteria not in [ANY, ALL]:
+            while rule not in [ANY, ALL]:
                 _apply_flag(
-                    criteria,
+                    rule,
                     expected_output,
                     param,
                     test_output_value
                 )
-                criteria = param_flags.pop(0)
+                rule = param_flags.pop(0)
 
             resulting_bools = [
                 _apply_flag(flag, expected_output, param, test_output_value)
                 for flag in param_flags
             ]
 
-            if (criteria == ANY and any(resulting_bools)) or \
-                    (criteria == ALL and all(resulting_bools)):
+            if (rule == ANY and any(resulting_bools)) or \
+                    (rule == ALL and all(resulting_bools)):
                 continue
 
             failed_params[param] = test_output_value
 
         # After dealing with all regular parameters, nested parameters are
-        # evaluated below.
+        # evaluated below. The following evaluation is based on the highest
+        # nested parameter in the hierarchy.
+        # Example: prefixes->timelines->startdate the nested param is prefixes
         for nested_param, fields in reshape_param_set(nested_params).items():
 
             # If a checkbox "Not Empty" is checked for a nested parameter,
@@ -253,7 +280,7 @@ class TestStat():
 
                 # At this point, current block includes all the fields in the
                 # corresponding fields of the nested parameter. Then, check if
-                # all those block fields match with the comparison criteria.
+                # all those block fields match with the comparison rule.
                 # The function below populates the list resulting_bools.
                 _check_current_level(fields, nested_param)
 

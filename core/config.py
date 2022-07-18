@@ -49,15 +49,15 @@ NESTED_PARAMS = [
     "ip_stats",
     "iana",
     "ripencc",
-    # "iana->timelines",
-    # "ripencc->timelines",
+    "iana->timelines",
+    "ripencc->timelines",
     "prefixes",
-    # "prefixes->timelines',
+    "prefixes->timelines",
     "stats",
     "imports",
     "exports",
     "neighbours",
-    # "neighbours->timelines',
+    "neighbours->timelines",
     "probes"
 ]
 
@@ -181,12 +181,12 @@ DATA_CALL_MAP = {
             "iana": {
                 "resource": [ANY, NOT_EMPTY, MATCH],
                 "status": [ANY, NOT_EMPTY, MATCH],
-                # "timelines": CommonParamsEnum.TIMELINES
+                "timelines": CommonParamsEnum.TIMELINES
             },
             "ripencc": {
                 "resource": [ANY, NOT_EMPTY, MATCH],
                 "status": [ANY, NOT_EMPTY, MATCH],
-                # "timelines": CommonParamsEnum.TIMELINES
+                "timelines": CommonParamsEnum.TIMELINES
             },
             "resource": [ANY, NOT_EMPTY, MATCH],
             "query_starttime": [ANY, NOT_EMPTY, MATCH],
@@ -201,7 +201,7 @@ DATA_CALL_MAP = {
         "output_params": {
             "prefixes": {
                 "prefix": [ANY, NOT_EMPTY, MATCH],
-                # "timelines": CommonParamsEnum.TIMELINES,
+                "timelines": CommonParamsEnum.TIMELINES,
             },
             "earliest_time": [ANY, NOT_EMPTY, MATCH],
             "latest_time": [ANY, NOT_EMPTY, MATCH],
@@ -300,7 +300,7 @@ DATA_CALL_MAP = {
         "output_params": {
             "neighbours": {
                 "neighbour": [ANY, NOT_EMPTY, MATCH, COMPARE],
-                # "timelines": CommonParamsEnum.TIMELINES
+                "timelines": CommonParamsEnum.TIMELINES
             },
             "earliest_time": [ANY, NOT_EMPTY, MATCH],
             "latest_time": [ANY, NOT_EMPTY, MATCH],
