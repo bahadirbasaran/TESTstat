@@ -20,4 +20,5 @@ jobs:
           # ./core/teststat.py:49:20: F821 undefined name 'MessageEnum'
           # ./core/teststat.py:52:20: F821 undefined name 'MessageEnum'
           ignore: "F821"
+          ignore: "W504"
           max-line-length: "100"
