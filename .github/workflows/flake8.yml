@@ -15,3 +15,9 @@ jobs:
           python-version: "3.10"
       - name: flake8 Lint
         uses: py-actions/flake8@v2
+        with:
+          # In order to avoid:
+          # ./core/teststat.py:49:20: F821 undefined name 'MessageEnum'
+          # ./core/teststat.py:52:20: F821 undefined name 'MessageEnum'
+          ignore: "F821"
+          max-line-length: "100"
