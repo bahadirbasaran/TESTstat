@@ -8,7 +8,7 @@ from PyQt5.QtCore import Qt, QRect
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QMainWindow, QWidget, QGroupBox, QHBoxLayout, \
     QLabel, QPushButton, QComboBox, QTableWidget, QTableWidgetItem, \
-        QProgressBar, QLineEdit, QApplication, QDialog, QCheckBox
+    QProgressBar, QLineEdit, QApplication, QDialog, QCheckBox
 
 
 TEST_CASES_PATH = "data/test_cases.csv"
@@ -334,7 +334,11 @@ class MainWindow():
                 throw_message(MessageEnum.CRITICAL, "Import Error", "The test suite is malformed!")
                 return
             if len(csv_file.readlines()) < 1:
-                throw_message(MessageEnum.CRITICAL, "Import Error", "No available test case to import!")
+                throw_message(
+                    MessageEnum.CRITICAL,
+                    "Import Error",
+                    "No available test case to import!"
+                )
                 return
 
         with open(TEST_CASES_PATH) as csv_file:

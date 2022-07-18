@@ -4,7 +4,7 @@ from core.config import DATA_CALL_MAP, NESTED_PARAMS
 from PyQt5.QtCore import Qt, QRect
 from PyQt5.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QPushButton, \
     QLabel, QComboBox, QTableWidgetItem, QCheckBox, QLineEdit, QFormLayout, QScrollArea
-                            
+
 
 class TestCaseWindow():
 
@@ -183,7 +183,7 @@ class TestCaseWindow():
 
                 # Create first a checkbox "Not Empty" for nested parameters
                 if isinstance(value, dict) and \
-                    (param in NESTED_PARAMS or f"{parent_label}->{param}" in NESTED_PARAMS):
+                        (param in NESTED_PARAMS or f"{parent_label}->{param}" in NESTED_PARAMS):
 
                     label_identifier = f"{param}:" if not parent_label \
                         else f"{parent_label}->{param}:"
@@ -326,8 +326,8 @@ class TestCaseWindow():
         self.main_ui.table_test_suite.setRowCount(row_count + 1)
 
         test_input = _get_input_params(
-            DATA_CALL_MAP[self.data_call]["required_params"]
-            + DATA_CALL_MAP[self.data_call]["optional_params"]
+            DATA_CALL_MAP[self.data_call]["required_params"] +
+            DATA_CALL_MAP[self.data_call]["optional_params"]
         )
 
         # If user does not type an input for status code, it is 200 by default
