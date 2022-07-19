@@ -34,13 +34,12 @@ class TestStat():
         else:
             throw_message(MessageEnum.CRITICAL, "Port Error", "Port cannot include characters!")
 
-    def run_test(self, data_call, test_input, expected_output, debug=False):
+    def run_test(self, data_call, test_input, expected_output):
 
         try:
             request = f"{self.raw_query}{data_call}/data.json?{test_input}"
 
-            if debug:
-                print(request)
+            print(request)
 
             response = requests.get(request, timeout=30)
 
