@@ -11,7 +11,8 @@ def run_cicd_tests(host):
 
     teststat = TestStat(host, cicd=True)
 
-    failed_calls = []
+    failed_test_cases = []
+    failed_data_calls = []
 
     with open(TEST_CASES_PATH) as csv_file:
 
@@ -38,15 +39,26 @@ def run_cicd_tests(host):
                 print(f"----> Test Case {row_index} failed!")
 
                 for param, value in expected_output.items():
-                    print(f"Parameter {param}:")
-                    print(f"Expected: {value} - Actual: {test_output[param]}")
+                    print(f"------> Parameter {param}:")
+                    print(f"------> Expected: {value} | Actual: {test_output[param]}")
 
-                if data_call not in failed_calls:
-                    failed_calls.append(data_call)
+
+                failed_test_cases.append(str(row_index))
+
+                if data_call not in failed_data_calls:
+                    failed_data_calls.append(data_call)
 
             print("\n")
 
-    if failed_calls:
-        sys.exit(', '.join(failed_calls))
+    if failed_data_calls:
+        failed_test_cases = ', '.join(failed_test_cases)
+        failed_data_calls = ', '.join(failed_data_calls)
+
+        script_return = (
+            f"Failed Test Cases: {failed_test_cases}\n"
+            f"Failed Data Calls: {failed_data_calls}"
+        )
+
+        sys.exit(script_return)
     else:
         sys.exit(0)
