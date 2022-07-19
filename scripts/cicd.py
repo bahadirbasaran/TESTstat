@@ -42,11 +42,10 @@ def run_cicd_tests(host):
                     print(f"------> Parameter {param}:")
                     print(f"------> Expected: {value} | Actual: {test_output[param]}")
 
-
                 failed_test_cases.append(str(row_index))
 
                 if data_call not in failed_data_calls:
-                    failed_data_calls.append(data_call)
+                    failed_data_calls.append(data_call.replace('-', ' ').title())
 
             print("\n")
 
