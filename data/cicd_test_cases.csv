@@ -57,7 +57,6 @@ blocklist,resource = 193/23,status_code = 200
 country-asns,resource = nl,status_code = 200
 country-resource-list,resource = at,status_code = 200
 country-resource-stats,resource = at,status_code = 200
-atlas-targets,resource = 140.78/16,status_code = 200
 bgp-state,resource = 140.78/16,status_code = 200
 bgp-update-activity,resource = 140.78/16,status_code = 200
 bgp-updates,resource = 140.78/16,status_code = 200
