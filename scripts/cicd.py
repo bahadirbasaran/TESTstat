@@ -41,7 +41,7 @@ def run_cicd_tests(host):
                     print(f"Parameter {param}:")
                     print(f"Expected: {value} - Actual: {test_output[param]}")
 
-                #sys.exit(f"Job failed at Test Case {row_index}!")
+                # sys.exit(f"Job failed at Test Case {row_index}!")
                 if data_call not in failed_calls:
                     failed_calls.append(data_call)
 
