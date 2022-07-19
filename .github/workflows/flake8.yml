@@ -14,7 +14,7 @@ jobs:
         with:
           python-version: "3.10"
       - name: flake8 Lint
-        uses: py-actions/flake8@v2
+        uses: py-actions/flake8@v4
         with:
           # In order to avoid:
           # ./core/teststat.py:49:20: F821 undefined name 'MessageEnum'
