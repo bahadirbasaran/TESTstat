@@ -66,6 +66,7 @@ country-resource-list,resource = at,status_code = 200
 historical-whois,resource = 193.0.20.0/24,status_code = 200
 iana-registry-info,resource = 193/23,status_code = 200
 looking-glass,resource = 140.78.0.0/16,status_code = 200
+looking-glass,resource = asdfasd,status_code = 200
 maxmind-geo-lite,resource = 193/23,status_code = 200
 maxmind-geo-lite-announced-by-as,resource = 3333,status_code = 200
 meternet-bandwidth-measurements,resource = 140.78/16,status_code = 200
@@ -89,6 +90,7 @@ ris-peers,,status_code = 200
 ris-prefixes,resource = 3333,status_code = 200
 routing-history,resource = 3333,status_code = 200
 routing-status,resource = 3333,status_code = 200
+routing-status,resource = afasdfasdf,status_code = 200
 rpki-history,resource = 3333,status_code = 200
 rpki-validation,resource = 3333;prefix = 193/21,status_code = 200
 rrc-info,,status_code = 200
