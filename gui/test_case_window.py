@@ -326,8 +326,8 @@ class TestCaseWindow():
         self.main_ui.table_test_suite.setRowCount(row_count + 1)
 
         test_input = _get_input_params(
-            DATA_CALL_MAP[self.data_call]["required_params"]
-            + DATA_CALL_MAP[self.data_call]["optional_params"]
+            DATA_CALL_MAP[self.data_call]["required_params"] +
+            DATA_CALL_MAP[self.data_call]["optional_params"]
         )
 
         # If user does not type an input for status code, it is 200 by default
