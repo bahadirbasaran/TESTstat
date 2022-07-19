@@ -45,4 +45,7 @@ def run_cicd_tests(host):
                 if data_call not in failed_calls:
                     failed_calls.append(data_call)
 
-    sys.exit(failed_calls)
+    if failed_calls:
+        sys.exit(failed_calls)
+    else:
+        sys.exit(0)
