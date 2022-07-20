@@ -3,7 +3,6 @@ abuse-contact-finder,resource = 3333,status_code = 200
 abuse-contact-finder,resource = as3333,status_code = 200;parameters->resource = 3333
 abuse-contact-finder,resource = 3333,status_code = 200;abuse_contacts = not empty
 abuse-contact-finder,resource = 3333,status_code = 200;abuse_contacts = abuse@ripe.net
-abuse-contact-finder,resource = 3333,status_code = 200;abuse_contacts = abuse@ripe.netsfaf
 address-space-hierarchy,resource = 193/21,status_code = 200;less_specific = not empty
 address-space-hierarchy,resource = 193/21,status_code = 200;rir = ripe;resource = 193.0.0.0/21;parameters->resource = 193.0.0.0/21;exact->netname = ripe-ncc;exact->org = org-rien1-ripe;exact->source = ripe;less_specific->netname = nl-ripencc-ops-990305;less_specific->country = nl;less_specific->mnt-lower = ripe-ncc-mnt
 address-space-hierarchy,resource = 193/21,status_code = 200;exact->org = not empty
@@ -15,7 +14,6 @@ address-space-usage,resource = 193/23,status_code = 200;assignments->asn_name = 
 address-space-usage,resource = 193/23,status_code = 200;query_time = not empty;resource = 193.0.0.0/23;assignments->address_range = 193.0.0.0/21;assignments->status = assignedpa;allocations->assignments = >0;ip_stats->ips = >0
 allocation-history,resource = 190.28,status_code = 200
 allocation-history,resource = 190.28,status_code = 200;resource = 12451868
-allocation-history,resource = 190.28,status_code = 200;resource = 124513333333
 allocation-history,resource = 190.28,status_code = 200;iana->resource = 65537-4294967294;iana->status = iana
 allocation-history,resource = 190.28,status_code = 200;iana = not empty
 allocation-history,resource = 140.78/16;starttime = 2020-12-12T12:00,status_code = 200;iana = not empty;ripencc = not empty
