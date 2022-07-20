@@ -9,6 +9,8 @@ TEST_CASES_PATH = "data/cicd_test_cases.csv"
 
 def run_cicd_tests(host):
 
+    sys.stdout.flush()
+
     teststat = TestStat(host, cicd=True)
 
     failed_test_cases = []
@@ -20,7 +22,7 @@ def run_cicd_tests(host):
 
         next(csv_reader)
 
-        print("Host: ", host)
+        print("Host: ", host, '\n')
 
         for row_index, row in enumerate(csv_reader, 1):
 
@@ -31,7 +33,7 @@ def run_cicd_tests(host):
                 param, value = param_value_pair.replace(' ', '').split('=', 1)
                 expected_output[param] = value.replace('&', ',')
 
-            print(f"Test Case {row_index} ->", end=' ')
+            print(f"Test Case {row_index}:")
 
             test_output = teststat.run_test(data_call, test_input, expected_output)
 
