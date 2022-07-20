@@ -39,7 +39,7 @@ class TestStat():
         try:
             request = f"{self.raw_query}{data_call}/data.json?{test_input}"
 
-            print(request)
+            print(request, end='\n')
 
             response = requests.get(request, timeout=30)
 
