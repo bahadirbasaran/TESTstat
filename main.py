@@ -18,11 +18,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # If there is a host name in arguments, run TESTstat for the CI job.
-    # Otherwise initiate the GUI for manual usage.
+    # Otherwise setup and initiate the GUI for manual usage.
     if args.host:
         from scripts.cicd import run_cicd_tests
 
-        print(f"Host: {args.host}")
         run_cicd_tests(args.host)
     else:
         from PyQt5.QtWidgets import QApplication
