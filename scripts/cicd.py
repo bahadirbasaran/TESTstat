@@ -20,6 +20,8 @@ def run_cicd_tests(host):
 
         next(csv_reader)
 
+        print("Host: ", host)
+
         for row_index, row in enumerate(csv_reader, 1):
 
             data_call = row[0]
