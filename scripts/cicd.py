@@ -20,7 +20,7 @@ def run_cicd_tests(host):
 
         next(csv_reader)
 
-        print("Host: ", host, end='\n')
+        print("Host: ", host)
 
         for row_index, row in enumerate(csv_reader, 1):
 
@@ -35,14 +35,14 @@ def run_cicd_tests(host):
 
             test_output = teststat.run_test(data_call, test_input, expected_output)
 
-            print("--> Expected: ", row[2].replace(';', ' | '), end='\n')
+            print("--> Expected: ", row[2].replace(';', ' | '))
 
             if test_output:
-                print(f"----> Test Case {row_index} failed!", end='\n')
+                print(f"----> Test Case {row_index} failed!")
 
                 for param, value in expected_output.items():
-                    print(f"------> Parameter {param}:", end='\n')
-                    print(f"------> Expected: {value} | Actual: {test_output[param]}", end='\n')
+                    print(f"------> Parameter {param}:")
+                    print(f"------> Expected: {value} | Actual: {test_output[param]}")
 
                 failed_test_cases.append(str(row_index))
 
@@ -52,9 +52,6 @@ def run_cicd_tests(host):
             print("\n")
 
     if failed_data_calls:
-
-        print("\n")
-
         failed_test_cases = ', '.join(failed_test_cases)
         failed_data_calls = ', '.join(failed_data_calls)
 
