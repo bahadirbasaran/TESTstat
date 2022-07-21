@@ -37,6 +37,8 @@ announced-prefixes,resource = 3333,status_code = 200;prefixes->prefix = 193.0.18
 as-overview,resource = 1111,status_code = 200
 as-overview,resource = 127.0.0.1,status_code = 200
 as-overview,resource = 140.78/16,status_code = 200
+as-overview,resource = 3333,status_code = 200;block->resource = 3154-3353
+as-overview,resource = 3333;query_time = 2020-12-12T12:00,status_code = 200;query_starttime = 2020-12-12t12:00:00;query_endtime = 2020-12-12t12:00:00
 as-overview,resource = loremipsum,status_code = 200
 as-path-length,resource = 1111,status_code = 200
 as-path-length,resource = loremipsum,status_code = 200
@@ -67,11 +69,6 @@ asn-neighbours-history,resource = loremipsum,status_code = 200
 asn-neighbours-history,resource = 1205,status_code = 200;neighbours = not empty
 asn-neighbours-history,resource = 1205;starttime = 2020-10-10T12:00;max_rows = 50,status_code = 200;neighbours = not empty
 asn-neighbours-history,resource = 1205;starttime = 2020-10-10T12:00;max_rows = 50,status_code = 200;neighbours->neighbour = >=1000;query_starttime = 2022-01-13t00:00:00;resource = 1205
-dns-chain,resource = www.ripe.net,status_code = 200
-dns-chain,resource = loremipsum,status_code = 200
-dns-chain,resource = www.ripe.net,status_code = 200;forward_nodes = www.ripe.net&www.ripe.net.cdn.cloudflare.net;reverse_nodes = 104.18.21.44&104.18.20.44;nameservers = 193.0.19.101;authoritative_nameservers = manus.authdns.ripe.net&rirns.arin.net
-dns-chain,resource = ripe.net,status_code = 200;forward_nodes = not empty;reverse_nodes = not empty;nameservers = not empty;authoritative_nameservers = not empty
-dns-chain,resource = www.ripe.net,status_code = 200;nameservers = 127.0.0.1
 atlas-probe-deployment,resource = tr,status_code = 200
 atlas-probe-deployment,resource = loremipsum,status_code = 200
 atlas-probes,resource = at,status_code = 200
@@ -94,22 +91,11 @@ country-resource-list,resource = at,status_code = 200
 country-resource-list,resource = loremipsum,status_code = 200
 country-resource-stats,resource = at,status_code = 200
 country-resource-stats,resource = loremipsum,status_code = 200
-atlas-targets,resource = 140.78/16,status_code = 200
-atlas-targets,resource = loremipsum,status_code = 200
-bgp-state,resource = 140.78/16,status_code = 200
-bgp-state,resource = loremipsum,status_code = 200
-bgp-update-activity,resource = 140.78/16,status_code = 200
-bgp-update-activity,resource = loremipsum,status_code = 200
-bgp-updates,resource = 140.78/16,status_code = 200
-bgp-updates,resource = loremipsum,status_code = 200
-bgplay,resource = 140.78/16,status_code = 200
-bgplay,resource = loremipsum,status_code = 200
-blocklist,resource = 193/23,status_code = 200
-blocklist,resource = loremipsum,status_code = 200
-country-asns,resource = nl,status_code = 200
-country-asns,resource = loremipsum,status_code = 200
-country-resource-list,resource = at,status_code = 200
-country-resource-list,resource = loremipsum,status_code = 200
+dns-chain,resource = www.ripe.net,status_code = 200
+dns-chain,resource = loremipsum,status_code = 200
+dns-chain,resource = www.ripe.net,status_code = 200;forward_nodes = www.ripe.net&www.ripe.net.cdn.cloudflare.net;reverse_nodes = 104.18.21.44&104.18.20.44;nameservers = 193.0.19.101;authoritative_nameservers = manus.authdns.ripe.net&rirns.arin.net
+dns-chain,resource = ripe.net,status_code = 200;forward_nodes = not empty;reverse_nodes = not empty;nameservers = not empty;authoritative_nameservers = not empty
+dns-chain,resource = www.ripe.net,status_code = 200;nameservers = 127.0.0.1
 example-resources,,status_code = 200
 historical-whois,resource = 193.0.20.0/24,status_code = 200
 historical-whois,resource = loremipsum,status_code = 200
