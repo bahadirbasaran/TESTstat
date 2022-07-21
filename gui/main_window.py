@@ -26,10 +26,14 @@ HOSTS = [
     "dev008.stat.ripe.net"
 ]
 
-# Class used to make columns read-only
+
 class ReadOnlyDelegate(QStyledItemDelegate):
+    """
+    Used to make columns read-only
+    """
     def createEditor(self, parent, option, index):
         return 
+
 
 class MainWindow():
 
@@ -85,7 +89,7 @@ class MainWindow():
             self.font.setPointSize(12)
             item.setFont(self.font)
             self.table_test_suite.setHorizontalHeaderItem(index, item)
-        
+
         # Make column 1 and 4 read-only
         delegate = ReadOnlyDelegate(self.table_test_suite)
         self.table_test_suite.setItemDelegateForColumn(0, delegate)
