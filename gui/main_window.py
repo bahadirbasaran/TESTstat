@@ -9,7 +9,7 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QMainWindow, QWidget, QGroupBox, QHBoxLayout, \
                             QLabel, QPushButton, QComboBox, QTableWidget, \
                             QTableWidgetItem, QProgressBar, QLineEdit, \
-                            QApplication, QDialog, QCheckBox
+                            QApplication, QDialog, QCheckBox, QStyledItemDelegate
 
 
 TEST_CASES_PATH = "data/test_cases.csv"
@@ -26,6 +26,10 @@ HOSTS = [
     "dev008.stat.ripe.net"
 ]
 
+# Class used to make columns read-only
+class ReadOnlyDelegate(QStyledItemDelegate):
+    def createEditor(self, parent, option, index):
+        return 
 
 class MainWindow():
 
@@ -83,6 +87,11 @@ class MainWindow():
             self.font.setPointSize(12)
             item.setFont(self.font)
             self.table_test_suite.setHorizontalHeaderItem(index, item)
+        
+        # Make column 1 and 4 read-only
+        delegate = ReadOnlyDelegate(self.table_test_suite)
+        self.table_test_suite.setItemDelegateForColumn(0, delegate)
+        self.table_test_suite.setItemDelegateForColumn(3, delegate)
 
         # Labels
 
@@ -489,7 +498,7 @@ class MainWindow():
         """Selects or deselects all the currently visible tests.
         Applicable while searching for tests using the searchbar and selecting all 
         found tests in bulk."""
-        
+
         column = 0
         if self.checkbox_select_all.isChecked():
             for row in range(self.table_test_suite.rowCount()):
