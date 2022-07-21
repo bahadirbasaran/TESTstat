@@ -32,7 +32,7 @@ class ReadOnlyDelegate(QStyledItemDelegate):
     Used to make columns read-only
     """
     def createEditor(self, parent, option, index):
-        return 
+        return
 
 
 class MainWindow():
