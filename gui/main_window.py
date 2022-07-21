@@ -7,9 +7,9 @@ from gui.utils import MessageEnum, ColorEnum, throw_message, format_table_item
 from PyQt5.QtCore import Qt, QRect
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QMainWindow, QWidget, QGroupBox, QHBoxLayout, \
-                            QLabel, QPushButton, QComboBox, QTableWidget, \
-                            QTableWidgetItem, QProgressBar, QLineEdit, \
-                            QApplication, QDialog, QCheckBox, QStyledItemDelegate
+    QLabel, QPushButton, QComboBox, QTableWidget, QTableWidgetItem, \
+    QProgressBar, QLineEdit, QApplication, QDialog, QCheckBox, \
+    QStyledItemDelegate
 
 
 TEST_CASES_PATH = "data/test_cases.csv"
@@ -77,9 +77,7 @@ class MainWindow():
         self.table_test_suite.setColumnWidth(1, 322)
         self.table_test_suite.setColumnWidth(2, 322)
         self.table_test_suite.setColumnWidth(3, 322)
-        self.table_test_suite.setStyleSheet(
-            "background-color: rgb(255, 255, 255);"
-        )
+        self.table_test_suite.setStyleSheet("background-color: rgb(255, 255, 255);")
 
         table_cols = ["Data Call", "Test Input", "Expected Output", "Output"]
         for index, column_name in enumerate(table_cols):
@@ -105,34 +103,21 @@ class MainWindow():
 
         self.font.setPointSize(14)
         self.label_status.setFont(self.font)
-        self.label_status.setAlignment(
-            Qt.AlignRight |
-            Qt.AlignTrailing |
-            Qt.AlignVCenter
-        )
+        self.label_status.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter)
 
         # Buttons
 
-        btn_run = QPushButton(
-            groupbox_config,
-            clicked=lambda: self.on_btn_run_click()
-        )
+        btn_run = QPushButton(groupbox_config, clicked=lambda: self.on_btn_run_click())
         btn_run.setText("Run Tests")
         btn_run.setStyleSheet("font-weight: bold;")
         btn_run.setGeometry(QRect(20, 70, 111, 32))
 
-        btn_compare = QPushButton(
-            groupbox_config,
-            clicked=lambda: self.on_btn_compare_click()
-        )
+        btn_compare = QPushButton(groupbox_config, clicked=lambda: self.on_btn_compare_click())
         btn_compare.setText("Compare")
         btn_compare.setStyleSheet("font-weight: bold;")
         btn_compare.setGeometry(QRect(144, 70, 111, 32))
 
-        btn_new_test = QPushButton(
-            central_widget,
-            clicked=lambda: self.on_btn_new_test_click()
-        )
+        btn_new_test = QPushButton(central_widget, clicked=lambda: self.on_btn_new_test_click())
         btn_new_test.setText("New Test Case")
         btn_new_test.setGeometry(QRect(950, 700, 130, 32))
         btn_new_test.setStyleSheet("font-weight: bold;")
@@ -145,25 +130,19 @@ class MainWindow():
         btn_remove_test.setGeometry(QRect(1090, 700, 130, 32))
         btn_remove_test.setStyleSheet("font-weight: bold;")
 
-        btn_load_test = QPushButton(
-            central_widget,
-            clicked=lambda: self.on_btn_load_test_click()
-        )
+        btn_load_test = QPushButton(central_widget, clicked=lambda: self.on_btn_load_test_click())
         btn_load_test.setText("Load Test Suite")
         btn_load_test.setGeometry(QRect(50, 700, 111, 32))
         btn_load_test.setStyleSheet("font-weight: bold;")
 
-        btn_save_test = QPushButton(
-            central_widget,
-            clicked=lambda: self.on_btn_save_test_click()
-        )
+        btn_save_test = QPushButton(central_widget, clicked=lambda: self.on_btn_save_test_click())
         btn_save_test.setText("Save Test Suite")
         btn_save_test.setGeometry(QRect(170, 700, 111, 32))
         btn_save_test.setStyleSheet("font-weight: bold;")
 
         btn_clear_outputs = QPushButton(
             central_widget,
-            clicked=lambda: self.on_btn_clear_outputs_click()
+            clicked=lambda: self.reset_main_window(clear_tests=False, confirmation=False)
         )
         btn_clear_outputs.setText("Clear All Outputs")
         btn_clear_outputs.setGeometry(QRect(1090, 150, 130, 32))
@@ -185,10 +164,7 @@ class MainWindow():
         self.combobox_host = QComboBox(layout_widget)
         self.combobox_host.addItems(HOSTS)
         self.combobox_host.currentIndexChanged.connect(
-            lambda: self.on_combobox_host_changed(
-                self.combobox_host,
-                self.port
-            )
+            lambda: self.on_combobox_host_changed(self.combobox_host, self.port)
         )
 
         # Searchbar
@@ -196,8 +172,7 @@ class MainWindow():
         self.searchbar = QLineEdit(central_widget)
         self.searchbar.setGeometry(QRect(700, 100, 520, 32))
         self.searchbar.setStyleSheet("background-color: rgb(255, 255, 255);")
-        self.searchbar.textChanged.connect(self.update_display)
-
+        self.searchbar.textChanged.connect(self.update_table_test_suite)
 
         # Line Edits
 
@@ -228,38 +203,27 @@ class MainWindow():
 
     # Utilization methods
 
-    def update_display(self, text):
-        """Dynamically update table with tests corresponding to the string in the searchbar.
-        Set the Select_all checkbox unchecked with any change in the search string, 
-        so any resulting tests can be selected in bulk."""       
+    def update_table_test_suite(self, text):
+        """
+        Dynamically update the table with tests corresponding to the string in
+        the searchbar. Set the "Select All" checkbox unchecked with any change
+        in search string, so any resulting tests can be selected in bulk.
+        """
 
         self.checkbox_select_all.setChecked(False)
-        column = 0
+
         for row in range(self.table_test_suite.rowCount()):
-            if text.lower() in self.table_test_suite.item(row, column).text().lower():
+            if text.lower() in self.table_test_suite.item(row, 0).text():
                 self.table_test_suite.showRow(row)
             else:
                 self.table_test_suite.hideRow(row)
 
-
-    def colorize_table_row(
-        self,
-        row_index,
-        text_color,
-        background_color,
-        process_immediately=True
-    ):
+    def colorize_table_row(self, row_index, text_color, background_color, process_immediately=True):
         """Colorizes given row's background and text"""
 
         for col_index in range(self.table_test_suite.columnCount()):
-            self.table_test_suite.item(
-                row_index,
-                col_index
-            ).setForeground(text_color)
-            self.table_test_suite.item(
-                row_index,
-                col_index
-            ).setBackground(background_color)
+            self.table_test_suite.item(row_index, col_index).setForeground(text_color)
+            self.table_test_suite.item(row_index, col_index).setBackground(background_color)
 
         if process_immediately:
             QApplication.processEvents()
@@ -292,12 +256,8 @@ class MainWindow():
             return
 
         for row_index in range(self.table_test_suite.rowCount()):
-            self.colorize_table_row(
-                row_index,
-                ColorEnum.UI_FONT,
-                ColorEnum.WHITE,
-                False
-            )
+
+            self.colorize_table_row(row_index, ColorEnum.UI_FONT, ColorEnum.WHITE, False)
 
             # Clear test outputs in each row
             self.table_test_suite.item(
@@ -314,16 +274,14 @@ class MainWindow():
 
     def get_checked_row_indexes(self, return_all=True):
         """
-        Returns the test case indexes checked by user
-        If param return_all = True and if none checked, returns all indexes
+        Returns the test case indexes checked by user.
+        If param return_all = True and if none checked, returns all indexes.
         """
 
         checked_row_indexes = []
 
         for row_index in range(self.table_test_suite.rowCount()):
-            if self.table_test_suite.item(
-                row_index, 0
-            ).checkState() == Qt.Checked:
+            if self.table_test_suite.item(row_index, 0).checkState() == Qt.Checked:
                 checked_row_indexes.append(row_index)
 
         if return_all and not checked_row_indexes:
@@ -346,8 +304,7 @@ class MainWindow():
     def on_btn_new_test_click(self):
 
         if not self.previous_results or \
-                (self.previous_results and
-                    self.reset_main_window() != MessageEnum.NO):
+                (self.previous_results and self.reset_main_window() != MessageEnum.NO):
             self.test_case_window_ui = TestCaseWindow(self)
             self.test_case_window_ui.setup_ui()
 
@@ -356,26 +313,16 @@ class MainWindow():
         rows_to_remove = self.get_checked_row_indexes(return_all=False)
 
         if not self.table_test_suite.rowCount():
-            throw_message(
-                MessageEnum.CRITICAL,
-                "Error",
-                "There is no test case to remove!"
-            )
+            throw_message(MessageEnum.CRITICAL, "Error", "There is no test case to remove!")
             return
         elif not rows_to_remove:
-            throw_message(
-                MessageEnum.CRITICAL,
-                "Error",
-                "No test case selected!"
-            )
+            throw_message(MessageEnum.CRITICAL, "Error", "No test case selected!")
             return
 
         if self.reset_main_window() != MessageEnum.NO:
             for row_index in reversed(rows_to_remove):
                 self.table_test_suite.removeRow(row_index)
-                self.label_status.setText(
-                    f"Tests: {self.table_test_suite.rowCount()}"
-                )
+                self.label_status.setText(f"Tests: {self.table_test_suite.rowCount()}")
 
     def on_btn_load_test_click(self):
         """Populates the table from TEST_CASES_PATH"""
@@ -389,25 +336,18 @@ class MainWindow():
             if ret_val == MessageEnum.NO:
                 return
 
-            self.reset_main_window(
-                clear_tests=True,
-                confirmation=False
-            )
+            self.reset_main_window(clear_tests=True, confirmation=False)
 
         with open(TEST_CASES_PATH) as csv_file:
             header = csv_file.readline().strip()
             if header != "data_call,test_input,expected_output":
-                throw_message(
-                    MessageEnum.CRITICAL,
-                    "Import Error",
-                    "The test suite is malformed!"
-                )
+                throw_message(MessageEnum.CRITICAL, "Import Error", "The test suite is malformed!")
                 return
             if len(csv_file.readlines()) < 1:
                 throw_message(
                     MessageEnum.CRITICAL,
                     "Import Error",
-                    "There is no available test case to load!"
+                    "No available test case to import!"
                 )
                 return
 
@@ -425,18 +365,12 @@ class MainWindow():
 
                 # Create items for each column of the row
                 item_data_call = QTableWidgetItem(csv_data_call)
-                item_test_input = QTableWidgetItem(
-                    format_table_item(csv_test_input)
-                )
-                item_expected_output = QTableWidgetItem(
-                    format_table_item(csv_expected_output)
-                )
+                item_test_input = QTableWidgetItem(format_table_item(csv_test_input))
+                item_expected_output = QTableWidgetItem(format_table_item(csv_expected_output))
                 item_test_output = QTableWidgetItem('')
 
                 item_data_call.setFlags(
-                    Qt.ItemIsUserCheckable |
-                    Qt.ItemIsEnabled |
-                    Qt.ItemIsEditable
+                    Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsEditable
                 )
                 item_data_call.setCheckState(Qt.Unchecked)
 
@@ -447,25 +381,13 @@ class MainWindow():
 
                 self.table_test_suite.resizeRowsToContents()
 
-                self.label_status.setText(
-                    f"Tests: {self.table_test_suite.rowCount()}"
-                )
-
-    def on_btn_clear_outputs_click(self):
-        self.reset_main_window(
-                clear_tests=False,
-                confirmation=False
-            )
+                self.label_status.setText(f"Tests: {self.table_test_suite.rowCount()}")
 
     def on_btn_save_test_click(self):
         """Overrides TEST_CASES_PATH by using test cases in the table"""
 
         if not self.table_test_suite.rowCount():
-            throw_message(
-                MessageEnum.CRITICAL,
-                "Save Error",
-                "There is no available test case to save!"
-            )
+            throw_message(MessageEnum.CRITICAL, "Save Error", "No available test case to save!")
             return
 
         ret_val = throw_message(
@@ -493,31 +415,27 @@ class MainWindow():
                 )
 
                 csv_writer.writerow([data_call, test_input, expected_output])
-    
-    def on_checkbox_select_all(self):
-        """Selects or deselects all the currently visible tests.
-        Applicable while searching for tests using the searchbar and selecting all 
-        found tests in bulk."""
 
-        column = 0
+    def on_checkbox_select_all(self):
+        """
+        Selects or deselects all the currently visible tests. Applicable while searching
+        for tests using the searchbar and selecting all found tests in bulk.
+        """
+
         if self.checkbox_select_all.isChecked():
             for row in range(self.table_test_suite.rowCount()):
                 if not self.table_test_suite.isRowHidden(row):
-                    self.table_test_suite.item(row, column).setCheckState(Qt.Checked)
+                    self.table_test_suite.item(row, 0).setCheckState(Qt.Checked)
         else:
             for row in range(self.table_test_suite.rowCount()):
                 if not self.table_test_suite.isRowHidden(row):
-                    self.table_test_suite.item(row, column).setCheckState(Qt.Unchecked)
+                    self.table_test_suite.item(row, 0).setCheckState(Qt.Unchecked)
 
     def on_btn_run_click(self):
         """Runs all/selected test cases in the table"""
 
         if not self.table_test_suite.rowCount():
-            throw_message(
-                MessageEnum.CRITICAL,
-                "Run Error",
-                "There is no available test case to run!"
-            )
+            throw_message(MessageEnum.CRITICAL, "Run Error", "No available test case to run!")
             return
 
         host = self.combobox_host.currentText()
@@ -541,9 +459,7 @@ class MainWindow():
             # Labels
 
             label_instruction = QLabel(comparison_widget)
-            label_instruction.setText(
-                f"API Source to compare with {main_host}:"
-            )
+            label_instruction.setText(f"API Source to compare with {main_host}:")
             label_instruction.setGeometry(QRect(20, 20, 350, 30))
 
             label_second_host = QLabel()
@@ -583,10 +499,7 @@ class MainWindow():
                 port_second_host.setPlaceholderText("Port")
 
             combobox_second_host.currentIndexChanged.connect(
-                lambda: self.on_combobox_host_changed(
-                    combobox_second_host,
-                    port_second_host
-                )
+                lambda: self.on_combobox_host_changed(combobox_second_host, port_second_host)
             )
 
             hbox_host_port.addWidget(label_second_host)
@@ -595,12 +508,7 @@ class MainWindow():
 
             comparison_widget.exec()
 
-    def on_btn_run_comparison_click(
-        self,
-        widget,
-        second_host,
-        port_second_host
-    ):
+    def on_btn_run_comparison_click(self, widget, second_host, port_second_host):
         """
         Compares two API sources and lists only the test cases that
         fail on one source and pass on the other and vice versa
@@ -610,11 +518,7 @@ class MainWindow():
         widget.close()
 
         if not self.table_test_suite.rowCount():
-            throw_message(
-                MessageEnum.CRITICAL,
-                "Run Error",
-                "There is no available test case to run!"
-            )
+            throw_message(MessageEnum.CRITICAL, "Run Error", "No available test case to run!")
             return
 
         tests_to_run = self.get_checked_row_indexes()
@@ -623,24 +527,14 @@ class MainWindow():
         port_main_host = None if not self.port.text() else self.port.text()
         port_second_host = None if not port_second_host else port_second_host
 
-        failed_tests_main_host = self.run_tests(
-            tests_to_run,
-            main_host,
-            port_main_host,
-            return_failed_tests=True
-        )
+        failed_tests_main_host = self.run_tests(tests_to_run, main_host, port_main_host, True)
 
         self.reset_main_window(confirmation=False)
 
         # Change the combobox on main window to indicate the host of second run
         self.combobox_host.setCurrentIndex(HOSTS.index(second_host))
 
-        failed_tests_second_host = self.run_tests(
-            tests_to_run,
-            second_host,
-            port_second_host,
-            return_failed_tests=True
-        )
+        failed_tests_second_host = self.run_tests(tests_to_run, second_host, port_second_host, True)
 
         self.reset_main_window(confirmation=False)
 
@@ -652,20 +546,12 @@ class MainWindow():
         for row_index in failed_tests_main_host:
             item_failed_output = QTableWidgetItem(f"Failed at {main_host}")
             self.table_test_suite.setItem(row_index, 3, item_failed_output)
-            self.colorize_table_row(
-                row_index,
-                ColorEnum.BLACK,
-                ColorEnum.FAILURE
-            )
+            self.colorize_table_row(row_index, ColorEnum.BLACK, ColorEnum.FAILURE)
 
         for row_index in failed_tests_second_host:
             item_failed_output = QTableWidgetItem(f"Failed at {second_host}")
             self.table_test_suite.setItem(row_index, 3, item_failed_output)
-            self.colorize_table_row(
-                row_index,
-                ColorEnum.BLACK,
-                ColorEnum.FAILURE_SECOND_HOST
-            )
+            self.colorize_table_row(row_index, ColorEnum.BLACK, ColorEnum.FAILURE_SECOND_HOST)
 
         self.table_test_suite.resizeRowsToContents()
 
@@ -678,9 +564,7 @@ class MainWindow():
 
         self.progress_bar.show()
         self.progress_bar.setProperty("maximum", num_total_tests)
-        self.label_status.setText(
-            f"{num_passed_tests} / {num_total_tests} passed"
-        )
+        self.label_status.setText(f"{num_passed_tests} / {num_total_tests} passed")
 
         teststat = TestStat(host, port)
 
@@ -699,20 +583,13 @@ class MainWindow():
                 param, value = param_value_pair.split('=', 1)
                 expected_output[param] = value
 
-            print(
-                f"Case {row_index+1} ({num_tests_run+1}/{num_total_tests}):",
-                end=' '
-            )
+            print(f"Case {row_index+1} ({num_tests_run+1}/{num_total_tests}):", end=' ')
 
             # test_output:
             #   {}  -> test is successful
             #   int -> test could not be executed (connection error, timeout)
             #   {param: val} -> test output that does not match with expected
-            test_output = teststat.run_test(
-                data_call,
-                test_input,
-                expected_output
-            )
+            test_output = teststat.run_test(data_call, test_input, expected_output)
 
             self.previous_results = True
 
@@ -722,25 +599,15 @@ class MainWindow():
                 num_tests_run += 1
                 self.progress_bar.setProperty("value", num_tests_run)
 
-                timed_out_item = QTableWidgetItem(
-                    "Error: Connection timed out!"
-                )
+                timed_out_item = QTableWidgetItem("Error: Connection timed out!")
                 self.table_test_suite.setItem(row_index, 3, timed_out_item)
 
-                self.colorize_table_row(
-                    row_index,
-                    ColorEnum.BLACK,
-                    ColorEnum.TIMEOUT
-                )
+                self.colorize_table_row(row_index, ColorEnum.BLACK, ColorEnum.TIMEOUT)
 
                 failed_tests.append(row_index)
                 continue
             elif test_output == MessageEnum.CONNECTION_ERROR:
-                throw_message(
-                    MessageEnum.CRITICAL,
-                    "Connection Error",
-                    test_output
-                )
+                throw_message(MessageEnum.CRITICAL, "Connection Error", test_output)
                 self.reset_main_window(confirmation=False)
                 return
 
@@ -749,15 +616,9 @@ class MainWindow():
 
             if not test_output:
                 num_passed_tests += 1
-                self.label_status.setText(
-                    f"{num_passed_tests} / {num_total_tests} passed"
-                )
+                self.label_status.setText(f"{num_passed_tests} / {num_total_tests} passed")
                 self.table_test_suite.setItem(row_index, 3, QTableWidgetItem(""))
-                self.colorize_table_row(
-                    row_index,
-                    ColorEnum.BLACK,
-                    ColorEnum.SUCCESS
-                )
+                self.colorize_table_row(row_index, ColorEnum.BLACK, ColorEnum.SUCCESS)
             else:
                 failed_tests.append(row_index)
                 failed_output = []
@@ -767,11 +628,7 @@ class MainWindow():
                 item_failed_output = QTableWidgetItem("\n".join(failed_output))
                 self.table_test_suite.setItem(row_index, 3, item_failed_output)
                 self.table_test_suite.resizeRowsToContents()
-                self.colorize_table_row(
-                    row_index,
-                    ColorEnum.BLACK,
-                    ColorEnum.FAILURE
-                )
+                self.colorize_table_row(row_index, ColorEnum.BLACK, ColorEnum.FAILURE)
 
         if return_failed_tests:
             return failed_tests
