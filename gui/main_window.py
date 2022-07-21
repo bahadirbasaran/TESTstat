@@ -122,7 +122,7 @@ class MainWindow():
         btn_compare.setGeometry(QRect(144, 70, 111, 32))
 
         btn_new_test = QPushButton(central_widget, clicked=lambda: self.on_btn_new_test_click())
-        btn_new_test.setText("New Test Case")
+        btn_new_test.setText("New Test")
         btn_new_test.setGeometry(QRect(950, 700, 130, 32))
         btn_new_test.setStyleSheet("font-weight: bold;")
 
@@ -130,17 +130,17 @@ class MainWindow():
             central_widget,
             clicked=lambda: self.on_btn_remove_test_click()
         )
-        btn_remove_test.setText("Remove Test Case")
+        btn_remove_test.setText("Remove Test")
         btn_remove_test.setGeometry(QRect(1090, 700, 130, 32))
         btn_remove_test.setStyleSheet("font-weight: bold;")
 
         btn_load_test = QPushButton(central_widget, clicked=lambda: self.on_btn_load_test_click())
-        btn_load_test.setText("Load Test Suite")
+        btn_load_test.setText("Load Tests")
         btn_load_test.setGeometry(QRect(50, 700, 111, 32))
         btn_load_test.setStyleSheet("font-weight: bold;")
 
         btn_save_test = QPushButton(central_widget, clicked=lambda: self.on_btn_save_test_click())
-        btn_save_test.setText("Save Test Suite")
+        btn_save_test.setText("Overwrite Tests")
         btn_save_test.setGeometry(QRect(170, 700, 111, 32))
         btn_save_test.setStyleSheet("font-weight: bold;")
 
