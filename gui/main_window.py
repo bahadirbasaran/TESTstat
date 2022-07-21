@@ -579,7 +579,7 @@ class MainWindow():
 
             # Format table items for the run_test method of the TestStat class
             test_input = test_input.replace("\n", '&').replace(' ', '')
-            expected_pairs = expected_output.replace(' ', '').split("\n")
+            expected_pairs = expected_output.lower().replace(' ', '').split("\n")
 
             expected_output = {}
             for param_value_pair in expected_pairs:
