@@ -49,6 +49,16 @@ class MainWindow():
 
         # Active test results on the table
         self.previous_results = False
+    
+    # Count selected tests
+    # Should be here to get the item from the ItemChanged()
+    # Checking whether change occured in the 1st column(checkbox)
+    def count_selected(self, item):
+            if item.column() == 0:
+                if self.table_test_suite.item(item.row(), 0) is not None:
+                    self.label_selected.setText(
+                        f"Selected tests: {len(self.get_checked_row_indexes(return_all = False))}"
+                )
 
     def setup_ui(self):
         """Sets main window up"""
@@ -74,16 +84,17 @@ class MainWindow():
         # Test cases table
 
         self.table_test_suite = QTableWidget(central_widget)
-        self.table_test_suite.setGeometry(QRect(50, 200, 1171, 470))
-        self.table_test_suite.setColumnCount(4)
+        self.table_test_suite.setGeometry(QRect(50, 200, 1190, 470))
+        self.table_test_suite.setColumnCount(5)
         self.table_test_suite.setRowCount(0)
-        self.table_test_suite.setColumnWidth(0, 200)
+        self.table_test_suite.setColumnWidth(0, 20)
         self.table_test_suite.setColumnWidth(1, 322)
         self.table_test_suite.setColumnWidth(2, 322)
         self.table_test_suite.setColumnWidth(3, 322)
+        self.table_test_suite.setColumnWidth(4, 200)
         self.table_test_suite.setStyleSheet("background-color: rgb(255, 255, 255);")
 
-        table_cols = ["Data Call", "Test Input", "Expected Output", "Output"]
+        table_cols = ["", "Data Call", "Test Input", "Expected Output", "Output"]
         for index, column_name in enumerate(table_cols):
             item = QTableWidgetItem(column_name)
             self.font.setPointSize(12)
@@ -92,7 +103,6 @@ class MainWindow():
 
         # Make column 1 and 4 read-only
         delegate = ReadOnlyDelegate(self.table_test_suite)
-        self.table_test_suite.setItemDelegateForColumn(0, delegate)
         self.table_test_suite.setItemDelegateForColumn(3, delegate)
 
         # Labels
@@ -112,19 +122,17 @@ class MainWindow():
         self.label_selected = QLabel(groupbox_config)
         self.label_selected.setGeometry(QRect(392, 90, 150, 32))
         self.label_selected.setText(
-            f"Selected tests: {len(self.get_checked_row_indexes(return_all = False))}"
+            f"Selected tests: 0"
         )
 
         self.font.setPointSize(14)
         self.label_selected.setFont(self.font)
         self.label_selected.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter)
-
+        
         # Count and show number of selected tests
         self.table_test_suite.itemChanged.connect(
-            lambda: self.label_selected.setText(
-                f"Selected tests: {len(self.get_checked_row_indexes(return_all = False))}"
+            self.count_selected
             )
-        )
 
         # Buttons
 
@@ -234,7 +242,7 @@ class MainWindow():
         self.checkbox_select_all.setChecked(False)
 
         for row in range(self.table_test_suite.rowCount()):
-            if text.lower() in self.table_test_suite.item(row, 0).text():
+            if text.lower() in self.table_test_suite.item(row, 1).text():
                 self.table_test_suite.showRow(row)
             else:
                 self.table_test_suite.hideRow(row)
@@ -290,6 +298,8 @@ class MainWindow():
             checkbox = self.table_test_suite.item(row_index, 0)
             if checkbox.checkState() == Qt.Checked:
                 checkbox.setCheckState(Qt.Unchecked)
+        
+        self.table_test_suite.sortByColumn(1, Qt.AscendingOrder)
 
         QApplication.processEvents()
 
@@ -302,7 +312,7 @@ class MainWindow():
         checked_row_indexes = []
 
         for row_index in range(self.table_test_suite.rowCount()):
-            if self.table_test_suite.item(row_index, 0).checkState() == Qt.Checked:
+            if self.table_test_suite.item(row_index, 0) is not None and self.table_test_suite.item(row_index, 0).checkState() == Qt.Checked:
                 checked_row_indexes.append(row_index)
 
         if return_all and not checked_row_indexes:
@@ -385,20 +395,22 @@ class MainWindow():
                 self.table_test_suite.setRowCount(index + 1)
 
                 # Create items for each column of the row
+                item_checkbox = QTableWidgetItem(None)
                 item_data_call = QTableWidgetItem(csv_data_call)
                 item_test_input = QTableWidgetItem(format_table_item(csv_test_input))
                 item_expected_output = QTableWidgetItem(format_table_item(csv_expected_output))
                 item_test_output = QTableWidgetItem('')
 
-                item_data_call.setFlags(
-                    Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsEditable
+                item_checkbox.setFlags(
+                    Qt.ItemIsUserCheckable | Qt.ItemIsEnabled
                 )
-                item_data_call.setCheckState(Qt.Unchecked)
+                item_checkbox.setCheckState(Qt.Unchecked)
 
-                self.table_test_suite.setItem(index, 0, item_data_call)
-                self.table_test_suite.setItem(index, 1, item_test_input)
-                self.table_test_suite.setItem(index, 2, item_expected_output)
-                self.table_test_suite.setItem(index, 3, item_test_output)
+                self.table_test_suite.setItem(index, 0, item_checkbox)
+                self.table_test_suite.setItem(index, 1, item_data_call)
+                self.table_test_suite.setItem(index, 2, item_test_input)
+                self.table_test_suite.setItem(index, 3, item_expected_output)
+                self.table_test_suite.setItem(index, 4, item_test_output)
 
                 self.table_test_suite.resizeRowsToContents()
 
@@ -425,13 +437,13 @@ class MainWindow():
             csv_writer.writerow(["data_call", "test_input", "expected_output"])
 
             for row_index in self.get_checked_row_indexes():
-                data_call = self.table_test_suite.item(row_index, 0).text()
+                data_call = self.table_test_suite.item(row_index, 1).text()
                 test_input = format_table_item(
-                    self.table_test_suite.item(row_index, 1).text(),
+                    self.table_test_suite.item(row_index, 2).text(),
                     csv_to_table=False
                 )
                 expected_output = format_table_item(
-                    self.table_test_suite.item(row_index, 2).text(),
+                    self.table_test_suite.item(row_index, 3).text(),
                     csv_to_table=False
                 )
 
@@ -461,6 +473,18 @@ class MainWindow():
 
         host = self.combobox_host.currentText()
         port = None if not self.port.text() else self.port.text()
+
+        # Reoder the table
+        for row in range(self.table_test_suite.rowCount()): 
+            if self.table_test_suite.item(row, 0).checkState() == Qt.Checked:
+                self.table_test_suite.item(row, 0).setText("checked")
+
+        self.table_test_suite.sortByColumn(1, Qt.AscendingOrder)
+        self.table_test_suite.sortByColumn(0, Qt.DescendingOrder)
+
+        for row in range(self.table_test_suite.rowCount()): 
+            if self.table_test_suite.item(row, 0).checkState() == Qt.Checked:
+                self.table_test_suite.item(row, 0).setText("")
 
         self.run_tests(self.get_checked_row_indexes(), host, port)
 
@@ -590,9 +614,9 @@ class MainWindow():
         teststat = TestStat(host, port)
 
         for row_index in tests_to_run:
-            data_call = self.table_test_suite.item(row_index, 0).text()
-            test_input = self.table_test_suite.item(row_index, 1).text()
-            expected_output = self.table_test_suite.item(row_index, 2).text()
+            data_call = self.table_test_suite.item(row_index, 1).text()
+            test_input = self.table_test_suite.item(row_index, 2).text()
+            expected_output = self.table_test_suite.item(row_index, 3).text()
 
             # Format table items for the run_test method of the TestStat class
             test_input = test_input.replace("\n", '&').replace(' ', '')
@@ -621,7 +645,7 @@ class MainWindow():
                 self.progress_bar.setProperty("value", num_tests_run)
 
                 timed_out_item = QTableWidgetItem("Error: Connection timed out!")
-                self.table_test_suite.setItem(row_index, 3, timed_out_item)
+                self.table_test_suite.setItem(row_index, 4, timed_out_item)
 
                 self.colorize_table_row(row_index, ColorEnum.BLACK, ColorEnum.TIMEOUT)
 
@@ -638,7 +662,7 @@ class MainWindow():
             if not test_output:
                 num_passed_tests += 1
                 self.label_status.setText(f"{num_passed_tests} / {num_total_tests} passed")
-                self.table_test_suite.setItem(row_index, 3, QTableWidgetItem(""))
+                self.table_test_suite.setItem(row_index, 4, QTableWidgetItem(""))
                 self.colorize_table_row(row_index, ColorEnum.BLACK, ColorEnum.SUCCESS)
             else:
                 failed_tests.append(row_index)
@@ -647,7 +671,7 @@ class MainWindow():
                     failed_output.append(f"{param} = {value}")
 
                 item_failed_output = QTableWidgetItem("\n".join(failed_output))
-                self.table_test_suite.setItem(row_index, 3, item_failed_output)
+                self.table_test_suite.setItem(row_index, 4, item_failed_output)
                 self.table_test_suite.resizeRowsToContents()
                 self.colorize_table_row(row_index, ColorEnum.BLACK, ColorEnum.FAILURE)
 
