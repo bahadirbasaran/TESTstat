@@ -49,15 +49,15 @@ class MainWindow():
 
         # Active test results on the table
         self.previous_results = False
-    
+
     # Count selected tests
     # Should be here to get the item from the ItemChanged()
     # Checking whether change occured in the 1st column(checkbox)
     def count_selected(self, item):
-            if item.column() == 0:
-                if self.table_test_suite.item(item.row(), 0) is not None:
-                    self.label_selected.setText(
-                        f"Selected tests: {len(self.get_checked_row_indexes(return_all = False))}"
+        if item.column() == 0:
+            if self.table_test_suite.item(item.row(), 0) is not None:
+                self.label_selected.setText(
+                    f"Selected tests: {len(self.get_checked_row_indexes(return_all = False))}"
                 )
 
     def setup_ui(self):
@@ -122,17 +122,17 @@ class MainWindow():
         self.label_selected = QLabel(groupbox_config)
         self.label_selected.setGeometry(QRect(392, 90, 150, 32))
         self.label_selected.setText(
-            f"Selected tests: 0"
+            "Selected tests: 0"
         )
 
         self.font.setPointSize(14)
         self.label_selected.setFont(self.font)
         self.label_selected.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter)
-        
+
         # Count and show number of selected tests
         self.table_test_suite.itemChanged.connect(
             self.count_selected
-            )
+        )
 
         # Buttons
 
@@ -298,7 +298,7 @@ class MainWindow():
             checkbox = self.table_test_suite.item(row_index, 0)
             if checkbox.checkState() == Qt.Checked:
                 checkbox.setCheckState(Qt.Unchecked)
-        
+
         self.table_test_suite.sortByColumn(1, Qt.AscendingOrder)
 
         QApplication.processEvents()
@@ -312,7 +312,7 @@ class MainWindow():
         checked_row_indexes = []
 
         for row_index in range(self.table_test_suite.rowCount()):
-            if self.table_test_suite.item(row_index, 0) is not None and self.table_test_suite.item(row_index, 0).checkState() == Qt.Checked:
+            if self.table_test_suite.item(row_index, 0).checkState() == Qt.Checked:
                 checked_row_indexes.append(row_index)
 
         if return_all and not checked_row_indexes:
@@ -475,14 +475,14 @@ class MainWindow():
         port = None if not self.port.text() else self.port.text()
 
         # Reoder the table
-        for row in range(self.table_test_suite.rowCount()): 
+        for row in range(self.table_test_suite.rowCount()):
             if self.table_test_suite.item(row, 0).checkState() == Qt.Checked:
                 self.table_test_suite.item(row, 0).setText("checked")
 
         self.table_test_suite.sortByColumn(1, Qt.AscendingOrder)
         self.table_test_suite.sortByColumn(0, Qt.DescendingOrder)
 
-        for row in range(self.table_test_suite.rowCount()): 
+        for row in range(self.table_test_suite.rowCount()):
             if self.table_test_suite.item(row, 0).checkState() == Qt.Checked:
                 self.table_test_suite.item(row, 0).setText("")
 
