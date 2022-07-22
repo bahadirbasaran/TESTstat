@@ -102,12 +102,23 @@ class MainWindow():
         label_host.setStyleSheet("font-weight: bold;")
 
         self.label_status = QLabel(groupbox_config)
-        self.label_status.setGeometry(QRect(392, 70, 150, 32))
+        self.label_status.setGeometry(QRect(392, 60, 150, 32))
         self.label_status.setText(f"Tests: {self.table_test_suite.rowCount()}")
 
         self.font.setPointSize(14)
         self.label_status.setFont(self.font)
         self.label_status.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter)
+
+        self.label_selected = QLabel(groupbox_config)
+        self.label_selected.setGeometry(QRect(392, 90, 150, 32))
+        self.label_selected.setText(f"Selected tests: {len(self.get_checked_row_indexes(return_all = False))}")
+
+        self.font.setPointSize(14)
+        self.label_selected.setFont(self.font)
+        self.label_selected.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter)
+        
+        # Count and show number of selected tests
+        self.table_test_suite.itemChanged.connect(lambda: self.label_selected.setText(f"Selected tests: {len(self.get_checked_row_indexes(return_all = False))}")) 
 
         # Buttons
 
