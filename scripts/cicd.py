@@ -65,7 +65,7 @@ def run_cicd_tests(host):
             print("\n")
 
     script_return = ""
-    
+
     if failed_data_calls:
         failed_test_cases = ', '.join(failed_test_cases)
         failed_data_calls = ', '.join(failed_data_calls)
@@ -74,7 +74,7 @@ def run_cicd_tests(host):
             f"Failed Test Cases: {failed_test_cases}\n"
             f"Failed Data Calls: {failed_data_calls}\n"
         )
-    
+
     if timed_out_data_calls:
         timed_out_test_cases = ', '.join(timed_out_test_cases)
         timed_out_data_calls = ', '.join(timed_out_data_calls)
