@@ -1,14 +1,6 @@
+from core.utils import MessageEnum
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtGui import QColor
-
-
-class MessageEnum():
-    NO = 65536
-    YES = 16384
-    TIMEOUT = 408
-    CONNECTION_ERROR = 500
-    CRITICAL = 1
-    WARNING = 2
 
 
 class ColorEnum():

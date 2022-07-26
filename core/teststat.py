@@ -1,6 +1,6 @@
 import requests
 
-from core.utils import filter_param_set, reshape_param_set, get_innermost_value
+from core.utils import MessageEnum, filter_param_set, reshape_param_set, get_innermost_value
 
 # Import conditional flags
 from core.config import ALL, ANY, COMPARE, INCLUDE, INCLUDE_KEYS, MATCH, NOT_EMPTY, TRIM_AS
@@ -17,7 +17,7 @@ class TestStat():
         # load for CI/CD tasks, because there is no need to install PyQt5 each
         # time for running all the test cases without the GUI.
         if not cicd:
-            from gui.utils import throw_message, MessageEnum
+            from gui.utils import throw_message
 
         protocol = "https" if with_tls else "http"
         host = host.lower().replace(' ', '')
