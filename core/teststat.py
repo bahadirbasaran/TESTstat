@@ -192,6 +192,7 @@ class TestStat():
         test_output["data"] = filter_param_set(test_output["data"].copy())
 
         for param, value in expected_output.items():
+            #.lower().replace(' ', '')
 
             if param.split("->")[0] not in test_output["data"]:
                 failed_params[param] = "The output does not include this key!"
