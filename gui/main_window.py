@@ -6,10 +6,10 @@ from gui.utils import MessageEnum, ColorEnum, throw_message, format_table_item
 
 from PyQt5.QtCore import Qt, QRect
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QMainWindow, QWidget, QGroupBox, QHBoxLayout, \
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, \
     QLabel, QPushButton, QComboBox, QTableWidget, QTableWidgetItem, \
     QProgressBar, QLineEdit, QApplication, QDialog, QCheckBox, \
-    QStyledItemDelegate
+    QStyledItemDelegate, QVBoxLayout, QGridLayout, QHeaderView
 
 
 TEST_CASES_PATH = "data/test_cases.csv"
@@ -35,14 +35,13 @@ class ReadOnlyDelegate(QStyledItemDelegate):
         return
 
 
-class MainWindow():
+class MainWindow(QWidget):
 
     def __init__(self):
-
-        self.main_window = QMainWindow()
-        self.main_window.setWindowTitle("TESTstat")
-        self.main_window.resize(1280, 800)
-        self.main_window.setStyleSheet((
+        super().__init__()
+        self.setWindowTitle("TESTstat")
+        self.outerLayout = QVBoxLayout()
+        self.setStyleSheet((
             "background-color: rgb(235, 236, 244);"
             "color: rgb(66, 77, 112);"
         ))
@@ -62,157 +61,157 @@ class MainWindow():
 
     def setup_ui(self):
         """Sets main window up"""
-
-        # Containers
-
-        central_widget = QWidget(self.main_window)
-
-        groupbox_config = QGroupBox(central_widget)
-        groupbox_config.setGeometry(QRect(50, 44, 600, 130))
-
-        layout_widget = QWidget(groupbox_config)
-        layout_widget.setGeometry(QRect(20, 20, 389, 32))
-
-        hbox_host_port = QHBoxLayout(layout_widget)
-        hbox_host_port.setContentsMargins(0, 0, 0, 0)
+        # Creating layouts
+        topLayout = QHBoxLayout()
+        self.topleftLayout = QGridLayout()
+        topcenterLayout = QGridLayout()
+        toprightLayout = QGridLayout()
+        middleLayout = QVBoxLayout()
+        middleTopLayout = QHBoxLayout()
+        bottomLayout = QHBoxLayout()
 
         # Font
-
         self.font = QFont()
         self.font.setBold(True)
 
-        # Test cases table
+        # Checkboxes
+        self.checkbox_select_all = QCheckBox(
+            clicked=lambda: self.on_checkbox_select_all()
+        )
+        self.checkbox_select_all.setText("Select All")
+        self.checkbox_select_all.setChecked(False)
+        self.checkbox_select_all.setStyleSheet("font-weight: bold; font-size:16px;")
+        self.checkbox_select_all.setGeometry(QRect(268, 70, 111, 32))
 
-        self.table_test_suite = QTableWidget(central_widget)
+        # Test cases table
+        self.table_test_suite = QTableWidget()
         self.table_test_suite.setGeometry(QRect(50, 200, 1190, 470))
         self.table_test_suite.setColumnCount(5)
         self.table_test_suite.setRowCount(0)
+        header = self.table_test_suite.horizontalHeader()
         self.table_test_suite.setColumnWidth(0, 20)
-        self.table_test_suite.setColumnWidth(1, 322)
-        self.table_test_suite.setColumnWidth(2, 322)
-        self.table_test_suite.setColumnWidth(3, 322)
-        self.table_test_suite.setColumnWidth(4, 200)
-        self.table_test_suite.setStyleSheet("background-color: rgb(255, 255, 255);")
+        header.setSectionResizeMode(1, QHeaderView.Stretch)
+        header.setSectionResizeMode(2, QHeaderView.Stretch)
+        header.setSectionResizeMode(3, QHeaderView.Stretch)
+        header.setSectionResizeMode(4, QHeaderView.Stretch)
+        self.table_test_suite.setStyleSheet("background-color: rgb(255, 255, 255); font-size:16px;")
 
         table_cols = ["", "Data Call", "Test Input", "Expected Output", "Output"]
         for index, column_name in enumerate(table_cols):
             item = QTableWidgetItem(column_name)
-            self.font.setPointSize(12)
+            self.font.setPointSize(16)
             item.setFont(self.font)
             self.table_test_suite.setHorizontalHeaderItem(index, item)
 
         # Make column 1 and 4 read-only
         delegate = ReadOnlyDelegate(self.table_test_suite)
+        self.table_test_suite.setItemDelegateForColumn(1, delegate)
         self.table_test_suite.setItemDelegateForColumn(3, delegate)
 
         # Labels
+        label_host = QLabel()
+        label_host.setText("Source:")
+        label_host.setStyleSheet("font-weight: bold; font-size:16px;")
 
-        label_host = QLabel(layout_widget)
-        label_host.setText("API Source:")
-        label_host.setStyleSheet("font-weight: bold;")
-
-        self.label_status = QLabel(groupbox_config)
+        self.label_status = QLabel()
         self.label_status.setGeometry(QRect(392, 60, 150, 32))
         self.label_status.setText(f"Tests: {self.table_test_suite.rowCount()}")
-
-        self.font.setPointSize(14)
+        self.font.setPointSize(16)
         self.label_status.setFont(self.font)
-        self.label_status.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter)
-
-        self.label_selected = QLabel(groupbox_config)
+        self.label_selected = QLabel()
         self.label_selected.setGeometry(QRect(392, 90, 150, 32))
         self.label_selected.setText(
             "Selected tests: 0"
         )
-
-        self.font.setPointSize(14)
         self.label_selected.setFont(self.font)
-        self.label_selected.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter)
 
         # Count and show number of selected tests
         self.table_test_suite.itemChanged.connect(
             self.count_selected
         )
 
+        self.label_failed = QLabel()
+        self.label_failed.setGeometry(QRect(392, 90, 150, 32))
+        self.label_failed.setText(
+            "Failed tests: 0"
+        )
+        self.label_failed.setFont(self.font)
+
+        self.label_succesful = QLabel()
+        self.label_succesful.setGeometry(QRect(392, 90, 150, 32))
+        self.label_succesful.setText(
+            "Successful tests: 0"
+        )
+        self.label_succesful.setFont(self.font)
+
         # Buttons
-
-        btn_run = QPushButton(groupbox_config, clicked=lambda: self.on_btn_run_click())
+        btn_run = QPushButton(clicked=lambda: self.on_btn_run_click())
         btn_run.setText("Run Tests")
-        btn_run.setStyleSheet("font-weight: bold;")
+        btn_run.setStyleSheet("font-weight: bold; font-size:16px;")
         btn_run.setGeometry(QRect(20, 70, 111, 32))
+        middleTopLayout.addWidget(self.checkbox_select_all)
 
-        btn_compare = QPushButton(groupbox_config, clicked=lambda: self.on_btn_compare_click())
+        btn_compare = QPushButton(clicked=lambda: self.on_btn_compare_click())
         btn_compare.setText("Compare")
-        btn_compare.setStyleSheet("font-weight: bold;")
+        btn_compare.setStyleSheet("font-weight: bold; font-size:16px;")
         btn_compare.setGeometry(QRect(144, 70, 111, 32))
 
-        btn_new_test = QPushButton(central_widget, clicked=lambda: self.on_btn_new_test_click())
-        btn_new_test.setText("New Test")
+        btn_new_test = QPushButton(clicked=lambda: self.on_btn_new_test_click())
+        btn_new_test.setText("Add Test")
         btn_new_test.setGeometry(QRect(950, 700, 130, 32))
-        btn_new_test.setStyleSheet("font-weight: bold;")
+        btn_new_test.setStyleSheet("font-weight: bold; font-size:16px;")
 
         btn_remove_test = QPushButton(
-            central_widget,
             clicked=lambda: self.on_btn_remove_test_click()
         )
         btn_remove_test.setText("Remove Test")
         btn_remove_test.setGeometry(QRect(1090, 700, 130, 32))
-        btn_remove_test.setStyleSheet("font-weight: bold;")
+        btn_remove_test.setStyleSheet("font-weight: bold; font-size:16px;")
 
-        btn_load_test = QPushButton(central_widget, clicked=lambda: self.on_btn_load_test_click())
+        btn_load_test = QPushButton(clicked=lambda: self.on_btn_load_test_click())
         btn_load_test.setText("Load Tests")
         btn_load_test.setGeometry(QRect(50, 700, 111, 32))
-        btn_load_test.setStyleSheet("font-weight: bold;")
+        btn_load_test.setMaximumWidth(400)
+        btn_load_test.setStyleSheet("font-weight: bold; font-size:16px;")
 
-        btn_save_test = QPushButton(central_widget, clicked=lambda: self.on_btn_save_test_click())
+        btn_save_test = QPushButton(clicked=lambda: self.on_btn_save_test_click())
         btn_save_test.setText("Overwrite Tests")
         btn_save_test.setGeometry(QRect(170, 700, 111, 32))
-        btn_save_test.setStyleSheet("font-weight: bold;")
+        btn_save_test.setStyleSheet("font-weight: bold; font-size:16px;")
 
         btn_clear_outputs = QPushButton(
-            central_widget,
             clicked=lambda: self.reset_main_window(clear_tests=False, confirmation=False)
         )
         btn_clear_outputs.setText("Clear All Outputs")
         btn_clear_outputs.setGeometry(QRect(1090, 150, 130, 32))
-        btn_clear_outputs.setStyleSheet("font-weight: bold;")
-
-        # Checkboxes
-
-        self.checkbox_select_all = QCheckBox(
-            groupbox_config,
-            clicked=lambda: self.on_checkbox_select_all()
-        )
-        self.checkbox_select_all.setText("Select All")
-        self.checkbox_select_all.setChecked(False)
-        self.checkbox_select_all.setStyleSheet("font-weight: bold;")
-        self.checkbox_select_all.setGeometry(QRect(268, 70, 111, 32))
+        btn_clear_outputs.setStyleSheet("font-weight: bold; font-size:16px;")
+        bottomLayout.addStretch()
 
         # Comboboxes
-
-        self.combobox_host = QComboBox(layout_widget)
+        self.combobox_host = QComboBox()
         self.combobox_host.addItems(HOSTS)
+        self.combobox_host.setStyleSheet("background-color: rgb(255, 255, 255);font-size:16px;")
         self.combobox_host.currentIndexChanged.connect(
             lambda: self.on_combobox_host_changed(self.combobox_host, self.port)
         )
 
         # Searchbar
-
-        self.searchbar = QLineEdit(central_widget)
+        self.searchbar = QLineEdit()
         self.searchbar.setGeometry(QRect(700, 100, 520, 32))
-        self.searchbar.setStyleSheet("background-color: rgb(255, 255, 255);")
+        self.searchbar.setMaximumWidth(600)
+        self.searchbar.setStyleSheet("background-color: rgb(255, 255, 255);font-size:16px;")
         self.searchbar.textChanged.connect(self.update_table_test_suite)
+        self.searchbar.setPlaceholderText("Search Data Call")
 
         # Line Edits
-
-        self.port = QLineEdit(layout_widget)
-        self.port.setStyleSheet("background-color: rgb(255, 255, 255);")
+        self.port = QLineEdit()
+        self.port.setStyleSheet("background-color: rgb(255, 255, 255);font-size:16px;")
         self.port.setPlaceholderText("Port")
         self.port.setText("8000")
+        self.port.setMinimumWidth(100)
 
         # Other indicators
-
-        self.progress_bar = QProgressBar(groupbox_config)
+        self.progress_bar = QProgressBar()
         self.progress_bar.setGeometry(QRect(20, 107, 390, 13))
         self.progress_bar.setProperty("value", 0)
         self.progress_bar.setOrientation(Qt.Horizontal)
@@ -221,14 +220,46 @@ class MainWindow():
         self.progress_bar.hide()
 
         # Set the main window UI up
+        self.topleftLayout.addWidget(label_host, 0, 0)
+        self.topleftLayout.addWidget(btn_run, 1, 0, 1, 2)
+        self.topleftLayout.addWidget(btn_compare, 1, 2, 1, 2)      
+        self.topleftLayout.addWidget(self.port, 0, 3)
+        self.topleftLayout.addWidget(self.progress_bar, 2, 0, 1, 4)
+        self.topleftLayout.addWidget(self.combobox_host, 0, 1, 1, 2)
+        self.topleftLayout.setColumnStretch(0, 3)
+        self.topleftLayout.setColumnStretch(1, 3)
+        self.topleftLayout.setColumnStretch(2, 3)
+        self.topleftLayout.setColumnStretch(3, 3)
 
-        hbox_host_port.addWidget(label_host)
-        hbox_host_port.addWidget(self.combobox_host)
-        hbox_host_port.addWidget(self.port)
+        toprightLayout.addWidget(self.label_status, 0, 0, alignment=Qt.AlignLeft)
+        toprightLayout.addWidget(self.label_selected, 1, 0, alignment=Qt.AlignLeft)
+        toprightLayout.addWidget(self.label_failed, 3, 0, alignment=Qt.AlignLeft)
+        toprightLayout.addWidget(self.label_succesful, 2, 0, alignment=Qt.AlignLeft)
 
-        self.main_window.setCentralWidget(central_widget)
+        topcenterLayout.addWidget(btn_new_test, 0, 1)
+        topcenterLayout.addWidget(btn_remove_test, 1, 1)
+        topcenterLayout.addWidget(btn_load_test, 0, 0)
+        topcenterLayout.addWidget(btn_save_test, 1, 0)
 
-        self.main_window.show()
+        topLayout.addLayout(self.topleftLayout, 3)
+        topLayout.insertStretch(1, 3)
+        topLayout.addLayout(topcenterLayout, 3)
+        topLayout.insertStretch(3, 3)
+        topLayout.addLayout(toprightLayout, 3)
+
+        middleTopLayout.addWidget(self.searchbar)
+        middleTopLayout.addWidget(self.checkbox_select_all)
+        middleTopLayout.addStretch()
+        middleLayout.addLayout(middleTopLayout)
+        middleLayout.addWidget(self.table_test_suite)
+
+        bottomLayout.addWidget(btn_clear_outputs)
+
+        self.outerLayout.addLayout(topLayout)
+        self.outerLayout.insertSpacing(1, 20)
+        self.outerLayout.addLayout(middleLayout)
+        self.outerLayout.addLayout(bottomLayout)
+        self.setLayout(self.outerLayout)
 
     # Utilization methods
 
@@ -257,7 +288,7 @@ class MainWindow():
         if process_immediately:
             QApplication.processEvents()
 
-    def reset_main_window(self, clear_tests=False, confirmation=True):
+    def reset_main_window(self, clear_tests=False, confirmation=True, clear_checkboxes=True):
 
         if confirmation and self.previous_results:
             ret_val = throw_message(
@@ -284,6 +315,13 @@ class MainWindow():
             QApplication.processEvents()
             return
 
+        # Clear successful/failed tests
+        self.label_succesful.setText("Successful tests: 0")
+        self.label_failed.setText("Failed tests: 0")
+
+        # Clear select all checkbox
+        self.checkbox_select_all.setChecked(False)
+
         for row_index in range(self.table_test_suite.rowCount()):
 
             self.colorize_table_row(row_index, ColorEnum.UI_FONT, ColorEnum.WHITE, False)
@@ -295,9 +333,10 @@ class MainWindow():
             ).setText('')
 
             # Clear checkboxes
-            checkbox = self.table_test_suite.item(row_index, 0)
-            if checkbox.checkState() == Qt.Checked:
-                checkbox.setCheckState(Qt.Unchecked)
+            if clear_checkboxes:
+                checkbox = self.table_test_suite.item(row_index, 0)
+                if checkbox.checkState() == Qt.Checked:
+                    checkbox.setCheckState(Qt.Unchecked)
 
         self.table_test_suite.sortByColumn(1, Qt.AscendingOrder)
 
@@ -338,6 +377,7 @@ class MainWindow():
                 (self.previous_results and self.reset_main_window() != MessageEnum.NO):
             self.test_case_window_ui = TestCaseWindow(self)
             self.test_case_window_ui.setup_ui()
+            self.test_case_window_ui.show()
 
     def on_btn_remove_test_click(self):
 
@@ -471,6 +511,7 @@ class MainWindow():
             throw_message(MessageEnum.CRITICAL, "Run Error", "No available test case to run!")
             return
 
+        self.reset_main_window(clear_tests=False, confirmation=False, clear_checkboxes=False)
         host = self.combobox_host.currentText()
         port = None if not self.port.text() else self.port.text()
 
@@ -509,7 +550,7 @@ class MainWindow():
 
             label_second_host = QLabel()
             label_second_host.setText("API Source 2:")
-            label_second_host.setStyleSheet("font-weight: bold;")
+            label_second_host.setStyleSheet("font-weight: bold; font-size:16px;")
 
             # Buttons
 
@@ -522,7 +563,7 @@ class MainWindow():
                 )
             )
             btn_run_comparison.setText("Compare")
-            btn_run_comparison.setStyleSheet("font-weight: bold;")
+            btn_run_comparison.setStyleSheet("font-weight: bold; font-size:16px;")
             btn_run_comparison.setGeometry(QRect(155, 110, 111, 32))
 
             # Comboboxes
@@ -550,7 +591,6 @@ class MainWindow():
             hbox_host_port.addWidget(label_second_host)
             hbox_host_port.addWidget(combobox_second_host)
             hbox_host_port.addWidget(port_second_host)
-
             comparison_widget.exec()
 
     def on_btn_run_comparison_click(self, widget, second_host, port_second_host):
@@ -604,12 +644,14 @@ class MainWindow():
 
         num_tests_run = 0
         num_passed_tests = 0
+        num_failed_tests = 0
         num_total_tests = len(tests_to_run)
         failed_tests = []
 
         self.progress_bar.show()
         self.progress_bar.setProperty("maximum", num_total_tests)
-        self.label_status.setText(f"{num_passed_tests} / {num_total_tests} passed")
+
+        self.label_succesful.setText(f"Successful tests: {num_passed_tests}")
 
         teststat = TestStat(host, port)
 
@@ -661,10 +703,12 @@ class MainWindow():
 
             if not test_output:
                 num_passed_tests += 1
-                self.label_status.setText(f"{num_passed_tests} / {num_total_tests} passed")
+                self.label_succesful.setText(f"Successful tests: {num_passed_tests}")
                 self.table_test_suite.setItem(row_index, 4, QTableWidgetItem(""))
                 self.colorize_table_row(row_index, ColorEnum.BLACK, ColorEnum.SUCCESS)
             else:
+                num_failed_tests += 1
+                self.label_failed.setText(f"Failed tests: {num_failed_tests}")
                 failed_tests.append(row_index)
                 failed_output = []
                 for param, value in test_output.items():
