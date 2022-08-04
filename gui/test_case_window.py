@@ -183,7 +183,7 @@ class TestCaseWindow(QWidget):
                 self.items_in_previous_view.append(reference_to_input)
                 reference_to_input.setStyleSheet(
                     "background-color: rgb(255, 255, 255);font-size:16px;"
-                    )
+                )
 
                 self.form_layout_input.addRow(reference_to_label, reference_to_input)
 
@@ -253,7 +253,7 @@ class TestCaseWindow(QWidget):
                     self.input_names_in_previous_view.append(f"expected_input_{var}")
                     reference_to_input.setStyleSheet(
                         "background-color: rgb(255, 255, 255);font-size:16px;"
-                        )
+                    )
                     self.form_layout_output.addRow(reference_to_label, reference_to_input)
                 # Scenario 2
                 else:

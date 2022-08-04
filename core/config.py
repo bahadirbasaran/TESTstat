@@ -332,10 +332,10 @@ DATA_CALL_MAP = {
         "optional_params": ["starttime", "endtime"],
         "output_params": {
             "deployments": [{
-                "resource": [], #is needed -- defines the exact input from all the inputs
+                "resource": [],  # is needed -- defines the exact input from all the inputs
                 "deployment": {
                     "date": [ANY, MATCH, COMPARE],
-                    "statuses": { # not sure how to check those; probably only COMPARE, will there be cases when we want to see the exact number? Also, those are always notempty
+                    "statuses": {  # not sure how to check; maybe only COMPARE; always notempty
                         "neverseen": [ANY, NOT_EMPTY, MATCH, COMPARE],
                         "connected": [ANY, NOT_EMPTY, MATCH, COMPARE],
                         "disconnected": [ANY, NOT_EMPTY, MATCH, COMPARE],
@@ -343,14 +343,15 @@ DATA_CALL_MAP = {
                     }
                 }
             }],
-            "query_date": [],#is it really needed -- just the execution time of the query
-            "starttime": [], #are derived from the input or are default -- worth of checking?
-            "endtime": [],  #are derived from the input or are default -- worth of checking?
-            "resource": [] #is this needed -- this is just the input in list
+            "query_date": [],  # is it really needed -- just the execution time of the query
+            "starttime": [],  # are derived from the input or are default -- worth of checking?
+            "endtime": [],  # are derived from the input or are default -- worth of checking?
+            "resource": []  # is this needed -- this is just the input in list
         }
     },
 
-    "atlas-probes": { # good to add info to the documentation: https://beta001.stat.ripe.net/docs/02.data-api/atlas-probes.html#code-examples
+    "atlas-probes": {  # good to add info to the documentation:
+        # https://beta001.stat.ripe.net/docs/02.data-api/atlas-probes.html#code-examples
         # how to add process_time and is it needed?
         # all of the fields are not empty
         # could be empty for: 91.201.7.0/24; 91.201.7.0/26
@@ -363,18 +364,18 @@ DATA_CALL_MAP = {
                 "status": [ANY, NOT_EMPTY, MATCH],
                 "status_name": [ANY, NOT_EMPTY, MATCH],
                 "prefix_v6": [ANY, NOT_EMPTY, MATCH],
-                "is_anchor": [ANY, MATCH], # always not empty, is a bool
-                "last_connected": [ANY, NOT_EMPTY, MATCH], # not sure match makes sense here, also always notempty
+                "is_anchor": [ANY, MATCH],  # always not empty, is a bool
+                "last_connected": [ANY, NOT_EMPTY, MATCH],  # match?, always notempty
                 "tags": [ANY, NOT_EMPTY, INCLUDE],
-                "type": [ANY, NOT_EMPTY, MATCH], # all are probes
+                "type": [ANY, NOT_EMPTY, MATCH],  # all are probes
                 "address_v6": [ANY, NOT_EMPTY, MATCH],
                 "latitude": [ANY, NOT_EMPTY, MATCH],
                 "longitude": [ANY, NOT_EMPTY, MATCH],
                 "id": [ANY, NOT_EMPTY, MATCH],
                 "address_v4": [ANY, NOT_EMPTY, MATCH],
                 "country_code": [ANY, NOT_EMPTY, MATCH],
-                "is_public": [ANY, NOT_EMPTY, MATCH], # always not empty, is a bool
-                "asn_v4": [ANY, NOT_EMPTY, MATCH], # what is this number and following numbers? are they ever tested?
+                "is_public": [ANY, NOT_EMPTY, MATCH],  # always not empty, is a bool
+                "asn_v4": [ANY, NOT_EMPTY, MATCH],  # what is this number? ever tested?
                 "asn_v6": [ANY, NOT_EMPTY, MATCH],
                 "status_since": [ANY, NOT_EMPTY, MATCH],
                 "first_connected": [ANY, NOT_EMPTY, MATCH],
@@ -383,11 +384,11 @@ DATA_CALL_MAP = {
             "stats": {
                 "total": [ANY, NOT_EMPTY, MATCH, COMPARE]
             },
-            "resource": [ANY, NOT_EMPTY, MATCH] # this is input -- is it necessary to be tested
+            "resource": [ANY, NOT_EMPTY, MATCH]  # this is input -- is it necessary to be tested
         }
     },
 
-    "atlas-targets": { # docs are not full, beta link does not work
+    "atlas-targets": {  # docs are not full, beta link does not work
         "data_call_name": "Atlas Targets",
         "required_params": ["resource"],
         "optional_params": [],

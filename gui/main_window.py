@@ -223,7 +223,7 @@ class MainWindow(QWidget):
         # Set the main window UI up
         self.topleftLayout.addWidget(label_host, 0, 0)
         self.topleftLayout.addWidget(btn_run, 1, 0, 1, 2)
-        self.topleftLayout.addWidget(btn_compare, 1, 2, 1, 2)      
+        self.topleftLayout.addWidget(btn_compare, 1, 2, 1, 2)
         self.topleftLayout.addWidget(self.port, 0, 3)
         self.topleftLayout.addWidget(self.progress_bar, 2, 0, 1, 4)
         self.topleftLayout.addWidget(self.combobox_host, 0, 1, 1, 2)
