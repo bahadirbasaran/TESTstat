@@ -2,6 +2,7 @@ import sys
 import csv
 
 from core.teststat import TestStat
+from core.utils import MessageEnum
 
 
 TEST_CASES_PATH = "data/cicd_test_cases.csv"
@@ -15,6 +16,8 @@ def run_cicd_tests(host):
 
     failed_test_cases = []
     failed_data_calls = []
+    timed_out_test_cases = []
+    timed_out_data_calls = []
 
     with open(TEST_CASES_PATH) as csv_file:
 
@@ -39,7 +42,15 @@ def run_cicd_tests(host):
 
             print("--> Expected: ", row[2].replace(';', ' | '))
 
-            if test_output:
+            if test_output == MessageEnum.TIMEOUT:
+                print(f"----> Test Case {row_index} timed-out!")
+
+                timed_out_test_cases.append(str(row_index))
+
+                if data_call not in timed_out_data_calls:
+                    timed_out_data_calls.append(data_call.replace('-', ' ').title())
+
+            elif test_output:
                 print(f"----> Test Case {row_index} failed!")
 
                 for param, value in expected_output.items():
@@ -53,15 +64,27 @@ def run_cicd_tests(host):
 
             print("\n")
 
+    script_return = ""
+
     if failed_data_calls:
         failed_test_cases = ', '.join(failed_test_cases)
         failed_data_calls = ', '.join(failed_data_calls)
 
-        script_return = (
+        script_return += (
             f"Failed Test Cases: {failed_test_cases}\n"
-            f"Failed Data Calls: {failed_data_calls}"
+            f"Failed Data Calls: {failed_data_calls}\n"
         )
 
+    if timed_out_data_calls:
+        timed_out_test_cases = ', '.join(timed_out_test_cases)
+        timed_out_data_calls = ', '.join(timed_out_data_calls)
+
+        script_return += (
+            f"Timed-out Test Cases: {timed_out_test_cases}\n"
+            f"Timed-out Data Calls: {timed_out_data_calls}"
+        )
+
+    if script_return:
         sys.exit(script_return)
     else:
         sys.exit(0)

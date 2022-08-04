@@ -1,3 +1,12 @@
+class MessageEnum():
+    NO = 65536
+    YES = 16384
+    TIMEOUT = 408
+    CONNECTION_ERROR = 500
+    CRITICAL = 1
+    WARNING = 2
+
+
 def get_innermost_value(param, param_set):
     """Returns innermost value of nested parameters"""
 
