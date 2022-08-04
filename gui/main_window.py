@@ -1,8 +1,9 @@
 import csv
 
 from core.teststat import TestStat
+from core.utils import MessageEnum
+from gui.utils import ColorEnum, throw_message, format_table_item
 from gui.test_case_window import TestCaseWindow
-from gui.utils import MessageEnum, ColorEnum, throw_message, format_table_item
 
 from PyQt5.QtCore import Qt, QRect
 from PyQt5.QtGui import QFont
