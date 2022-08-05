@@ -538,14 +538,16 @@ class MainWindow(QWidget):
             main_host = self.combobox_host.currentText()
 
             comparison_widget = QDialog()
+            comparison_widget_layout = QVBoxLayout(comparison_widget)
             comparison_widget.setWindowTitle("Compare API Sources")
 
-            hbox_host_port = QHBoxLayout(comparison_widget)
-            hbox_host_port.setContentsMargins(20, 60, 30, 100)
+            hbox_host_port = QHBoxLayout()  # comparison_widget)
+            # hbox_host_port.setContentsMargins(20, 60, 30, 100)
 
             # Labels
 
-            label_instruction = QLabel(comparison_widget)
+            label_instruction = QLabel()  # comparison_widget)
+            label_instruction.setStyleSheet("font-size:16px;")
             label_instruction.setText(f"API Source to compare with {main_host}:")
             label_instruction.setGeometry(QRect(20, 20, 350, 30))
 
@@ -556,7 +558,7 @@ class MainWindow(QWidget):
             # Buttons
 
             btn_run_comparison = QPushButton(
-                comparison_widget,
+                # comparison_widget,
                 clicked=lambda: self.on_btn_run_comparison_click(
                     comparison_widget,
                     combobox_second_host.currentText(),
@@ -566,10 +568,12 @@ class MainWindow(QWidget):
             btn_run_comparison.setText("Compare")
             btn_run_comparison.setStyleSheet("font-weight: bold; font-size:16px;")
             btn_run_comparison.setGeometry(QRect(155, 110, 111, 32))
+            btn_run_comparison.setMaximumWidth(200)
 
             # Comboboxes
 
             combobox_second_host = QComboBox()
+            combobox_second_host.setStyleSheet("QComboBox { font-size:16px;}")
             hosts_but_main = [host for host in HOSTS if host != main_host]
             combobox_second_host.addItems(hosts_but_main)
 
@@ -577,8 +581,10 @@ class MainWindow(QWidget):
 
             port_second_host = QLineEdit()
             port_second_host.setStyleSheet(
-                "background-color: rgb(255, 255, 255);"
+                "background-color: rgb(255, 255, 255); font-size:16px;"
             )
+            port_second_host.setMinimumWidth(100)
+            port_second_host.setMaximumWidth(300)
             if combobox_second_host.currentText() == "Local Host":
                 port_second_host.setText("8000")
             else:
@@ -592,6 +598,12 @@ class MainWindow(QWidget):
             hbox_host_port.addWidget(label_second_host)
             hbox_host_port.addWidget(combobox_second_host)
             hbox_host_port.addWidget(port_second_host)
+            hbox_host_port.addStretch()
+
+            comparison_widget_layout.addWidget(label_instruction)
+            comparison_widget_layout.addLayout(hbox_host_port)
+            comparison_widget_layout.addWidget(btn_run_comparison)
+            comparison_widget_layout.addStretch()
             comparison_widget.exec()
 
     def on_btn_run_comparison_click(self, widget, second_host, port_second_host):
