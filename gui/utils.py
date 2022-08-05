@@ -16,7 +16,7 @@ class ColorEnum():
 def throw_message(type, title, message):
 
     msg = QMessageBox()
-    msg.setText(message)
+    msg.setText(str(message))
     msg.setWindowTitle(title)
 
     if type == MessageEnum.CRITICAL:
