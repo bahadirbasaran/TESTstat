@@ -4,7 +4,7 @@ from core.config import DATA_CALL_MAP, NESTED_PARAMS
 from PyQt5.QtCore import Qt, QRect
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, \
     QLabel, QComboBox, QTableWidgetItem, QCheckBox, QLineEdit, QFormLayout, \
-    QVBoxLayout
+    QVBoxLayout, QScrollArea
 
 
 class TestCaseWindow(QWidget):
@@ -52,10 +52,18 @@ class TestCaseWindow(QWidget):
 
         scroll_area_input_container = QWidget()
         scroll_area_input_container.setObjectName("scroll_area_input_container")
+        scroll_area_input = QScrollArea()
+        scroll_area_input.setWidgetResizable(True)
+        scroll_area_input.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll_area_input.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         scroll_area_input_container.setStyleSheet(" font-size:16px;")
 
         scroll_area_output_container = QWidget()
         scroll_area_output_container.setObjectName("scroll_area_output_container")
+        scroll_area_output = QScrollArea()
+        scroll_area_output.setWidgetResizable(True)
+        scroll_area_output.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll_area_output.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         scroll_area_output_container.setStyleSheet(" font-size:16px;")
 
         self.form_layout_input = QFormLayout()
@@ -121,6 +129,11 @@ class TestCaseWindow(QWidget):
         scroll_area_output_container.setMaximumWidth(600)
         scroll_area_output_container.setMinimumWidth(400)
 
+        scroll_area_input.setWidget(scroll_area_input_container)
+        scroll_area_input.setMinimumWidth(450)
+        scroll_area_output.setWidget(scroll_area_output_container)
+        scroll_area_output.setMinimumWidth(450)
+
         # Manually populate the UI with initial fields
         self.on_combobox_data_call_changed(combobox_data_call.currentText())
 
@@ -130,17 +143,17 @@ class TestCaseWindow(QWidget):
         topLayout.addStretch()
 
         middleLeftLayout.addWidget(label_test_input)
-        middleLeftMainLayout.addWidget(scroll_area_input_container)
+        middleLeftMainLayout.addWidget(scroll_area_input)
         middleLeftLayout.addLayout(middleLeftMainLayout)
-        middleLeftLayout.addStretch()
+        # middleLeftLayout.addStretch(0)
 
         middleRightLayout.addWidget(label_expected_output)
         status_layout = QFormLayout()
         status_layout.addRow(label_status_code, self.status_code)
         middleRightMainLayout.addLayout(status_layout)
-        middleRightMainLayout.addWidget(scroll_area_output_container)
+        middleRightMainLayout.addWidget(scroll_area_output)
         middleRightLayout.addLayout(middleRightMainLayout)
-        middleRightLayout.addStretch()
+        # middleRightLayout.addStretch()
 
         middleLayout.addLayout(middleLeftLayout, 2)
         middleLayout.addLayout(middleRightLayout, 3)
@@ -154,7 +167,7 @@ class TestCaseWindow(QWidget):
         self.test_case_outerLayout.addLayout(topLayout)
         self.test_case_outerLayout.addSpacing(20)
         self.test_case_outerLayout.addLayout(middleLayout)
-        self.test_case_outerLayout.addSpacing(40)
+        # self.test_case_outerLayout.addSpacing(40)
         self.test_case_outerLayout.addLayout(bottomLayout)
         self.setLayout(self.test_case_outerLayout)
 
