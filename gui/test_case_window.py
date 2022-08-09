@@ -87,7 +87,7 @@ class TestCaseWindow(QWidget):
         # Buttons
 
         btn_cancel_new_test = QPushButton(
-            clicked=lambda: self.test_case_window.close()
+            clicked=lambda: self.close()
         )
         btn_cancel_new_test.setStyleSheet("font-weight: bold; font-size:16px;")
         btn_cancel_new_test.setText("Cancel")
