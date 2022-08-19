@@ -19,6 +19,9 @@
 #   https://stat.ripe.net/data/address-space-hierarchy/data.json?resource=110/4
 
 # Conditional Flags
+from ast import In
+
+
 ALL = "All following are True"
 ANY = "At least one of following is True"
 COMPARE = "Compare quantitatively (<[=] >[=])"
@@ -121,12 +124,7 @@ DATA_CALL_MAP = {
         "optional_params": [],
         "output_params": {
             "abuse_contacts": [ANY, NOT_EMPTY, INCLUDE],
-            "authoritative_rir": [ANY, NOT_EMPTY, MATCH],
-            "earliest_time": [ANY, NOT_EMPTY, MATCH],
-            "latest_time": [ANY, NOT_EMPTY, MATCH],
-            "parameters": {
-                "resource": [TRIM_AS, ANY, NOT_EMPTY, MATCH]
-            },
+            "authoritative_rir": [ANY, NOT_EMPTY, MATCH]
         }
     },
 
@@ -139,11 +137,7 @@ DATA_CALL_MAP = {
             "more_specific": CommonParamsEnum.WHOIS_PARAMS,
             "less_specific": CommonParamsEnum.WHOIS_PARAMS,
             "rir": [ANY, NOT_EMPTY, MATCH],
-            "query_time": [ANY, NOT_EMPTY, MATCH],
-            "resource": [ANY, NOT_EMPTY, MATCH],
-            "parameters": {
-                "resource": [ANY, NOT_EMPTY, MATCH]
-            }
+            "resource": [ANY, NOT_EMPTY, MATCH]
         }
     },
 
@@ -167,9 +161,7 @@ DATA_CALL_MAP = {
             "ip_stats": {
                 "status": [ANY, NOT_EMPTY, MATCH],
                 "ips": [ANY, NOT_EMPTY, MATCH, COMPARE]
-            },
-            "query_time": [ANY, NOT_EMPTY, MATCH],
-            "resource": [ANY, NOT_EMPTY, MATCH]
+            }
         }
     },
 
@@ -187,10 +179,7 @@ DATA_CALL_MAP = {
                 "resource": [ANY, NOT_EMPTY, MATCH],
                 "status": [ANY, NOT_EMPTY, MATCH],
                 "timelines": CommonParamsEnum.TIMELINES
-            },
-            "resource": [ANY, NOT_EMPTY, MATCH],
-            "query_starttime": [ANY, NOT_EMPTY, MATCH],
-            "query_endtime": [ANY, NOT_EMPTY, MATCH],
+            }
         }
     },
 
@@ -202,12 +191,7 @@ DATA_CALL_MAP = {
             "prefixes": {
                 "prefix": [ANY, NOT_EMPTY, MATCH],
                 "timelines": CommonParamsEnum.TIMELINES,
-            },
-            "earliest_time": [ANY, NOT_EMPTY, MATCH],
-            "latest_time": [ANY, NOT_EMPTY, MATCH],
-            "query_starttime": [ANY, NOT_EMPTY, MATCH],
-            "query_endtime": [ANY, NOT_EMPTY, MATCH],
-            "resource": [ANY, NOT_EMPTY, MATCH]
+            }
         }
     },
 
@@ -223,10 +207,7 @@ DATA_CALL_MAP = {
                 "name": [ANY, NOT_EMPTY, MATCH]
             },
             "holder": [ANY, NOT_EMPTY, MATCH],
-            "announced": [ANY, NOT_EMPTY, MATCH],
-            "query_starttime": [ANY, NOT_EMPTY, MATCH],
-            "query_endtime": [ANY, NOT_EMPTY, MATCH],
-            "resource": [ANY, NOT_EMPTY, MATCH]
+            "announced": [ANY, NOT_EMPTY, MATCH]
         }
     },
 
@@ -241,9 +222,7 @@ DATA_CALL_MAP = {
                 "stripped": CommonParamsEnum.AS_PATH_STATS,
                 "unstripped": CommonParamsEnum.AS_PATH_STATS
             },
-            "sort_by": [ANY, NOT_EMPTY, MATCH],
-            "query_time": [ANY, NOT_EMPTY, MATCH],
-            "resource": [ANY, NOT_EMPTY, MATCH]
+            "sort_by": [ANY, NOT_EMPTY, MATCH]
         }
     },
 
@@ -260,10 +239,7 @@ DATA_CALL_MAP = {
             },
             "imports": CommonParamsEnum.AS_PEER_PARAMS,
             "exports": CommonParamsEnum.AS_PEER_PARAMS,
-            "authority": [ANY, NOT_EMPTY, MATCH],
-            "query_starttime": [ANY, NOT_EMPTY, MATCH],
-            "query_endtime": [ANY, NOT_EMPTY, MATCH],
-            "resource": [ANY, NOT_EMPTY, MATCH]
+            "authority": [ANY, NOT_EMPTY, MATCH]
         }
     },
 
@@ -284,12 +260,7 @@ DATA_CALL_MAP = {
                 "power": [ANY, NOT_EMPTY, MATCH, COMPARE],
                 "v4_peers": [ANY, NOT_EMPTY, MATCH, COMPARE],
                 "v6_peers": [ANY, NOT_EMPTY, MATCH, COMPARE]
-            },
-            "earliest_time": [ANY, NOT_EMPTY, MATCH],
-            "latest_time": [ANY, NOT_EMPTY, MATCH],
-            "query_starttime": [ANY, NOT_EMPTY, MATCH],
-            "query_endtime": [ANY, NOT_EMPTY, MATCH],
-            "resource": [ANY, NOT_EMPTY, MATCH]
+            }
         }
     },
 
@@ -301,12 +272,7 @@ DATA_CALL_MAP = {
             "neighbours": {
                 "neighbour": [ANY, NOT_EMPTY, MATCH, COMPARE],
                 "timelines": CommonParamsEnum.TIMELINES
-            },
-            "earliest_time": [ANY, NOT_EMPTY, MATCH],
-            "latest_time": [ANY, NOT_EMPTY, MATCH],
-            "query_starttime": [ANY, NOT_EMPTY, MATCH],
-            "query_endtime": [ANY, NOT_EMPTY, MATCH],
-            "resource": [ANY, NOT_EMPTY, MATCH]
+            }
         }
     },
 
@@ -318,9 +284,7 @@ DATA_CALL_MAP = {
             "forward_nodes": [ANY, NOT_EMPTY, INCLUDE_KEYS],
             "reverse_nodes": [ANY, NOT_EMPTY, INCLUDE_KEYS],
             "nameservers": [ANY, NOT_EMPTY, INCLUDE],
-            "authoritative_nameservers": [ANY, NOT_EMPTY, INCLUDE],
-            "query_time": [ANY, NOT_EMPTY, MATCH],
-            "resource": [ANY, NOT_EMPTY, MATCH]
+            "authoritative_nameservers": [ANY, NOT_EMPTY, INCLUDE]
         }
     },
 
@@ -331,96 +295,86 @@ DATA_CALL_MAP = {
         "required_params": ["resource"],
         "optional_params": ["starttime", "endtime"],
         "output_params": {
-            "deployments": [{
-                "resource": [],  # is needed -- defines the exact input from all the inputs
+            "deployments": {
+                "resource": [ANY, NOT_EMPTY, MATCH],
                 "deployment": {
-                    "date": [ANY, MATCH, COMPARE],
-                    "statuses": {  # not sure how to check; maybe only COMPARE; always notempty
+                    "date": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "statuses": { 
                         "neverseen": [ANY, NOT_EMPTY, MATCH, COMPARE],
                         "connected": [ANY, NOT_EMPTY, MATCH, COMPARE],
                         "disconnected": [ANY, NOT_EMPTY, MATCH, COMPARE],
                         "abandoned": [ANY, NOT_EMPTY, MATCH, COMPARE]
                     }
                 }
-            }],
-            "query_date": [],  # is it really needed -- just the execution time of the query
-            "starttime": [],  # are derived from the input or are default -- worth of checking?
-            "endtime": [],  # are derived from the input or are default -- worth of checking?
-            "resource": []  # is this needed -- this is just the input in list
+            }
         }
     },
 
-    "atlas-probes": {  # good to add info to the documentation:
-        # https://beta001.stat.ripe.net/docs/02.data-api/atlas-probes.html#code-examples
-        # how to add process_time and is it needed?
-        # all of the fields are not empty
-        # could be empty for: 91.201.7.0/24; 91.201.7.0/26
+    "atlas-probes": { 
         "data_call_name": "Atlas Probes",
         "required_params": ["resource"],
         "optional_params": [],
         "output_params": {
-            "probes": [{
+            "probes": {
                 "prefix_v4": [ANY, NOT_EMPTY, MATCH],
                 "status": [ANY, NOT_EMPTY, MATCH],
                 "status_name": [ANY, NOT_EMPTY, MATCH],
                 "prefix_v6": [ANY, NOT_EMPTY, MATCH],
-                "is_anchor": [ANY, MATCH],  # always not empty, is a bool
-                "last_connected": [ANY, NOT_EMPTY, MATCH],  # match?, always notempty
+                "is_anchor": [ANY, NOT_EMPTY, MATCH],  # bool
+                "last_connected": [ANY, NOT_EMPTY, MATCH],
                 "tags": [ANY, NOT_EMPTY, INCLUDE],
-                "type": [ANY, NOT_EMPTY, MATCH],  # all are probes
+                "type": [ANY, NOT_EMPTY, MATCH],
                 "address_v6": [ANY, NOT_EMPTY, MATCH],
                 "latitude": [ANY, NOT_EMPTY, MATCH],
                 "longitude": [ANY, NOT_EMPTY, MATCH],
                 "id": [ANY, NOT_EMPTY, MATCH],
                 "address_v4": [ANY, NOT_EMPTY, MATCH],
                 "country_code": [ANY, NOT_EMPTY, MATCH],
-                "is_public": [ANY, NOT_EMPTY, MATCH],  # always not empty, is a bool
-                "asn_v4": [ANY, NOT_EMPTY, MATCH],  # what is this number? ever tested?
-                "asn_v6": [ANY, NOT_EMPTY, MATCH],
-                "status_since": [ANY, NOT_EMPTY, MATCH],
-                "first_connected": [ANY, NOT_EMPTY, MATCH],
-                "total_uptime": [ANY, NOT_EMPTY, MATCH]
-            }],
+                "is_public": [ANY, NOT_EMPTY, MATCH],  # bool
+                "asn_v4": [ANY, NOT_EMPTY, MATCH],  
+                "asn_v6": [ANY, NOT_EMPTY, MATCH], 
+                "status_since": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "first_connected": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "total_uptime": [ANY, NOT_EMPTY, MATCH, COMPARE]
+            },
             "stats": {
                 "total": [ANY, NOT_EMPTY, MATCH, COMPARE]
-            },
-            "resource": [ANY, NOT_EMPTY, MATCH]  # this is input -- is it necessary to be tested
+            }
         }
     },
 
-    "atlas-targets": {  # docs are not full, beta link does not work
+    "atlas-targets": {
         "data_call_name": "Atlas Targets",
         "required_params": ["resource"],
         "optional_params": [],
         "output_params": {
             "measurements": {
-                "af": [],
-                "msm_id": [],
-                "stop_time": [],
-                "start_time": [],
-                "dst_name": [],
-                "dst_addr": [],
-                "dst_asn": [],
+                "af": [ANY, NOT_EMPTY, MATCH],  # address family, 4 or 6 (integer)-- always not empty
+                "msm_id": [ANY, NOT_EMPTY, MATCH], 
+                "stop_time": [ANY, NOT_EMPTY, MATCH, COMPARE], 
+                "start_time": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "dst_name": [ANY, NOT_EMPTY, MATCH],
+                "dst_addr": [ANY, NOT_EMPTY, MATCH],
+                "dst_asn": [ANY, NOT_EMPTY, MATCH],
                 "status": {
-                    "name": [],
-                    "id": [],
-                    "when": []
+                    "name": [ANY, NOT_EMPTY, MATCH],
+                    "id": [ANY, NOT_EMPTY, MATCH],
+                    "when": [ANY, NOT_EMPTY, MATCH]
                 },
                 "type": {
-                    "name": []
+                    "name": [ANY, NOT_EMPTY, MATCH]
                 },
-                "creation_time": [],
-                "description": [],
-                "result": [],
-                "size": [],
-                "is_public": [],
-                "participant_count": []
+                "creation_time": [ANY, NOT_EMPTY, MATCH],
+                "description": [ANY, NOT_EMPTY, MATCH],
+                "result": [ANY, NOT_EMPTY, MATCH],
+                "size": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "is_public": [ANY, NOT_EMPTY, MATCH],  # bool
+                "participant_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
             },
             "stats": {
-                "total": []
+                "total": [ANY, NOT_EMPTY, MATCH, COMPARE]
             },
-            "authenticated": [],
-            "resource": []
+            "authenticated": [ANY, NOT_EMPTY, MATCH],  # bool
         }
     },
 
@@ -430,14 +384,12 @@ DATA_CALL_MAP = {
         "optional_params": ["timestamp", "rrcs", "unix_timestamps"],
         "output_params": {
             "bgp_state": {
-                "target_prefix": [],
-                "source_id": [],
-                "path": [],
-                "community": []
+                "target_prefix": [ANY, NOT_EMPTY, MATCH],
+                "source_id": [ANY, NOT_EMPTY, MATCH],
+                "path": [ANY, NOT_EMPTY, MATCH, INCLUDE],
+                "community": [ANY, NOT_EMPTY, MATCH, INCLUDE]
             },
-            "nr_routes": [],
-            "query_time": [],
-            "resource": []
+            "nr_routes": [ANY, NOT_EMPTY, MATCH, COMPARE]
         }
     },
 
@@ -454,18 +406,15 @@ DATA_CALL_MAP = {
         ],
         "output_params": {
             "updates": {
-                "announcements": [],
-                "withdrawals": [],
-                "starttime": []
+                "announcements": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "withdrawals": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "starttime": [ANY, NOT_EMPTY, MATCH, COMPARE]
             },
-            "sampling_period": [],
-            "sampling_period_human": [],
-            "max_samples": [],
-            "related_prefixes": [],
-            "query_starttime": [],
-            "query_endtime": [],
-            "resource": [],
-            "resource_type": []
+            "sampling_period": [ANY, NOT_EMPTY, MATCH, COMPARE],
+            "sampling_period_human": [ANY, NOT_EMPTY, MATCH],
+            "max_samples": [ANY, NOT_EMPTY, MATCH, COMPARE],
+            "related_prefixes": [ANY, NOT_EMPTY, MATCH, INCLUDE],
+            "resource_type": [ANY, NOT_EMPTY, MATCH]
         }
     },
 
@@ -475,20 +424,17 @@ DATA_CALL_MAP = {
         "optional_params": ["starttime", "endtime", "rrcs", "unix_timestamps"],
         "output_params": {
             "updates": {
-                "seq": [],
-                "timestamp": [],
-                "type": [],
+                "seq": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "timestamp": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "type": [ANY, NOT_EMPTY, MATCH],
                 "attrs": {
-                    "source_id": [],
-                    "target_prefix": [],
-                    "path": [],
-                    "community": []
+                    "source_id": [ANY, NOT_EMPTY, MATCH],
+                    "target_prefix": [ANY, NOT_EMPTY, MATCH],
+                    "path": [ANY, NOT_EMPTY, MATCH, INCLUDE],
+                    "community": [ANY, NOT_EMPTY, MATCH, INCLUDE]
                 }
             },
-            "nr_updates": [],
-            "query_starttime": [],
-            "query_endtime": [],
-            "resource": []
+            "nr_updates": [ANY, NOT_EMPTY, MATCH, COMPARE]
         }
     },
 
@@ -498,38 +444,35 @@ DATA_CALL_MAP = {
         "optional_params": ["starttime", "endtime", "rrcs", "unix_timestamps"],
         "output_params": {
             "initial_state": {
-                "target_prefix": [],
-                "source_id": [],
-                "path": [],
-                "community": []
+                "target_prefix": [ANY, NOT_EMPTY, MATCH],
+                "source_id": [ANY, NOT_EMPTY, MATCH],
+                "path": [ANY, NOT_EMPTY, MATCH, INCLUDE],
+                "community": [ANY, NOT_EMPTY, MATCH, INCLUDE]
             },
             "events": {
-                "seq": [],
-                "timestamp": [],
-                "type": [],
+                "seq": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "timestamp": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "type": [ANY, NOT_EMPTY, MATCH],
                 "attrs": {
-                    "source_id": [],
-                    "target_prefix": [],
-                    "path": [],
-                    "community": []
+                    "source_id": [ANY, NOT_EMPTY, MATCH],
+                    "target_prefix": [ANY, NOT_EMPTY, MATCH],
+                    "path": [ANY, NOT_EMPTY, MATCH, INCLUDE],
+                    "community": [ANY, NOT_EMPTY, MATCH, INCLUDE]
                 }
             },
             "nodes": {
-                "as_number": [],
-                "owner": []
+                "as_number": [ANY, NOT_EMPTY, MATCH],
+                "owner": [ANY, NOT_EMPTY, MATCH]
             },
             "targets": {
-                "prefix": []
+                "prefix": [ANY, NOT_EMPTY, MATCH]
             },
             "sources": {
-                "id": [],
-                "as_number": [],
-                "ip": [],
-                "rrc": []
-            },
-            "query_starttime": [],
-            "query_endtime": [],
-            "resource": []
+                "id": [ANY, NOT_EMPTY, MATCH],
+                "as_number": [ANY, NOT_EMPTY, MATCH],
+                "ip": [ANY, NOT_EMPTY, MATCH],
+                "rrc": [ANY, NOT_EMPTY, MATCH]
+            }
         }
     },
 
@@ -540,17 +483,14 @@ DATA_CALL_MAP = {
         "output_params": {
             "sources": {
                 "uceprotect-level1": {
-                    "prefix": [],
-                    "details": [],
+                    "prefix": [ANY, NOT_EMPTY, MATCH],
+                    "details": [ANY, NOT_EMPTY, MATCH],
                     "timelines": {
-                        "starttime": [],
-                        "endtime": []
+                        "starttime": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                        "endtime": [ANY, NOT_EMPTY, MATCH, COMPARE]
                     }
                 }
-            },
-            "query_starttime": [],
-            "query_endtime": [],
-            "resource": []
+            }
         }
     },
 
@@ -561,16 +501,13 @@ DATA_CALL_MAP = {
         "output_params": {
             "countries": {
                 "stats": {
-                    "registered": [],
-                    "routed": [],
+                    "registered": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "routed": [ANY, NOT_EMPTY, MATCH, COMPARE],
                 },
-                "resource": []
+                "resource": [ANY, NOT_EMPTY, MATCH]
             },
-            "lod": [],
-            "latest_time": [],
-            "query_time": [],
-            # This is different than other resource params!
-            "resource": []
+            "lod": [ANY, NOT_EMPTY, MATCH],
+            "latest_time": [ANY, NOT_EMPTY, MATCH, COMPARE]
         }
     },
 
@@ -580,11 +517,10 @@ DATA_CALL_MAP = {
         "optional_params": ["time", "v4_format"],
         "output_params": {
             "resources": {
-                "asn": [],
-                "ipv4": [],
-                "ipv6": []
-            },
-            "query_time": []
+                "asn": [ANY, NOT_EMPTY, MATCH, INCLUDE],
+                "ipv4": [ANY, NOT_EMPTY, MATCH, INCLUDE],
+                "ipv6": [ANY, NOT_EMPTY, MATCH, INCLUDE]
+            }
         }
     },
 
@@ -593,6 +529,23 @@ DATA_CALL_MAP = {
         "required_params": ["resource"],
         "optional_params": ["starttime", "endtime", "resolution"],
         "output_params": {
+            "stats": {
+                "timeline": {
+                    "starttime": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "endtime": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "v4_prefixes_ris": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "v6_prefixes_ris": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "asns_ris": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "v4_prefixes_stats": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "v6_prefixes_stats": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "asns_stats": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "stats_date": [ANY, NOT_EMPTY, MATCH, COMPARE]
+
+            },
+            "latest_time": [ANY, NOT_EMPTY, MATCH, COMPARE],  
+            "earliest_time": [ANY, NOT_EMPTY, MATCH, COMPARE], 
+            "hd_latest_time": [ANY, NOT_EMPTY, MATCH, COMPARE]
         }
     },
 
@@ -601,55 +554,61 @@ DATA_CALL_MAP = {
         "required_params": [],
         "optional_params": [],
         "output_params": {
-            "ipv4": [],
-            "range4": [],
-            "ipv6": [],
-            "asn": []
+            "ipv4": [ANY, NOT_EMPTY],
+            "range4": [ANY, NOT_EMPTY],
+            "ipv6": [ANY, NOT_EMPTY],
+            "asn": [ANY, NOT_EMPTY]
         }
     },
 
+    # Output structure changes based on inputs for params
     "historical-whois": {
         "data_call_name": "Historical Whois",
         "required_params": ["resource"],
         "optional_params": ["version"],
         "output_params": {
-            "terms_and_conditions": [],
-            "num_versions": [],
+            "terms_and_conditions": [ANY, NOT_EMPTY, MATCH],
+            "num_versions": [ANY, NOT_EMPTY, MATCH, COMPARE],
             "versions": {
-                "from_time": [],
-                "to_time": [],
-                "version": []
+                "from_time": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "to_time": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "version": [ANY, NOT_EMPTY, MATCH, COMPARE]
             },
-            "database": [],
-            "type": [],
-            "objects": {
-                "type": "aut-num",
-                "key": "AS3333",
+            "database": [ANY, NOT_EMPTY, MATCH],
+            "type": [ANY, NOT_EMPTY, MATCH],
+            "objects": {  
+                "type": [ANY, NOT_EMPTY, MATCH],
+                "key":  [ANY, NOT_EMPTY, MATCH],
                 "attributes": {
-                    "attribute": "aut-num",
-                    "value": "AS3333"
+                    "attribute":  [ANY, NOT_EMPTY, MATCH],
+                    "value":  [ANY, NOT_EMPTY, MATCH]
                 }
             },
             # Beware, different implementation (e.g. resource=3333)
-            "referencing": [],
+            "referencing": {
+                "type": [ANY, NOT_EMPTY, MATCH],
+                "key": [ANY, NOT_EMPTY, MATCH],
+                "from_time": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "to_time": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "version": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "latest": [ANY, NOT_EMPTY, MATCH]
+
+            },
             # Probably nested. Couldn't find an example.
             "referenced_by": [],
-            "access": [],
+            "access": [ANY, NOT_EMPTY, MATCH],
             "suggestions": {
-                "type": [],
-                "key": [],
+                "type": [ANY, NOT_EMPTY, MATCH],
+                "key":  [ANY, NOT_EMPTY, MATCH],
                 "attributes": {
-                    "attribute": [],
-                    "value": []
+                    "attribute":  [ANY, NOT_EMPTY, MATCH],
+                    "value":  [ANY, NOT_EMPTY, MATCH]
                 },
-                "from_time": [],
-                "version": [],
-                "latest": [],
-                "deleted": []
-            },
-            "version": [],
-            "latest_time": [],
-            "resource": [],
+                "from_time": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "version": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "latest": [ANY, NOT_EMPTY, MATCH],
+                "deleted": [ANY, NOT_EMPTY, MATCH]  # bool
+            }
         }
     },
 
@@ -659,23 +618,22 @@ DATA_CALL_MAP = {
         "optional_params": ["resource", "best_match_only"],
         "output_params": {
             "resources": {
-                "resource": [],
-                "type_properties": [],
-                "description": [],
+                "resource": [ANY, NOT_EMPTY, MATCH],
+                "type_properties": [ANY, NOT_EMPTY, MATCH, INCLUDE],
+                "description": [ANY, NOT_EMPTY, MATCH],
                 "details": {
-                    "Designation": [],
-                    "Date": [],
-                    "WHOIS": [],
-                    "RDAP": [],
-                    "Status [1]": [],
-                    "Note": []
+                    "Designation": [ANY, NOT_EMPTY, MATCH],
+                    "Date": [ANY, NOT_EMPTY, MATCH],
+                    "WHOIS": [ANY, NOT_EMPTY, MATCH],
+                    "RDAP": [ANY, NOT_EMPTY, MATCH],
+                    "Status [1]": [ANY, NOT_EMPTY, MATCH],
+                    "Note": [ANY, NOT_EMPTY, MATCH]
                 },
-                "source": [],
-                "source_url": []
+                "source": [ANY, NOT_EMPTY, MATCH],
+                "source_url": [ANY, NOT_EMPTY, MATCH]
             },
-            "load_time": [],
-            "returned": [],
-            "resource": []
+            "load_time": [ANY, NOT_EMPTY, MATCH],
+            "returned": [ANY, NOT_EMPTY, MATCH, COMPARE]
         }
     },
 
@@ -685,26 +643,21 @@ DATA_CALL_MAP = {
         "optional_params": ["look_back_limit"],
         "output_params": {
             "rrcs": {
-                "rrc": [],
-                "location": [],
+                "rrc": [ANY, NOT_EMPTY, MATCH],
+                "location": [ANY, NOT_EMPTY, MATCH],
                 "peers": {
-                    "asn_origin": [],
-                    "as_path": [],
-                    "community": [],
-                    "last_updated": [],
-                    "prefix": [],
-                    "peer": [],
-                    "origin": [],
-                    "next_hop": [],
-                    "latest_time": []
+                    "asn_origin": [ANY, NOT_EMPTY, MATCH],
+                    "as_path": [ANY, NOT_EMPTY, MATCH],
+                    "community": [ANY, NOT_EMPTY, MATCH],
+                    "last_updated": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "prefix": [ANY, NOT_EMPTY, MATCH],
+                    "peer": [ANY, NOT_EMPTY, MATCH],
+                    "origin": [ANY, NOT_EMPTY, MATCH],
+                    "next_hop": [ANY, NOT_EMPTY, MATCH],
+                    "latest_time": [ANY, NOT_EMPTY, MATCH]
                 }
             },
-            "query_time": [],
-            "latest_time": [],
-            "parameters": {
-                "resource": [],
-                "look_back_limit": []
-            }
+            "latest_time": [ANY, NOT_EMPTY, MATCH, COMPARE]
         }
     },
 
@@ -714,27 +667,19 @@ DATA_CALL_MAP = {
         "optional_params": [],
         "output_params": {
             "located_resources": {
-                "resource": [],
+                "resource": [ANY, NOT_EMPTY, MATCH],
                 "locations": {
-                    "country": [],
-                    "city": [],
-                    "resources": [],
-                    "latitude": [],
-                    "longitude": [],
-                    "covered_percentage": []
+                    "country": [ANY, NOT_EMPTY, MATCH],
+                    "city": [ANY, NOT_EMPTY, MATCH],
+                    "resources": [ANY, NOT_EMPTY, MATCH, INCLUDE],
+                    "latitude": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "longitude": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "covered_percentage": [ANY, NOT_EMPTY, MATCH, COMPARE]
                 },
-                "unknown_percentage": []
+                "unknown_percentage": [ANY, NOT_EMPTY, MATCH, COMPARE]
             },
             "unknown_percentage": {
-                "v4": [],
-                "v6": []
-            },
-            "result_time": [],
-            "earliest_time": [],
-            "latest_time": [],
-            "parameters": {
-                "resource": [],
-                "resolution": []
+                "v4": [ANY, NOT_EMPTY, MATCH, COMPARE]
             }
         }
     },
@@ -745,31 +690,25 @@ DATA_CALL_MAP = {
         "optional_params": [],
         "output_params": {
             "located_resources": {
-                "resource": [],
+                "resource": [ANY, NOT_EMPTY, MATCH],
                 "locations": {
-                    "country": [],
-                    "city": [],
-                    "resources": [],
-                    "latitude": [],
-                    "longitude": [],
-                    "covered_percentage": []
+                    "country": [ANY, NOT_EMPTY, MATCH],
+                    "city": [ANY, NOT_EMPTY, MATCH],
+                    "resources": [ANY, NOT_EMPTY, MATCH, INCLUDE],
+                    "latitude": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "longitude": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "covered_percentage": [ANY, NOT_EMPTY, MATCH, COMPARE]
                 },
-                "unknown_percentage": []
+                "unknown_percentage": [ANY, NOT_EMPTY, MATCH, COMPARE]
             },
             "unknown_percentage": {
-                "v4": [],
-                "v6": []
-            },
-            "result_time": [],
-            "earliest_time": [],
-            "latest_time": [],
-            "parameters": {
-                "resource": [],
-                "resolution": []
+                "v4": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "v6": [ANY, NOT_EMPTY, MATCH, COMPARE]
             }
         }
     },
 
+#cannot obtain measurements
     "meternet-bandwidth-measurements": {
         "data_call_name": "Meter.net Bandwidth Measurements",
         "required_params": ["resource"],
@@ -782,7 +721,7 @@ DATA_CALL_MAP = {
                 "up": []
             },
             "statistics": {
-                "measurements": []
+                "measurements": [ANY, NOT_EMPTY, MATCH, COMPARE]
             },
             "earliest_time": [],
             "latest_time": [],
@@ -791,7 +730,7 @@ DATA_CALL_MAP = {
             "resource": []
         }
     },
-
+    #in maintenance
     "mlab-activity-count": {
         "data_call_name": "M-lab Activity Count",
         "required_params": ["resource"],
@@ -804,7 +743,7 @@ DATA_CALL_MAP = {
             "resource": []
         }
     },
-
+#in maintenance
     "mlab-bandwidth": {
         "data_call_name": "Mlab Bandwidth",
         "required_params": ["resource"],
@@ -816,7 +755,7 @@ DATA_CALL_MAP = {
             "resource": []
         }
     },
-
+#in maintenance
     "mlab-clients": {
         "data_call_name": "Mlab Clients",
         "required_params": ["resource"],
@@ -842,8 +781,8 @@ DATA_CALL_MAP = {
         "required_params": ["resource"],
         "optional_params": [],
         "output_params": {
-            "asns": [],
-            "prefix": []
+            "asns": [ANY, NOT_EMPTY, MATCH, INCLUDE],
+            "prefix": [ANY, NOT_EMPTY, MATCH]
         }
     },
 
@@ -859,10 +798,7 @@ DATA_CALL_MAP = {
         "output_params": {
             "ipv4": CommonParamsEnum.PREFIX_CHANGES_PER_TIMESTAMP,
             "ipv6": CommonParamsEnum.PREFIX_CHANGES_PER_TIMESTAMP,
-            "resolution": [],
-            "query_starttime": [],
-            "query_endtime": [],
-            "resource": []
+            "resolution": [ANY, NOT_EMPTY, MATCH]
         }
     },
 
@@ -872,22 +808,20 @@ DATA_CALL_MAP = {
         "optional_params": ["min_peers_seeing", "max_related", "query_time"],
         "output_params": {
             "asns": {
-                "asn": [],
-                "holder": []
+                "asn": [ANY, NOT_EMPTY, MATCH],
+                "holder": [ANY, NOT_EMPTY, MATCH]
             },
-            "is_less_specific": [],
-            "announced": [],
-            "related_prefixes": [],
-            "type": [],
+            "is_less_specific": [ANY, NOT_EMPTY, MATCH],  # bool
+            "announced": [ANY, NOT_EMPTY, MATCH],  # bool
+            "related_prefixes": [ANY, NOT_EMPTY, MATCH, INCLUDE],
+            "type": [ANY, NOT_EMPTY, MATCH],
             "block": {
-                "resource": [],
-                "desc": [],
-                "name": []
+                "resource": [ANY, NOT_EMPTY, MATCH],
+                "desc": [ANY, NOT_EMPTY, MATCH],
+                "name": [ANY, NOT_EMPTY, MATCH]
             },
-            "actual_num_related": [],
-            "query_time": [],
-            "num_filtered_out": [],
-            "resource": []
+            "actual_num_related": [ANY, NOT_EMPTY, MATCH, COMPARE],
+            "num_filtered_out": [ANY, NOT_EMPTY, MATCH, COMPARE]
         }
     },
 
@@ -897,16 +831,13 @@ DATA_CALL_MAP = {
         "optional_params": [],
         "output_params": {
             "routes": {
-                "in_bgp": [],
-                "in_whois": [],
-                "prefix": [],
-                "origin": [],
-                "irr_sources": [],
-                "asn_name": []
-            },
-            "query_starttime": [],
-            "query_endtime": [],
-            "resource": []
+                "in_bgp": [ANY, NOT_EMPTY, MATCH],   # bool
+                "in_whois": [ANY, NOT_EMPTY, MATCH],   # bool
+                "prefix": [ANY, NOT_EMPTY, MATCH],
+                "origin": [ANY, NOT_EMPTY, MATCH],
+                "irr_sources": [ANY, NOT_EMPTY, MATCH, INCLUDE],
+                "asn_name": [ANY, NOT_EMPTY, MATCH]
+            }
         }
     },
 
@@ -916,9 +847,7 @@ DATA_CALL_MAP = {
         "optional_params": ["timestamp", "min_peers_seeing"],
         "output_params": {
             "ipv4": CommonParamsEnum.PREFIX_SIZE,
-            "ipv6": CommonParamsEnum.PREFIX_SIZE,
-            "query_time": [],
-            "resource": []
+            "ipv6": CommonParamsEnum.PREFIX_SIZE
         }
     },
 
@@ -928,13 +857,11 @@ DATA_CALL_MAP = {
         "optional_params": [],
         "output_params": {
             "prefixes": {
-                "prefix": [],
-                "origin_asn": [],
-                "asn_name": [],
-                "relationship": []
+                "prefix": [ANY, NOT_EMPTY, MATCH],
+                "origin_asn": [ANY, NOT_EMPTY, MATCH],
+                "asn_name": [ANY, NOT_EMPTY, MATCH],
+                "relationship": [ANY, NOT_EMPTY, MATCH]
             },
-            "query_time": [],
-            "resource": []
         }
     },
 
@@ -944,14 +871,13 @@ DATA_CALL_MAP = {
         "optional_params": [],
         "output_params": {
             "delegations": {
-                "key": [],
-                "value": []
-            },
-            "query_time": [],
-            "resource": []
+                "key": [ANY, NOT_EMPTY, MATCH],
+                "value": [ANY, NOT_EMPTY, MATCH]
+            }
         }
     },
 
+# not straightforward -- to discuss
     "reverse-dns-consistency": {
         "data_call_name": "Reverse DNS Consistency",
         "required_params": ["resource"],
@@ -974,10 +900,8 @@ DATA_CALL_MAP = {
         "required_params": ["resource"],
         "optional_params": [],
         "output_params": {
-            "result": [],
-            "error": [],
-            "query_time": [],
-            "resource": []
+            "result": [ANY, NOT_EMPTY, MATCH, INCLUDE],
+            "error": [ANY, NOT_EMPTY, MATCH]
         }
     },
 
@@ -987,15 +911,12 @@ DATA_CALL_MAP = {
         "optional_params": ["starttime", "endtime", "lod"],
         "output_params": {
             "rirs": {
-                "rir": [],
-                "first_time": [],
-                "last_time": []
+                "rir": [ANY, NOT_EMPTY, MATCH],
+                "first_time": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "last_time": [ANY, NOT_EMPTY, MATCH, COMPARE]
             },
-            "lod": [],
-            "latest": [],
-            "query_starttime": [],
-            "query_endtime": [],
-            "resource": []
+            "lod": [ANY, NOT_EMPTY, MATCH],
+            "latest": [ANY, NOT_EMPTY, MATCH, COMPARE]
         }
     },
 
@@ -1005,16 +926,9 @@ DATA_CALL_MAP = {
         "optional_params": ["query_time"],
         "output_params": {
             "located_resources": {
-                "resource": [],
-                "location": []
-            },
-            "parameters": {
-                "resource": [],
-                "query_time": []
-            },
-            "result_time": [],
-            "earliest_time": [],
-            "latest_time": []
+                "resource": [ANY, NOT_EMPTY, MATCH],
+                "location": [ANY, NOT_EMPTY, MATCH]
+            }
         }
     },
 
@@ -1024,15 +938,12 @@ DATA_CALL_MAP = {
         "optional_params": ["query_time"],
         "output_params": {
             "rirs": {
-                "rir": [],
+                "rir": [ANY, NOT_EMPTY, MATCH],
                 "distribution": {
-                    "prefix_size": [],
-                    "count": []
+                    "prefix_size": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "count": [ANY, NOT_EMPTY, MATCH, COMPARE]
                 }
-            },
-            "query_starttime": [],
-            "query_endtime": [],
-            "resource": []
+            }
         }
     },
 
@@ -1042,15 +953,8 @@ DATA_CALL_MAP = {
         "optional_params": ["query_time"],
         "output_params": {
             "located_resources": {
-                "resource": [],
-                "location": []
-            },
-            "result_time": [],
-            "earliest_time": [],
-            "latest_time": [],
-            "parameters": {
-                "resource": [],
-                "query_time": []
+                "resource": [ANY, NOT_EMPTY, MATCH],
+                "location": [ANY, NOT_EMPTY, MATCH]
             }
         }
     },
@@ -1073,7 +977,12 @@ DATA_CALL_MAP = {
         "data_call_name": "RIS First-Last-Seen",
         "required_params": ["resource"],
         "optional_params": ["include"],
-        "output_params": {}
+        "output_params": {
+            "measurements": [ANY, NOT_EMPTY, MATCH, INCLUDE],
+            "statistics": {
+                "measurements": [ANY, NOT_EMPTY, MATCH, COMPARE]
+            }        
+        }
     },
 
     "ris-full-table-threshold": {
@@ -1081,14 +990,8 @@ DATA_CALL_MAP = {
         "required_params": [],
         "optional_params": ["query_time"],
         "output_params": {
-            "v4": [],
-            "v6": [],
-            "result_time": [],
-            "earliest_time": [],
-            "latest_time": [],
-            "parameters": {
-                "query_time": []
-            }
+            "v4": [ANY, NOT_EMPTY, MATCH, COMPARE],
+            "v6": [ANY, NOT_EMPTY, MATCH, COMPARE]
         }
     },
 
@@ -1105,29 +1008,27 @@ DATA_CALL_MAP = {
             "peer_count": {
                 "v4": {
                     "total": {
-                        "timestamp": [],
-                        "count": []
+                        "timestamp": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                        "count": [ANY, NOT_EMPTY, MATCH, COMPARE]
                     },
                     "full_feed": {
-                        "timestamp": [],
-                        "count": []
+                        "timestamp": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                        "count": [ANY, NOT_EMPTY, MATCH, COMPARE]
                     }
                 },
                 "v6": {
                     "total": {
-                        "timestamp": [],
-                        "count": []
+                        "timestamp": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                        "count": [ANY, NOT_EMPTY, MATCH, COMPARE]
                     },
                     "full_feed": {
-                        "timestamp": [],
-                        "count": []
+                        "timestamp": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                        "count": [ANY, NOT_EMPTY, MATCH, COMPARE]
                     }
                 }
             },
-            "v4_full_prefix_threshold": [],
-            "v6_full_prefix_threshold": [],
-            "starttime": [],
-            "endtime": []
+            "v4_full_prefix_threshold": [ANY, NOT_EMPTY, MATCH, COMPARE],
+            "v6_full_prefix_threshold": [ANY, NOT_EMPTY, MATCH, COMPARE]
         }
     },
 
@@ -1138,32 +1039,29 @@ DATA_CALL_MAP = {
         "output_params": {
             "peerings": {
                 "probe": {
-                    "city": [],
-                    "country": [],
-                    "longitude": [],
-                    "latitude": [],
-                    "name": [],
-                    "ipv4_peer_count": [],
-                    "ipv6_peer_count": [],
-                    "ixp": []
+                    "city": [ANY, NOT_EMPTY, MATCH],
+                    "country": [ANY, NOT_EMPTY, MATCH],
+                    "longitude": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "latitude": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "name": [ANY, NOT_EMPTY, MATCH],
+                    "ipv4_peer_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "ipv6_peer_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "ixp": [ANY, NOT_EMPTY, MATCH]
                 },
                 "peers": {
-                    "asn": [],
-                    "ip": [],
-                    "ip_version": [],
-                    "table_version": [],
-                    "prefix_count": [],
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "ip_version": [ANY, NOT_EMPTY, MATCH],
+                    "table_version": [ANY, NOT_EMPTY, MATCH],
+                    "prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
                     "routes": {
-                        "as_path": []
+                        "as_path": [ANY, NOT_EMPTY, MATCH, INCLUDE]
                     }
                 }
             }
-        },
-        "query_starttime": [],
-        "query_endtime": [],
-        "resource": []
+        }
     },
-
+#not straighforward -- keys could be changed and how to insert them?
     "ris-peers": {
         "data_call_name": "RIS Peers",
         "required_params": [],
@@ -1171,11 +1069,8 @@ DATA_CALL_MAP = {
         "output_params": {
             # INCLUDE_KEYS
             "peers": [],
-            "earliest_time": [],
-            "latest_time": [],
-            "parameters": {
-                "query_time": []
-            }
+            "earliest_time": [],  # does it make sense to test it?
+            "latest_time": [],  # does it make sense to test it?
         }
     },
 
@@ -1219,24 +1114,21 @@ DATA_CALL_MAP = {
         ],
         "output_params": {
             "by_origin": {
-                "origin": [],
+                "origin": [ANY, NOT_EMPTY, MATCH],
                 "prefixes": {
-                    "prefix": [],
+                    "prefix": [ANY, NOT_EMPTY, MATCH],
                     "timelines": {
-                        "starttime": [],
-                        "endtime": [],
-                        "full_peers_seeing": []
+                        "starttime": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                        "endtime": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                        "full_peers_seeing": [ANY, NOT_EMPTY, MATCH, COMPARE]
                     }
                 }
             },
             "latest_max_ff_peers": {
-                "v4": [],
-                "v6": []
+                "v4": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "v6": [ANY, NOT_EMPTY, MATCH, COMPARE]
             },
-            "time_granularity": [],
-            "query_starttime": [],
-            "query_endtime": [],
-            "resource": [],
+            "time_granularity": [ANY, NOT_EMPTY, MATCH, COMPARE]
         }
     },
 
@@ -1246,38 +1138,36 @@ DATA_CALL_MAP = {
         "optional_params": ["timestamp", "min_peers_seeing"],
         "output_params": {
             "first_seen": {
-                "prefix": [],
-                "origin": [],
-                "time": []
+                "prefix": [ANY, NOT_EMPTY, MATCH],
+                "origin": [ANY, NOT_EMPTY, MATCH],
+                "time": [ANY, NOT_EMPTY, MATCH, COMPARE]
             },
             "last_seen": {
-                "prefix": [],
-                "origin": [],
-                "time": []
+                "prefix": [ANY, NOT_EMPTY, MATCH],
+                "origin": [ANY, NOT_EMPTY, MATCH],
+                "time": [ANY, NOT_EMPTY, MATCH, COMPARE]
             },
             "visibility": {
                 "v4": {
-                    "ris_peers_seeing": [],
-                    "total_ris_peers": []
+                    "ris_peers_seeing": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "total_ris_peers": [ANY, NOT_EMPTY, MATCH, COMPARE]
                 },
                 "v6": {
-                    "ris_peers_seeing": [],
-                    "total_ris_peers": []
+                    "ris_peers_seeing": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "total_ris_peers": [ANY, NOT_EMPTY, MATCH, COMPARE]
                 }
             },
             "announced_space": {
                 "v4": {
-                    "prefixes": [],
-                    "ips": []
+                    "prefixes": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "ips": [ANY, NOT_EMPTY, MATCH, COMPARE]
                 },
                 "v6": {
-                    "prefixes": [],
-                    "48s": []
+                    "prefixes": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "48s": [ANY, NOT_EMPTY, MATCH, COMPARE]
                 }
             },
-            "observed_neighbours": [],
-            "resource": [],
-            "query_time": []
+            "observed_neighbours": [ANY, NOT_EMPTY, MATCH, COMPARE]
         }
     },
 
@@ -1305,41 +1195,38 @@ DATA_CALL_MAP = {
         "optional_params": [],
         "output_params": {
             "validating_roas": {
-                "origin": [],
-                "prefix": [],
-                "max_length": [],
-                "validity": []
+                "origin": [ANY, NOT_EMPTY, MATCH],
+                "prefix": [ANY, NOT_EMPTY, MATCH],
+                "max_length": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "validity": [ANY, NOT_EMPTY, MATCH]
             },
-            "status": [],
-            "validator": [],
-            "prefix": [],
-            "resource": []
+            "status": [ANY, NOT_EMPTY, MATCH],
+            "validator": [ANY, NOT_EMPTY, MATCH],
         }
     },
 
-    "rrc-info": {
+    "rrc-info": { 
         "data_call_name": "RRC Info",
         "required_params": [],
         "optional_params": [],
         "output_params": {
             "rrcs": {
-                "id": [],
-                "name": [],
-                "geographical_location": [],
-                "topological_location": [],
-                "multihop": [],
-                "activated_on": [],
-                "deactivated_on": [],
+                "id": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "name": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "geographical_location": [ANY, NOT_EMPTY, MATCH],
+                "topological_location": [ANY, NOT_EMPTY, MATCH],
+                "multihop": [ANY, NOT_EMPTY, MATCH],  # bool
+                "activated_on": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "deactivated_on": [ANY, NOT_EMPTY, MATCH, COMPARE],
                 "peers": {
-                    "asn": [],
-                    "ip": [],
-                    "v4_prefix_count": [],
-                    "is_full_feed_v4": [],
-                    "v6_prefix_count": [],
-                    "is_full_feed_v6": []
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "is_full_feed_v4": [ANY, NOT_EMPTY, MATCH],  # bool
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "is_full_feed_v6": [ANY, NOT_EMPTY, MATCH]  # bool
                 }
-            },
-            "parameters": []
+            }
         }
     },
 
@@ -1349,16 +1236,13 @@ DATA_CALL_MAP = {
         "optional_params": ["limit"],
         "output_params": {
             "categories": {
-                "category": [],
+                "category": [ANY, NOT_EMPTY, MATCH],
                 "suggestions": {
-                    "label": [],
-                    "value": [],
-                    "description": []
+                    "label": [ANY, NOT_EMPTY, MATCH],
+                    "value": [ANY, NOT_EMPTY, MATCH],
+                    "description": [ANY, NOT_EMPTY, MATCH]
                 }
-            },
-            "query_term": [],
-            "limit": [],
-            "query_time": []
+            }
         }
     },
 
@@ -1368,19 +1252,14 @@ DATA_CALL_MAP = {
         "optional_params": ["starttime", "endtime"],
         "output_params": {
             "measurements": {
-                "prefix": [],
-                "date": [],
-                "down": [],
-                "up": []
+                "prefix": [ANY, NOT_EMPTY, MATCH],
+                "date": [ANY, NOT_EMPTY, MATCH],
+                "down": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "up": [ANY, NOT_EMPTY, MATCH, COMPARE]
             },
             "statistics": {
-                "measurements": []
-            },
-            "earliest_time": [],
-            "latest_time": [],
-            "starttime": [],
-            "endtime": [],
-            "resource": []
+                "measurements": [ANY, NOT_EMPTY, MATCH, COMPARE]
+            }
         }
     },
 
@@ -1391,25 +1270,29 @@ DATA_CALL_MAP = {
         "output_params": {
             "visibilities": {
                 "probe": {
-                    "city": [],
-                    "country": [],
-                    "longitude": [],
-                    "latitude": [],
-                    "name": [],
-                    "ipv4_peer_count": [],
-                    "ipv6_peer_count": [],
-                    "ixp": []
+                    "city": [ANY, NOT_EMPTY, MATCH],
+                    "country": [ANY, NOT_EMPTY, MATCH],
+                    "longitude": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "latitude": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "name": [ANY, NOT_EMPTY, MATCH],
+                    "ipv4_peer_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "ipv6_peer_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "ixp": [ANY, NOT_EMPTY, MATCH]
                 },
-                "ipv4_full_table_peers_not_seeing": [],
-                "ipv6_full_table_peers_not_seeing": [],
-                "ipv4_full_table_peer_count": [],
-                "ipv6_full_table_peer_count": []
+                "ipv4_full_table_peers_not_seeing": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "ipv6_full_table_peers_not_seeing": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "ipv4_full_table_peer_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "ipv6_full_table_peer_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
             },
-            "related_prefixes": [],
-            "include": [],
-            "query_time": [],
-            "latest_time": [],
-            "resource": []
+            "related_prefixes": [ANY, NOT_EMPTY, MATCH, INCLUDE]
         }
     },
 
@@ -1418,7 +1301,7 @@ DATA_CALL_MAP = {
         "required_params": [],
         "optional_params": [],
         "output_params": {
-            "ip": []
+            "ip": [ANY, NOT_EMPTY, MATCH]
         }
     },
 
@@ -1427,11 +1310,17 @@ DATA_CALL_MAP = {
         "required_params": ["resource"],
         "optional_params": [],
         "output_params": {
-            "records": [],
-            "irr_records": [],
-            "authorities": [],
-            "query_time": [],
-            "resource": [],
+            "records": {
+                "key": [ANY, NOT_EMPTY, MATCH],
+                "value": [ANY, NOT_EMPTY, MATCH],
+                "details_link": [ANY, NOT_EMPTY, MATCH]
+            },
+            "irr_records": {
+                "key": [ANY, NOT_EMPTY, MATCH],
+                "value": [ANY, NOT_EMPTY, MATCH],
+                "details_link": [ANY, NOT_EMPTY, MATCH]
+            },
+            "authorities": [ANY, NOT_EMPTY, MATCH, INCLUDE]
         }
     },
 
@@ -1440,10 +1329,8 @@ DATA_CALL_MAP = {
         "required_params": ["object", "type", "source"],
         "optional_params": ["timestamp", "compare_with_live"],
         "output_params": {
-            "object": [],
-            "last_updated": [],
-            "query_time": [],
-            "same_as_live": [],
+            "last_updated": [ANY, NOT_EMPTY, MATCH, COMPARE],
+            "same_as_live": [ANY, NOT_EMPTY, MATCH],
         }
     },
 
@@ -1452,23 +1339,13 @@ DATA_CALL_MAP = {
         "required_params": ["resource"],
         "optional_params": ["method"],
         "output_params": {
-            "params": {
-                "domain": [],
-                "user_ip": [],
-                "client_id": [],
-                "client_version": []
-            },
-            "hash_id": [],
             "id": [],
-            "results": {
-                "level": [],
-                "module": [],
-                "message": []
-            },
-            "creation_time": [],
-            "parameters": {
-                "resource": [],
-                "method": []
+            "result": {
+                "created_at": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "undelegated": [ANY, NOT_EMPTY, MATCH],
+                "id": [ANY, NOT_EMPTY, MATCH],
+                "creation_time": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "overall_result": [ANY, NOT_EMPTY, MATCH]
             }
         }
     },
