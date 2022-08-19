@@ -18,9 +18,6 @@
 # "<param>: No item matching all the expected inputs found!".
 #   https://stat.ripe.net/data/address-space-hierarchy/data.json?resource=110/4
 
-# Conditional Flags
-from ast import In
-
 
 ALL = "All following are True"
 ANY = "At least one of following is True"
@@ -299,7 +296,7 @@ DATA_CALL_MAP = {
                 "resource": [ANY, NOT_EMPTY, MATCH],
                 "deployment": {
                     "date": [ANY, NOT_EMPTY, MATCH, COMPARE],
-                    "statuses": { 
+                    "statuses": {
                         "neverseen": [ANY, NOT_EMPTY, MATCH, COMPARE],
                         "connected": [ANY, NOT_EMPTY, MATCH, COMPARE],
                         "disconnected": [ANY, NOT_EMPTY, MATCH, COMPARE],
@@ -310,7 +307,7 @@ DATA_CALL_MAP = {
         }
     },
 
-    "atlas-probes": { 
+    "atlas-probes": {
         "data_call_name": "Atlas Probes",
         "required_params": ["resource"],
         "optional_params": [],
@@ -331,8 +328,8 @@ DATA_CALL_MAP = {
                 "address_v4": [ANY, NOT_EMPTY, MATCH],
                 "country_code": [ANY, NOT_EMPTY, MATCH],
                 "is_public": [ANY, NOT_EMPTY, MATCH],  # bool
-                "asn_v4": [ANY, NOT_EMPTY, MATCH],  
-                "asn_v6": [ANY, NOT_EMPTY, MATCH], 
+                "asn_v4": [ANY, NOT_EMPTY, MATCH],
+                "asn_v6": [ANY, NOT_EMPTY, MATCH],
                 "status_since": [ANY, NOT_EMPTY, MATCH, COMPARE],
                 "first_connected": [ANY, NOT_EMPTY, MATCH, COMPARE],
                 "total_uptime": [ANY, NOT_EMPTY, MATCH, COMPARE]
@@ -349,9 +346,9 @@ DATA_CALL_MAP = {
         "optional_params": [],
         "output_params": {
             "measurements": {
-                "af": [ANY, NOT_EMPTY, MATCH],  # address family, 4 or 6 (integer)-- always not empty
-                "msm_id": [ANY, NOT_EMPTY, MATCH], 
-                "stop_time": [ANY, NOT_EMPTY, MATCH, COMPARE], 
+                "af": [ANY, NOT_EMPTY, MATCH],  # address family, 4 or 6 -- always not empty
+                "msm_id": [ANY, NOT_EMPTY, MATCH],
+                "stop_time": [ANY, NOT_EMPTY, MATCH, COMPARE],
                 "start_time": [ANY, NOT_EMPTY, MATCH, COMPARE],
                 "dst_name": [ANY, NOT_EMPTY, MATCH],
                 "dst_addr": [ANY, NOT_EMPTY, MATCH],
@@ -543,8 +540,8 @@ DATA_CALL_MAP = {
                 "stats_date": [ANY, NOT_EMPTY, MATCH, COMPARE]
 
             },
-            "latest_time": [ANY, NOT_EMPTY, MATCH, COMPARE],  
-            "earliest_time": [ANY, NOT_EMPTY, MATCH, COMPARE], 
+            "latest_time": [ANY, NOT_EMPTY, MATCH, COMPARE],
+            "earliest_time": [ANY, NOT_EMPTY, MATCH, COMPARE],
             "hd_latest_time": [ANY, NOT_EMPTY, MATCH, COMPARE]
         }
     },
@@ -576,7 +573,7 @@ DATA_CALL_MAP = {
             },
             "database": [ANY, NOT_EMPTY, MATCH],
             "type": [ANY, NOT_EMPTY, MATCH],
-            "objects": {  
+            "objects": {
                 "type": [ANY, NOT_EMPTY, MATCH],
                 "key":  [ANY, NOT_EMPTY, MATCH],
                 "attributes": {
@@ -708,7 +705,7 @@ DATA_CALL_MAP = {
         }
     },
 
-#cannot obtain measurements
+    # cannot obtain measurements
     "meternet-bandwidth-measurements": {
         "data_call_name": "Meter.net Bandwidth Measurements",
         "required_params": ["resource"],
@@ -730,7 +727,7 @@ DATA_CALL_MAP = {
             "resource": []
         }
     },
-    #in maintenance
+    # in maintenance
     "mlab-activity-count": {
         "data_call_name": "M-lab Activity Count",
         "required_params": ["resource"],
@@ -743,7 +740,7 @@ DATA_CALL_MAP = {
             "resource": []
         }
     },
-#in maintenance
+    # in maintenance
     "mlab-bandwidth": {
         "data_call_name": "Mlab Bandwidth",
         "required_params": ["resource"],
@@ -755,7 +752,7 @@ DATA_CALL_MAP = {
             "resource": []
         }
     },
-#in maintenance
+    # in maintenance
     "mlab-clients": {
         "data_call_name": "Mlab Clients",
         "required_params": ["resource"],
@@ -877,7 +874,7 @@ DATA_CALL_MAP = {
         }
     },
 
-# not straightforward -- to discuss
+    # not straightforward -- to discuss
     "reverse-dns-consistency": {
         "data_call_name": "Reverse DNS Consistency",
         "required_params": ["resource"],
@@ -981,7 +978,7 @@ DATA_CALL_MAP = {
             "measurements": [ANY, NOT_EMPTY, MATCH, INCLUDE],
             "statistics": {
                 "measurements": [ANY, NOT_EMPTY, MATCH, COMPARE]
-            }        
+            }
         }
     },
 
@@ -1061,7 +1058,7 @@ DATA_CALL_MAP = {
             }
         }
     },
-#not straighforward -- keys could be changed and how to insert them?
+    # not straighforward -- keys could be changed and how to insert them?
     "ris-peers": {
         "data_call_name": "RIS Peers",
         "required_params": [],
@@ -1205,7 +1202,7 @@ DATA_CALL_MAP = {
         }
     },
 
-    "rrc-info": { 
+    "rrc-info": {
         "data_call_name": "RRC Info",
         "required_params": [],
         "optional_params": [],
