@@ -55,6 +55,7 @@ def run_cicd_tests(host):
 
                 for param, value in expected_output.items():
                     print(f"------> Parameter {param}:")
+                    param = param.split("->")[0] if "->" in param else param
                     print(f"------> Expected: {value} | Actual: {test_output[param]}")
 
                 failed_test_cases.append(str(row_index))
