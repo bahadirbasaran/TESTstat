@@ -285,8 +285,6 @@ DATA_CALL_MAP = {
         }
     },
 
-    # Under construction !!!
-
     "atlas-probe-deployment": {
         "data_call_name": "Atlas Probe Deployment",
         "required_params": ["resource"],
@@ -559,6 +557,7 @@ DATA_CALL_MAP = {
     },
 
     # Output structure changes based on inputs for params
+    # might require change
     "historical-whois": {
         "data_call_name": "Historical Whois",
         "required_params": ["resource"],
@@ -575,10 +574,10 @@ DATA_CALL_MAP = {
             "type": [ANY, NOT_EMPTY, MATCH],
             "objects": {
                 "type": [ANY, NOT_EMPTY, MATCH],
-                "key":  [ANY, NOT_EMPTY, MATCH],
+                "key": [ANY, NOT_EMPTY, MATCH],
                 "attributes": {
-                    "attribute":  [ANY, NOT_EMPTY, MATCH],
-                    "value":  [ANY, NOT_EMPTY, MATCH]
+                    "attribute": [ANY, NOT_EMPTY, MATCH],
+                    "value": [ANY, NOT_EMPTY, MATCH]
                 }
             },
             # Beware, different implementation (e.g. resource=3333)
@@ -586,20 +585,26 @@ DATA_CALL_MAP = {
                 "type": [ANY, NOT_EMPTY, MATCH],
                 "key": [ANY, NOT_EMPTY, MATCH],
                 "from_time": [ANY, NOT_EMPTY, MATCH, COMPARE],
-                "to_time": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "to_time": [ANY, NOT_EMPTY, MATCH, COMPARE],  # could be missing
                 "version": [ANY, NOT_EMPTY, MATCH, COMPARE],
-                "latest": [ANY, NOT_EMPTY, MATCH]
+                "latest": [ANY, NOT_EMPTY, MATCH]  # bool
 
             },
-            # Probably nested. Couldn't find an example.
-            "referenced_by": [],
+            "referenced_by": {
+                "type": [ANY, NOT_EMPTY, MATCH],
+                "key": [ANY, NOT_EMPTY, MATCH],
+                "from_time": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "to_time": [ANY, NOT_EMPTY, MATCH, COMPARE],  # could be missing
+                "version": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "latest": [ANY, NOT_EMPTY, MATCH]  # bool
+            },
             "access": [ANY, NOT_EMPTY, MATCH],
             "suggestions": {
                 "type": [ANY, NOT_EMPTY, MATCH],
-                "key":  [ANY, NOT_EMPTY, MATCH],
+                "key": [ANY, NOT_EMPTY, MATCH],
                 "attributes": {
-                    "attribute":  [ANY, NOT_EMPTY, MATCH],
-                    "value":  [ANY, NOT_EMPTY, MATCH]
+                    "attribute": [ANY, NOT_EMPTY, MATCH],
+                    "value": [ANY, NOT_EMPTY, MATCH]
                 },
                 "from_time": [ANY, NOT_EMPTY, MATCH, COMPARE],
                 "version": [ANY, NOT_EMPTY, MATCH, COMPARE],
@@ -706,6 +711,7 @@ DATA_CALL_MAP = {
     },
 
     # cannot obtain measurements
+    """
     "meternet-bandwidth-measurements": {
         "data_call_name": "Meter.net Bandwidth Measurements",
         "required_params": ["resource"],
@@ -728,7 +734,7 @@ DATA_CALL_MAP = {
         }
     },
     # in maintenance
-    "mlab-activity-count": {
+   "mlab-activity-count": {
         "data_call_name": "M-lab Activity Count",
         "required_params": ["resource"],
         "optional_params": ["starttime", "endtime"],
@@ -771,7 +777,7 @@ DATA_CALL_MAP = {
             "query_endtime": [],
             "resource": []
         }
-    },
+    }, """
 
     "network-info": {
         "data_call_name": "Network Info",
@@ -874,7 +880,7 @@ DATA_CALL_MAP = {
         }
     },
 
-    # not straightforward -- to discuss
+    # not straightforward -- to discuss, there are changing prefixes
     "reverse-dns-consistency": {
         "data_call_name": "Reverse DNS Consistency",
         "required_params": ["resource"],
@@ -957,16 +963,20 @@ DATA_CALL_MAP = {
     },
 
     # Output structure changes based on inputs for list_asns and asn_types
+    # requires the change
     "ris-asns": {
         "data_call_name": "RIS ASNs",
         "required_params": [],
         "optional_params": ["list_asns", "asn_types", "query_time"],
         "output_params": {
-            "asns": [],
-            "counts": [],
-            "earliest_time": [],
-            "latest_time": [],
-            "query_time": []
+            # "asns": [ANY, NOT_EMPTY, MATCH, INCLUDE],
+            "asns": {
+                "originating": [ANY, NOT_EMPTY, MATCH, INCLUDE],
+                "transiting": [ANY, NOT_EMPTY, MATCH, INCLUDE]
+            },
+            "counts": {
+                "total": [ANY, NOT_EMPTY, MATCH, COMPARE]
+            }
         }
     },
 
@@ -1058,20 +1068,181 @@ DATA_CALL_MAP = {
             }
         }
     },
-    # not straighforward -- keys could be changed and how to insert them?
+    # how to optimize the keys here?
     "ris-peers": {
         "data_call_name": "RIS Peers",
         "required_params": [],
         "optional_params": ["query_time"],
         "output_params": {
             # INCLUDE_KEYS
-            "peers": [],
-            "earliest_time": [],  # does it make sense to test it?
-            "latest_time": [],  # does it make sense to test it?
+            "peers": {
+                "rrc00": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "rrc01": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "rrc02": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "rrc03": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "rrc04": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "rrc05": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "rrc06": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "rrc07": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "rrc08": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "rrc09": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "rrc10": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "rrc11": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "rrc12": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "rrc13": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "rrc14": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "rrc15": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "rrc16": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "rrc17": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "rrc18": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "rrc19": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "rrc20": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "rrc21": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "rrc22": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "rrc23": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "rrc24": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "rrc25": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "rrc26": {
+                    "asn": [ANY, NOT_EMPTY, MATCH],
+                    "ip": [ANY, NOT_EMPTY, MATCH],
+                    "v4_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "v6_prefix_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+
+            },
         }
     },
 
-    # Output structure changes based on inputs for params
     "ris-prefixes": {
         "data_call_name": "RIS Peers",
         "required_params": ["resource"],
@@ -1084,17 +1255,15 @@ DATA_CALL_MAP = {
         ],
         "output_params": {
             "counts": {
-                "v4": [],
-                "v6": []
-            },
-            "list_prefixes": [],
-            "af": [],
-            "types": [],
-            "noise": [],
-            "earliest_time": [],
-            "latest_time": [],
-            "query_time": [],
-            "resource": [],
+                "v4": {
+                    "originating": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "transiting": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                },
+                "v6": {
+                    "originating": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                    "transiting": [ANY, NOT_EMPTY, MATCH, COMPARE]
+                }
+            }
         }
     },
 
@@ -1168,21 +1337,19 @@ DATA_CALL_MAP = {
         }
     },
 
-    # Output structure changes based on inputs for params
     "rpki-history": {
         "data_call_name": "RPKI History",
         "required_params": ["resource"],
         "optional_params": ["family", "resolution", "delegated"],
         "output_params": {
             "timeseries": {
-                "cc": [],
-                "time": [],
-                "family": [],
+                "asn": [ANY, NOT_EMPTY, MATCH],
+                "time": [ANY, NOT_EMPTY, MATCH, COMPARE],
+                "family": [ANY, NOT_EMPTY, MATCH],
                 "rpki": {
-                    "vrp_count": []
+                    "vrp_count": [ANY, NOT_EMPTY, MATCH, COMPARE]
                 }
-            },
-            "resource": []
+            }
         }
     },
 
