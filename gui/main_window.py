@@ -157,7 +157,6 @@ class MainWindow(QWidget):
         btn_run.setText("Run Tests")
         btn_run.setStyleSheet("font-weight: bold; font-size:16px;")
         btn_run.setGeometry(QRect(20, 70, 111, 32))
-        middleTopLayout.addWidget(self.checkbox_select_all)
 
         btn_compare = QPushButton(clicked=lambda: self.on_btn_compare_click())
         btn_compare.setText("Compare")
@@ -264,8 +263,8 @@ class MainWindow(QWidget):
         topLayout.insertStretch(3, 3)
         topLayout.addLayout(toprightLayout, 3)
 
-        middleTopLayout.addWidget(self.searchbar)
         middleTopLayout.addWidget(self.checkbox_select_all)
+        middleTopLayout.addWidget(self.searchbar)
         middleTopLayout.addStretch()
         middleLayout.addLayout(middleTopLayout)
         middleLayout.addWidget(self.table_test_suite)
