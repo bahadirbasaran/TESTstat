@@ -145,6 +145,13 @@ class MainWindow(QWidget):
         )
         self.label_succesful.setFont(self.font)
 
+        self.label_timeout = QLabel()
+        self.label_timeout.setGeometry(QRect(392, 90, 150, 32))
+        self.label_timeout.setText(
+            "Timed out tests: 0"
+        )
+        self.label_timeout.setFont(self.font)
+
         # Buttons
         btn_run = QPushButton(clicked=lambda: self.on_btn_run_click())
         btn_run.setText("Run Tests")
@@ -244,6 +251,7 @@ class MainWindow(QWidget):
         toprightLayout.addWidget(self.label_selected, 1, 0, alignment=Qt.AlignLeft)
         toprightLayout.addWidget(self.label_failed, 3, 0, alignment=Qt.AlignLeft)
         toprightLayout.addWidget(self.label_succesful, 2, 0, alignment=Qt.AlignLeft)
+        toprightLayout.addWidget(self.label_timeout, 4, 0, alignment=Qt.AlignLeft)
 
         topcenterLayout.addWidget(btn_new_test, 0, 1)
         topcenterLayout.addWidget(btn_remove_test, 1, 1)
@@ -328,6 +336,7 @@ class MainWindow(QWidget):
         # Clear successful/failed tests
         self.label_succesful.setText("Successful tests: 0")
         self.label_failed.setText("Failed tests: 0")
+        self.label_timeout.setText("Timed out tests: 0")
 
         # Clear select all checkbox
         self.checkbox_select_all.setChecked(False)
@@ -671,6 +680,7 @@ class MainWindow(QWidget):
         num_tests_run = 0
         num_passed_tests = 0
         num_failed_tests = 0
+        num_timeout_tests = 0
         num_total_tests = len(tests_to_run)
         failed_tests = []
 
@@ -711,6 +721,8 @@ class MainWindow(QWidget):
 
                 if test_output == MessageEnum.TIMEOUT:
                     num_tests_run += 1
+                    num_timeout_tests += 1
+                    self.label_timeout.setText(f"Timed out tests: {num_timeout_tests}")
                     self.progress_bar.setProperty("value", num_tests_run)
 
                     timed_out_item = QTableWidgetItem("Error: Connection timed out!")
