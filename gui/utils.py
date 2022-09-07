@@ -2,7 +2,7 @@ from core.utils import MessageEnum
 from PyQt5.QtWidgets import QMessageBox, QStyledItemDelegate
 
 
-HOSTS = ["Local Host", "stat.ripe.net"] + [f"dev00{n}.stat.ripe.net" for n in range(1, 8)]
+HOSTS = ["Local Host", "stat.ripe.net"] + [f"dev00{n}.stat.ripe.net" for n in range(1, 9)]
 
 
 class ColorEnum():
