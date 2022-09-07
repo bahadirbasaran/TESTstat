@@ -10,10 +10,19 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--host',
-        dest='host',
+        "--host",
+        dest="host",
         type=str,
-        help='Host to connect. Default: stat.ripe.net'
+        choices=["stat.ripe.net"] + [f"dev00{n}.stat.ripe.net" for n in range(1, 9)],
+        help="Host to connect"
+    )
+    parser.add_argument(
+        "--mode",
+        dest="mode",
+        type=str,
+        choices=["complete", "500"],
+        default="complete",
+        help="Test mode. 'complete' for the most detailed test run, '500' for 500-only testing"
     )
     args = parser.parse_args()
 
@@ -22,7 +31,7 @@ if __name__ == "__main__":
     if args.host:
         from scripts.cicd import run_cicd_tests
 
-        run_cicd_tests(args.host)
+        run_cicd_tests(args.host, args.mode)
     else:
         from PyQt5.QtWidgets import QApplication
         from gui.main_window import MainWindow

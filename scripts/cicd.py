@@ -5,12 +5,28 @@ from core.teststat import TestStat
 from core.utils import MessageEnum
 
 
-TEST_CASES_PATH = "data/test_cases_cicd.csv"
+def run_cicd_tests(host, mode):
+    """Run CICD test cases for given host in given mode"""
 
+    def place_stats(stat_type):
 
-def run_cicd_tests(host):
+        if stat_type == "timeout":
+            target_index_list = timed_out_test_cases
+            target_dc_list = timed_out_data_calls
+        elif stat_type == "failure":
+            target_index_list = failed_test_cases
+            target_dc_list = failed_data_calls
+
+        target_index_list.append(str(row_index))
+
+        data_call_repr = data_call.replace('-', ' ').title()
+        if data_call_repr not in target_dc_list:
+            target_dc_list.append(data_call_repr)
+
+    test_cases_path = "data/test_cases_500.csv" if mode == "500" else "data/test_cases_cicd.csv"
 
     sys.stdout.flush()
+    print(f"Host: {host}\nTest Cases: {test_cases_path}\nMode: {mode}")
 
     teststat = TestStat(host, cicd=True)
 
@@ -19,13 +35,11 @@ def run_cicd_tests(host):
     timed_out_test_cases = []
     timed_out_data_calls = []
 
-    with open(TEST_CASES_PATH) as csv_file:
+    with open(test_cases_path) as csv_file:
 
         csv_reader = csv.reader(csv_file, delimiter=',')
 
         next(csv_reader)
-
-        print("Host: ", host, '\n')
 
         for row_index, row in enumerate(csv_reader, 1):
 
@@ -44,24 +58,21 @@ def run_cicd_tests(host):
 
             if test_output == MessageEnum.TIMEOUT:
                 print(f"----> Test Case {row_index} timed-out!")
+                place_stats("timeout")
 
-                timed_out_test_cases.append(str(row_index))
+            else:
+                if mode == "complete" and test_output:
+                    print(f"----> Test Case {row_index} failed!")
 
-                if data_call not in timed_out_data_calls:
-                    timed_out_data_calls.append(data_call.replace('-', ' ').title())
+                    for param, value in expected_output.items():
+                        print(f"------> Parameter {param}:")
+                        param = param.split("->")[0]
+                        print(f"------> Expected: {value} | Actual: {test_output[param]}")
 
-            elif test_output:
-                print(f"----> Test Case {row_index} failed!")
+                    place_stats("failure")
 
-                for param, value in expected_output.items():
-                    print(f"------> Parameter {param}:")
-                    param = param.split("->")[0] if "->" in param else param
-                    print(f"------> Expected: {value} | Actual: {test_output[param]}")
-
-                failed_test_cases.append(str(row_index))
-
-                if data_call not in failed_data_calls:
-                    failed_data_calls.append(data_call.replace('-', ' ').title())
+                elif mode == "500" and not test_output:
+                    place_stats("failure")
 
             print("\n")
 
