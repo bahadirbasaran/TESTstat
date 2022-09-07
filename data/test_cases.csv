@@ -1,7 +1,7 @@
 data_call,test_input,expected_output
 abuse-contact-finder,resource = 3333,status_code = 200
 abuse-contact-finder,resource = loremipsum,status_code = 200
-abuse-contact-finder,resource = as3333,status_code = 200;parameters->resource = 3333
+abuse-contact-finder,resource = as3333,status_code = 200
 abuse-contact-finder,resource = 3333,status_code = 200;abuse_contacts = not empty
 abuse-contact-finder,resource = 3333,status_code = 200;abuse_contacts = abuse@ripe.net
 abuse-contact-finder,resource = 3333,status_code = 200;abuse_contacts = abuse@ripe.net&abuse@ripe.com
@@ -9,7 +9,7 @@ address-space-hierarchy,resource = loremipsum,status_code = 200
 address-space-hierarchy,resource = 193/21,status_code = 200;exact->inetnum = ripe-ncc;exact->status = assignedpa;more_specific = not empty;less_specific->remarks = utrecht&netherlands;less_specific->country = nl
 address-space-hierarchy,resource = 193/21,status_code = 200;more_specific->inetnum = not empty
 address-space-hierarchy,resource = 193/21,status_code = 200;less_specific = not empty
-address-space-hierarchy,resource = 193/21,status_code = 200;rir = ripe;resource = 193.0.0.0/21;parameters->resource = 193.0.0.0/21;exact->netname = ripe-ncc;exact->org = org-rien1-ripe;exact->source = ripe;less_specific->netname = nl-ripencc-ops-990305;less_specific->country = nl;less_specific->mnt-lower = ripe-ncc-mnt
+address-space-hierarchy,resource = 193/21,status_code = 200;rir = ripe;exact->netname = ripe-ncc;exact->org = org-rien1-ripe;exact->source = ripe;less_specific->netname = nl-ripencc-ops-990305;less_specific->country = nl;less_specific->mnt-lower = ripe-ncc-mnt
 address-space-hierarchy,resource = 193/21,status_code = 200;exact->org = not empty
 address-space-hierarchy,resource = 193/21,status_code = 200;exact = not empty
 address-space-hierarchy,resource = 193/21,status_code = 200;more_specific = not empty
@@ -19,12 +19,10 @@ address-space-usage,resource = 193/23,status_code = 200
 address-space-usage,resource = loremipsum,status_code = 200
 address-space-usage,resource = 193/23,status_code = 200;assignments = not empty;allocations = not empty;ip_stats = not empty
 address-space-usage,resource = 193/23,status_code = 200;assignments->asn_name = not empty;allocations->allocation = not empty;ip_stats->status = not empty
-address-space-usage,resource = 193/23,status_code = 200;query_time = not empty;resource = 193.0.0.0/23;assignments->address_range = 193.0.0.0/21;assignments->status = assignedpa;allocations->assignments = >0;ip_stats->ips = >0
+address-space-usage,resource = 193/23,status_code = 200;query_time = not empty;assignments->address_range = 193.0.0.0/21;assignments->status = assignedpa;allocations->assignments = >0;ip_stats->ips = >0
 address-space-usage,resource = 193/23,status_code = 200;ip_stats->status = assignedpa;ip_stats->ips = >=3000
 allocation-history,resource = 190.28,status_code = 200
 allocation-history,resource = loremipsum,status_code = 200
-allocation-history,resource = 190.28,status_code = 200;resource = 12451868
-allocation-history,resource = 190.28,status_code = 200;query_starttime = 2000-01-01t00:00:00;query_endtime = 2022-04-04t00:00:00
 allocation-history,resource = 190.28,status_code = 200;iana->resource = 65537-4294967294;iana->status = iana
 allocation-history,resource = 190.28,status_code = 200;iana = not empty
 allocation-history,resource = 190.28,status_code = 200;ripencc = not empty
@@ -32,13 +30,13 @@ allocation-history,resource = 140.78/16;starttime = 2020-12-12T12:00,status_code
 announced-prefixes,resource = 3333,status_code = 200
 announced-prefixes,resource = loremipsum,status_code = 200
 announced-prefixes,resource = 3333,status_code = 200;prefixes = not empty
-announced-prefixes,resource = as3333;starttime = 2020-12-12T12:00,status_code = 200;prefixes->prefix = 2001:67c:2e8::/48;earliest_time = 2000-08-01t00:00:00
+announced-prefixes,resource = as3333;starttime = 2020-12-12T12:00,status_code = 200;prefixes->prefix = 2001:67c:2e8::/48
 announced-prefixes,resource = 3333,status_code = 200;prefixes->prefix = 193.0.18.0/10
 as-overview,resource = 1111,status_code = 200
 as-overview,resource = 127.0.0.1,status_code = 200
 as-overview,resource = 140.78/16,status_code = 200
 as-overview,resource = 3333,status_code = 200;block->resource = 3154-3353
-as-overview,resource = 3333;query_time = 2020-12-12T12:00,status_code = 200;query_starttime = 2020-12-12t12:00:00;query_endtime = 2020-12-12t12:00:00
+as-overview,resource = 3333;query_time = 2020-12-12T12:00,status_code = 200
 as-overview,resource = loremipsum,status_code = 200
 as-path-length,resource = 1111,status_code = 200
 as-path-length,resource = loremipsum,status_code = 200
@@ -68,7 +66,7 @@ asn-neighbours-history,resource = 1205,status_code = 200
 asn-neighbours-history,resource = loremipsum,status_code = 200
 asn-neighbours-history,resource = 1205,status_code = 200;neighbours = not empty
 asn-neighbours-history,resource = 1205;starttime = 2020-10-10T12:00;max_rows = 50,status_code = 200;neighbours = not empty
-asn-neighbours-history,resource = 1205;starttime = 2020-10-10T12:00;max_rows = 50,status_code = 200;neighbours->neighbour = >=1000;query_starttime = 2022-01-13t00:00:00;resource = 1205
+asn-neighbours-history,resource = 1205;starttime = 2020-10-10T12:00;max_rows = 50,status_code = 200;neighbours->neighbour = >=1000
 atlas-probe-deployment,resource = tr,status_code = 200
 atlas-probe-deployment,resource = loremipsum,status_code = 200
 atlas-probes,resource = at,status_code = 200
