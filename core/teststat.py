@@ -55,7 +55,7 @@ class TestStat():
 
     def evaluate_result(self, data_call, test_output, expected_output):
         """
-        Evaluates test result by comparing expected_output with test_output
+        Evaluate test result by comparing expected_output with test_output
         for given data_call. Returns:
             {}  -> test is successful
             int -> test could not be executed (connection error, timeout)
@@ -103,7 +103,7 @@ class TestStat():
 
         def _check_current_level(current_level, current_identifier):
             """
-            Checks if all block fields match with the comparison rule
+            Check if all block fields match with the comparison rule
             from top to bottom node, level by level and populates the list
             resulting_bools with evaluation results.
             """
