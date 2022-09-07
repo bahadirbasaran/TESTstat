@@ -1,7 +1,7 @@
 from gui.utils import throw_message, MessageEnum, StyleEnum
 from core.config import DATA_CALL_MAP, NESTED_PARAMS
 
-from PyQt5.QtCore import Qt, QRect
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, \
     QLabel, QComboBox, QTableWidgetItem, QCheckBox, QLineEdit, \
     QFormLayout, QVBoxLayout, QScrollArea
@@ -52,7 +52,7 @@ class TestCaseWindow(QWidget):
         scroll_area_input = QScrollArea()
         scroll_area_input_container = QWidget()
         scroll_area_input_container.setObjectName("scroll_area_input_container")
-        
+
         scroll_area_output = QScrollArea()
         scroll_area_output_container = QWidget()
         scroll_area_output_container.setObjectName("scroll_area_output_container")
