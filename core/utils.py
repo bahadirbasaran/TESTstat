@@ -8,7 +8,7 @@ class MessageEnum():
 
 
 def get_innermost_value(param, param_set):
-    """Returns innermost value of nested parameters"""
+    """Return innermost value of nested parameters"""
 
     if "->" in param:
         for index, inner_param in enumerate(param.split("->")):
@@ -28,7 +28,7 @@ def get_innermost_value(param, param_set):
 
 def filter_param_set(param_set, filtered_param_set={}, current_level=None):
     """
-    Makes all parameter-value pairs of param_set lower case, trims whitespaces,
+    Make all parameter-value pairs of param_set lower case, trims whitespaces,
     convert bools&numbers into string representations.
     """
 
