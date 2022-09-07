@@ -186,7 +186,7 @@ class TestStat():
                     error_type, error_message = test_output["messages"][0]
                     failed_params[error_type] = error_message.split("\n")[0]
                 else:
-                    failed_params["error"] = "Status code is 200 and differes from the expected."
+                    failed_params["error"] = "Status code is 200 and differs from the expected."
                 return failed_params
 
         # In some data call responses, 'data' is wrapped with 'results' key.
