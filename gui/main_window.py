@@ -574,7 +574,7 @@ class MainWindow(QWidget):
 
             failed_tests_second_host = self.run_tests(
                 tests_to_run,
-                second_host, 
+                second_host,
                 port_second_host,
                 return_failed_tests=True
             )
