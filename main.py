@@ -32,6 +32,7 @@ if __name__ == "__main__":
 
         ui = MainWindow()
         ui.setup_ui()
+        ui.show()
 
         # May not exit the app, but reset the window
         sys.exit(app.exec_())

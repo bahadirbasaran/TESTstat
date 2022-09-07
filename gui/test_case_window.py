@@ -1,144 +1,144 @@
-from gui.utils import throw_message, MessageEnum
+from gui.utils import throw_message, MessageEnum, StyleEnum
 from core.config import DATA_CALL_MAP, NESTED_PARAMS
 
 from PyQt5.QtCore import Qt, QRect
-from PyQt5.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QPushButton, \
-    QLabel, QComboBox, QTableWidgetItem, QCheckBox, QLineEdit, QFormLayout, QScrollArea
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, \
+    QLabel, QComboBox, QTableWidgetItem, QCheckBox, QLineEdit, \
+    QFormLayout, QVBoxLayout, QScrollArea
 
 
-class TestCaseWindow():
+class TestCaseWindow(QWidget):
 
     def __init__(self, main_ui):
+        """Construct test case window"""
+
+        super().__init__()
 
         self.main_ui = main_ui
 
-        self.test_case_window = QMainWindow()
-        self.test_case_window.setWindowTitle("New Test Case")
-        self.test_case_window.resize(900, 512)
-        self.test_case_window.setStyleSheet((
-            "background-color: rgb(235, 236, 244);"
-            "color: rgb(66, 77, 112);"
-        ))
+        self.setWindowTitle("TESTstat")
+        self.resize(500, 400)
+        self.setStyleSheet(StyleEnum.UI)
 
         # Keep track of items in each view
-        self.items_in_previous_view, self.input_names_in_previous_view = [], []
+        self.items_in_previous_view = []
+        self.input_names_in_previous_view = []
 
     def setup_ui(self):
-        """Sets test case window up"""
+        """Set test case window up"""
 
-        # Containers
+        # Layouts and containers
+        top_layout = QHBoxLayout()
+        middle_layout = QHBoxLayout()
+        bottom_layout = QHBoxLayout()
 
-        central_widget = QWidget(self.test_case_window)
-        self.test_case_window.setCentralWidget(central_widget)
-
-        layout_widget = QWidget(central_widget)
-        layout_widget.setGeometry(QRect(614, 450, 216, 32))
-
-        hbox_data_call_container = QWidget(central_widget)
-        hbox_data_call_container.setGeometry(QRect(50, 25, 320, 40))
-        hbox_data_call = QHBoxLayout(hbox_data_call_container)
-        hbox_data_call.setContentsMargins(0, 0, 0, 0)
-
-        hbox_cancel_save_container = QWidget(central_widget)
-        hbox_cancel_save_container.setGeometry(QRect(600, 425, 250, 40))
-        hbox_cancel_save = QHBoxLayout(hbox_cancel_save_container)
-        hbox_cancel_save.setContentsMargins(0, 0, 0, 0)
-
-        scroll_area_input_container = QWidget()
-        scroll_area_input_container.setObjectName("scroll_area_input_container")
-        scroll_area_input = QScrollArea(central_widget)
-        scroll_area_input.setWidgetResizable(True)
-        scroll_area_input.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        scroll_area_input.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        scroll_area_input.setGeometry(QRect(50, 110, 370, 310))
-
-        scroll_area_output_container = QWidget()
-        scroll_area_output_container.setObjectName("scroll_area_output_container")
-        scroll_area_output = QScrollArea(central_widget)
-        scroll_area_output.setWidgetResizable(True)
-        scroll_area_output.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        scroll_area_output.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        scroll_area_output.setGeometry(QRect(480, 110, 370, 310))
+        middle_right_layout = QVBoxLayout()
+        middle_right_main_layout = QVBoxLayout()
+        middle_left_layout = QVBoxLayout()
+        middle_left_main_layout = QVBoxLayout()
+        test_case_outer_layout = QVBoxLayout()
 
         self.form_layout_input = QFormLayout()
         self.form_layout_output = QFormLayout()
 
+        hbox_data_call_container = QWidget()
+        hbox_data_call = QHBoxLayout(hbox_data_call_container)
+        hbox_data_call.setContentsMargins(0, 0, 0, 0)
+
+        hbox_cancel_save_container = QWidget()
+        hbox_cancel_save = QHBoxLayout(hbox_cancel_save_container)
+        hbox_cancel_save.setContentsMargins(0, 0, 0, 0)
+
+        scroll_area_input = QScrollArea()
+        scroll_area_input_container = QWidget()
+        scroll_area_input_container.setObjectName("scroll_area_input_container")
+        
+        scroll_area_output = QScrollArea()
+        scroll_area_output_container = QWidget()
+        scroll_area_output_container.setObjectName("scroll_area_output_container")
+
         # Labels
-
-        label_test_input = QLabel(central_widget)
-        label_test_input.setGeometry(QRect(50, 80, 68, 16))
-        label_test_input.setStyleSheet("font-weight: bold;")
-        label_test_input.setText("Test Input:")
-
-        label_expected_output = QLabel(central_widget)
-        label_expected_output.setGeometry(QRect(480, 80, 112, 16))
-        label_expected_output.setStyleSheet("font-weight: bold;")
-        label_expected_output.setText("Expected Output:")
-
+        label_data_call = QLabel("Data Call:")
+        label_test_input = QLabel("Test Input:")
+        label_exp_output = QLabel("Expected Output:")
         label_status_code = QLabel("Status Code:")
 
         # Buttons
-
-        btn_cancel_new_test = QPushButton(
-            layout_widget,
-            clicked=lambda: self.test_case_window.close()
-        )
-        btn_cancel_new_test.setStyleSheet("font-weight: bold;")
-        btn_cancel_new_test.setText("Cancel")
-
-        btn_save_new_test = QPushButton(
-            layout_widget,
-            clicked=lambda: self.on_btn_save_new_test_click()
-        )
-        btn_save_new_test.setStyleSheet("font-weight: bold;")
-        btn_save_new_test.setText("Save")
-
-        self.label_data_call = QLabel()
-        self.label_data_call.setStyleSheet("font-weight: bold;")
-        self.label_data_call.setText("Data Call:")
+        btn_cancel = QPushButton("Cancel", clicked=lambda: self.close())
+        btn_save = QPushButton("Save", clicked=lambda: self.on_btn_save_click())
 
         # Comboboxes
-
         combobox_data_call = QComboBox()
-        combobox_data_call.setStyleSheet("QComboBox { combobox-popup: 0; }")
+        combobox_data_call.setStyleSheet(StyleEnum.COMBOBOX)
+        combobox_data_call.addItems([specs["data_call_name"] for _, specs in DATA_CALL_MAP.items()])
         combobox_data_call.setMaxVisibleItems(15)
         combobox_data_call.view().setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        combobox_data_call.addItems([specs["data_call_name"] for _, specs in DATA_CALL_MAP.items()])
         combobox_data_call.currentIndexChanged.connect(
             lambda: self.on_combobox_data_call_changed(combobox_data_call.currentText())
         )
 
         # Line Edits
-
         self.status_code = QLineEdit()
-        self.status_code.setGeometry(QRect(150, 10, 125, 21))
-        self.status_code.setStyleSheet("background-color: rgb(255,255,255);")
+        self.status_code.setStyleSheet(StyleEnum.TABLE_LINE_EDIT)
         self.status_code.setPlaceholderText("200")
 
-        # Set the test case window UI up
+        # Wrap the test case window UI up
+        for item in [label_data_call, label_test_input, label_exp_output, btn_cancel, btn_save]:
+            item.setStyleSheet(StyleEnum.BTN_LABEL_CHECKBOX)
 
-        hbox_cancel_save.addWidget(btn_cancel_new_test)
-        hbox_cancel_save.addWidget(btn_save_new_test)
-        hbox_data_call.addWidget(self.label_data_call)
-        hbox_data_call.addWidget(combobox_data_call)
+        for item in [scroll_area_input, scroll_area_output]:
+            item.setWidgetResizable(True)
+            item.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+            item.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
 
         scroll_area_input_container.setLayout(self.form_layout_input)
-        scroll_area_output_container.setLayout(self.form_layout_output)
+        scroll_area_input_container.setMaximumWidth(600)
+        scroll_area_input_container.setMinimumWidth(400)
         scroll_area_input.setWidget(scroll_area_input_container)
+        scroll_area_input.setMinimumWidth(450)
+
+        scroll_area_output_container.setLayout(self.form_layout_output)
+        scroll_area_output_container.setMaximumWidth(600)
+        scroll_area_output_container.setMinimumWidth(400)
         scroll_area_output.setWidget(scroll_area_output_container)
+        scroll_area_output.setMinimumWidth(450)
+
+        top_layout.addWidget(label_data_call)
+        top_layout.addWidget(combobox_data_call)
+        top_layout.addStretch()
+
+        middle_left_layout.addWidget(label_test_input)
+        middle_left_main_layout.addWidget(scroll_area_input)
+        middle_left_layout.addLayout(middle_left_main_layout)
+
+        middle_right_layout.addWidget(label_exp_output)
+        middle_right_main_layout.addWidget(scroll_area_output)
+        middle_right_layout.addLayout(middle_right_main_layout)
+
+        middle_layout.addLayout(middle_left_layout, 2)
+        middle_layout.addLayout(middle_right_layout, 3)
+        middle_layout.insertStretch(1, 3)
+        middle_layout.insertStretch(3, 2)
+
+        bottom_layout.addStretch()
+        bottom_layout.addWidget(btn_cancel)
+        bottom_layout.addWidget(btn_save)
+
+        test_case_outer_layout.addLayout(top_layout)
+        test_case_outer_layout.addSpacing(20)
+        test_case_outer_layout.addLayout(middle_layout)
+        test_case_outer_layout.addLayout(bottom_layout)
+        self.setLayout(test_case_outer_layout)
 
         self.form_layout_output.addRow(label_status_code, self.status_code)
 
-        # Manually populate the UI with initial fields
+        # Populate the UI with initial fields
         self.on_combobox_data_call_changed(combobox_data_call.currentText())
 
-        self.test_case_window.show()
-
     # Combobox slots
-
     def on_combobox_data_call_changed(self, data_call):
         """
-        Populates the test case window UI according to data call selected.
+        Populate the test case window UI according to data call selected.
 
         Since the UI is populated based on core/config.py instead of static
         definition, input items are created/accessed using referencing.
@@ -157,7 +157,7 @@ class TestCaseWindow():
                 reference_to_input = getattr(self, f"test_input_{param}")
                 reference_to_input.setObjectName(f"test_input_{param}")
                 self.items_in_previous_view.append(reference_to_input)
-                reference_to_input.setStyleSheet("background-color: rgb(255,255,255);")
+                reference_to_input.setStyleSheet(StyleEnum.TABLE_LINE_EDIT)
 
                 self.form_layout_input.addRow(reference_to_label, reference_to_input)
 
@@ -196,7 +196,7 @@ class TestCaseWindow():
                     setattr(self, cb_label, QLabel(label_identifier))
                     reference_to_label = getattr(self, cb_label)
                     if not parent_label:
-                        reference_to_label.setStyleSheet("font-weight: bold;")
+                        reference_to_label.setStyleSheet(StyleEnum.BOLD)
                     self.items_in_previous_view.append(reference_to_label)
 
                     setattr(self, cb_input_name, QCheckBox("Not Empty"))
@@ -225,7 +225,7 @@ class TestCaseWindow():
                     reference_to_input.setObjectName(f"expected_input_{var}")
                     self.items_in_previous_view.append(reference_to_input)
                     self.input_names_in_previous_view.append(f"expected_input_{var}")
-                    reference_to_input.setStyleSheet("background-color: rgb(255,255,255);")
+                    reference_to_input.setStyleSheet(StyleEnum.TABLE_LINE_EDIT)
                     self.form_layout_output.addRow(reference_to_label, reference_to_input)
                 # Scenario 2
                 else:
@@ -245,7 +245,7 @@ class TestCaseWindow():
         # "Required Parameters:" label to make it more simple
         if DATA_CALL_MAP[self.data_call]["optional_params"]:
             self.label_required_params = QLabel("Required Parameters:")
-            self.label_required_params.setStyleSheet("font-weight: bold;")
+            self.label_required_params.setStyleSheet(StyleEnum.BOLD)
             self.form_layout_input.addRow(self.label_required_params)
             self.items_in_previous_view.append(self.label_required_params)
 
@@ -255,7 +255,7 @@ class TestCaseWindow():
         # If there is any optional parameter, put the label after required ones
         if DATA_CALL_MAP[self.data_call]["optional_params"]:
             self.label_optional_params = QLabel("Optional Parameters:")
-            self.label_optional_params.setStyleSheet("font-weight: bold;")
+            self.label_optional_params.setStyleSheet(StyleEnum.BOLD)
             self.form_layout_input.addRow(self.label_optional_params)
             self.items_in_previous_view.append(self.label_optional_params)
 
@@ -266,9 +266,8 @@ class TestCaseWindow():
         _populate_output_area(DATA_CALL_MAP[self.data_call]["output_params"])
 
     # Button slots
-
-    def on_btn_save_new_test_click(self):
-        """Saves the created test case into the table in the main window"""
+    def on_btn_save_click(self):
+        """Save the created test case into the table in the main window"""
 
         def _get_input_params(param_set):
 
@@ -346,29 +345,30 @@ class TestCaseWindow():
         expected_output = "\n".join(expected_output)
 
         # Create table items
+        item_checkbox = QTableWidgetItem(None)
         item_data_call = QTableWidgetItem(self.data_call)
         item_test_input = QTableWidgetItem(test_input)
         item_expected_output = QTableWidgetItem(expected_output)
-        item_test_output = QTableWidgetItem("")
+        item_test_output = QTableWidgetItem('')
 
-        item_data_call.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsEditable)
-        item_data_call.setCheckState(Qt.Unchecked)
+        item_checkbox.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+        item_checkbox.setCheckState(Qt.Unchecked)
 
         # Set table items
-        self.main_ui.table_test_suite.setItem(row_count, 0, item_data_call)
-        self.main_ui.table_test_suite.setItem(row_count, 1, item_test_input)
-        self.main_ui.table_test_suite.setItem(row_count, 2, item_expected_output)
-        self.main_ui.table_test_suite.setItem(row_count, 3, item_test_output)
+        self.main_ui.table_test_suite.setItem(row_count, 0, item_checkbox)
+        self.main_ui.table_test_suite.setItem(row_count, 1, item_data_call)
+        self.main_ui.table_test_suite.setItem(row_count, 2, item_test_input)
+        self.main_ui.table_test_suite.setItem(row_count, 3, item_expected_output)
+        self.main_ui.table_test_suite.setItem(row_count, 4, item_test_output)
 
         self.main_ui.table_test_suite.resizeRowsToContents()
 
         # Update test case count in the main window
-        self.main_ui.label_status.setText(f"Tests: {self.main_ui.table_test_suite.rowCount()}")
+        self.main_ui.label_total_value.setText(f"{self.main_ui.table_test_suite.rowCount()}")
 
-        self.test_case_window.close()
+        self.close()
 
     # Checkbox slots
-
     def on_checkbox_change(self):
 
         checkbox_names = [cb for cb in self.input_names_in_previous_view if "checkbox" in cb]
@@ -393,10 +393,10 @@ class TestCaseWindow():
                 if getattr(self, checkbox_name).isChecked():
                     reference_to_input.setEnabled(False)
                     reference_to_input.setText('')
-                    reference_to_input.setStyleSheet("background-color: rgb(225, 226, 232);")
+                    reference_to_input.setStyleSheet(StyleEnum.INPUT_DISABLED)
                 else:
                     reference_to_input.setEnabled(True)
-                    reference_to_input.setStyleSheet("background-color: rgb(255, 255, 255);")
+                    reference_to_input.setStyleSheet(StyleEnum.INPUT_ENABLED)
             elif input_name.startswith(checkbox_name + '_'):
                 if getattr(self, checkbox_name).isChecked():
                     reference_to_input.setChecked(True)

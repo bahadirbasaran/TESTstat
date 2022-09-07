@@ -5,7 +5,7 @@ from core.teststat import TestStat
 from core.utils import MessageEnum
 
 
-TEST_CASES_PATH = "data/cicd_test_cases.csv"
+TEST_CASES_PATH = "data/test_cases_cicd.csv"
 
 
 def run_cicd_tests(host):

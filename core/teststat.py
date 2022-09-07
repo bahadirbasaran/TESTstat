@@ -55,7 +55,7 @@ class TestStat():
 
     def evaluate_result(self, data_call, test_output, expected_output):
         """
-        Evaluates test result by comparing expected_output with test_output
+        Evaluate test result by comparing expected_output with test_output
         for given data_call. Returns:
             {}  -> test is successful
             int -> test could not be executed (connection error, timeout)
@@ -103,7 +103,7 @@ class TestStat():
 
         def _check_current_level(current_level, current_identifier):
             """
-            Checks if all block fields match with the comparison rule
+            Check if all block fields match with the comparison rule
             from top to bottom node, level by level and populates the list
             resulting_bools with evaluation results.
             """
@@ -173,11 +173,21 @@ class TestStat():
 
         # If status code is different than 200, directly return error message
         expected_status_code = expected_output.pop("status_code")
-        if expected_status_code != str(test_output["status_code"]):
-            failed_params["status_code"] = str(test_output["status_code"])
-            error_type, error_message = test_output["messages"][0]
-            failed_params[error_type] = error_message.split("\n")[0]
-            return failed_params
+        if expected_status_code == "200":
+            if expected_status_code != str(test_output["status_code"]):
+                failed_params["status_code"] = str(test_output["status_code"])
+                error_type, error_message = test_output["messages"][0]
+                failed_params[error_type] = error_message.split("\n")[0]
+                return failed_params
+        else:
+            if expected_status_code != str(test_output["status_code"]):
+                failed_params["status_code"] = str(test_output["status_code"])
+                if len(test_output["messages"]) > 0:
+                    error_type, error_message = test_output["messages"][0]
+                    failed_params[error_type] = error_message.split("\n")[0]
+                else:
+                    failed_params["error"] = "Status code is 200 and differes from the expected."
+                return failed_params
 
         # In some data call responses, 'data' is wrapped with 'results' key.
         # Extract this key if in such case.
