@@ -377,7 +377,7 @@ class MainWindow(QWidget):
             with open(path) as csv_file:
                 header = csv_file.readline().strip()
                 if header != "data_call,test_input,expected_output":
-                    throw_message(MessageEnum.CRITICAL, "Import Error", "The test suite is malformed!")
+                    throw_message(MessageEnum.CRITICAL, "Import Error", f"{path} is malformed!")
                     return
 
                 csv_row_count = len(csv_file.readlines())
@@ -572,7 +572,12 @@ class MainWindow(QWidget):
             # Change the combobox on main window to indicate the host of second run
             self.combobox_host.setCurrentIndex(HOSTS.index(second_host))
 
-            failed_tests_second_host = self.run_tests(tests_to_run, second_host, port_second_host, True)
+            failed_tests_second_host = self.run_tests(
+                tests_to_run,
+                second_host, 
+                port_second_host,
+                return_failed_tests=True
+            )
 
             self.reset_main_window(confirmation=False, clear_checkboxes=False)
 
