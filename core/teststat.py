@@ -21,8 +21,9 @@ class TestStat():
 
         protocol = "https" if with_tls else "http"
         host = host.lower().replace(' ', '')
+        self.is_localhost = True if host == "127.0.0.1" or host == "localhost" else False
 
-        if (host == "127.0.0.1" or host == "localhost") and port.isdecimal():
+        if self.is_localhost and port.isdecimal():
             self.raw_query = f"http://127.0.0.1:{port}/data/"
 
         elif port is None:
@@ -36,12 +37,15 @@ class TestStat():
 
     def run_test(self, data_call, test_input, expected_output):
 
+        if not self.is_localhost:
+            test_input += "&cache=ignore"
+
         try:
             request = f"{self.raw_query}{data_call}/data.json?{test_input}"
 
             print(request)
 
-            response = requests.get(request, timeout=30)
+            response = requests.get(request, timeout=45)
 
         except requests.exceptions.ConnectionError:
             return MessageEnum.CONNECTION_ERROR

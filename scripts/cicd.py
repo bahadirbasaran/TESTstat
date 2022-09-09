@@ -76,7 +76,7 @@ def run_cicd_tests(host, mode):
 
             print("\n")
 
-    script_return = ""
+    script_return = "\n\n###########################################\n\n"
 
     if failed_data_calls:
         failed_test_cases = ', '.join(failed_test_cases)
@@ -92,9 +92,11 @@ def run_cicd_tests(host, mode):
         timed_out_data_calls = ', '.join(timed_out_data_calls)
 
         script_return += (
-            f"Timed-out Test Cases: {timed_out_test_cases}\n"
+            f"\nTimed-out Test Cases: {timed_out_test_cases}\n"
             f"Timed-out Data Calls: {timed_out_data_calls}"
         )
+
+    script_return += "\n\n###########################################\n\n"
 
     if script_return:
         sys.exit(script_return)
