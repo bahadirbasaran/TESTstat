@@ -177,6 +177,11 @@ class TestStat():
 
         # If status code is different than 200, directly return error message
         expected_status_code = expected_output.pop("status_code")
+        # if expected_status_code != str(test_output["status_code"]):
+        #     failed_params["status_code"] = str(test_output["status_code"])
+        #     error_type, error_message = test_output["messages"][0]
+        #     failed_params[error_type] = error_message.split("\n")[0]
+        #     return failed_params
         if expected_status_code == "200":
             if expected_status_code != str(test_output["status_code"]):
                 failed_params["status_code"] = str(test_output["status_code"])
