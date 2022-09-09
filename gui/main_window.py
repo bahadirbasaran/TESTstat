@@ -366,7 +366,7 @@ class MainWindow(QWidget):
     def on_btn_load_tests_click(self):
         """Open dialog box to select test case source"""
 
-        def on_btn_load_click(widget, path):
+        def _on_btn_load_click(widget, path):
             """Populate the table from test case source"""
 
             # Close the widget first
@@ -447,7 +447,7 @@ class MainWindow(QWidget):
         combobox_load_csv.addItems([csv for csv in os.listdir("data")])
 
         btn_load_csv = QPushButton(
-            clicked=lambda: on_btn_load_click(
+            clicked=lambda: _on_btn_load_click(
                 load_csv_widget,
                 "data/" + combobox_load_csv.currentText()
             )
@@ -546,7 +546,7 @@ class MainWindow(QWidget):
     def on_btn_compare_sources_click(self):
         """Open the comparison widget to choose a API source to compare"""
 
-        def on_btn_compare_click(self, widget, second_host, port_second_host):
+        def _on_btn_compare_click(widget, second_host, port_second_host):
             """
             Compare two API sources and lists only the test cases that
             fail on one source and pass on the other and vice versa
@@ -600,9 +600,9 @@ class MainWindow(QWidget):
 
             if len(failed_tests_main_host) == 0 and len(failed_tests_second_host) == 0:
                 throw_message(
-                    MessageEnum.CRITICAL,
+                    MessageEnum.WARNING,
                     "Warning!",
-                    "Two sources are identical for the selected cases"
+                    "The sources are identical for the selected cases"
                 )
                 return
 
@@ -624,7 +624,7 @@ class MainWindow(QWidget):
 
             # Buttons
             btn_run_comparison = QPushButton(
-                clicked=lambda: on_btn_compare_click(
+                clicked=lambda: _on_btn_compare_click(
                     comparison_widget,
                     combobox_second_host.currentText(),
                     port_second_host.text()

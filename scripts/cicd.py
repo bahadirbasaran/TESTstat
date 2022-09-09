@@ -8,7 +8,7 @@ from core.utils import MessageEnum
 def run_cicd_tests(host, mode):
     """Run CICD test cases for given host in given mode"""
 
-    def place_stats(stat_type):
+    def _place_stats(stat_type):
 
         if stat_type == "timeout":
             target_index_list = timed_out_test_cases
@@ -58,27 +58,28 @@ def run_cicd_tests(host, mode):
 
             if test_output == MessageEnum.TIMEOUT:
                 print(f"----> Test Case {row_index} timed-out!")
-                place_stats("timeout")
+                _place_stats("timeout")
 
-            else:
-                if mode == "complete" and test_output:
-                    print(f"----> Test Case {row_index} failed!")
+            elif "error" in test_output or (mode == "500" and not test_output):
+                print(f"----> Test Case {row_index} failed!")
+                _place_stats("failure")
 
-                    for param, value in expected_output.items():
-                        print(f"------> Parameter {param}:")
-                        param = param.split("->")[0]
-                        print(f"------> Expected: {value} | Actual: {test_output[param]}")
+            elif mode == "complete" and test_output:
+                print(f"----> Test Case {row_index} failed!")
 
-                    place_stats("failure")
+                for param, value in expected_output.items():
+                    print(f"------> Parameter {param}:")
+                    param = param.split("->")[0]
+                    print(f"------> Expected: {value} | Actual: {test_output[param]}")
 
-                elif mode == "500" and not test_output:
-                    place_stats("failure")
+                _place_stats("failure")
 
             print("\n")
 
-    script_return = "\n\n###########################################\n\n"
+    script_return = ""
 
     if failed_data_calls:
+
         failed_test_cases = ', '.join(failed_test_cases)
         failed_data_calls = ', '.join(failed_data_calls)
 
@@ -96,7 +97,10 @@ def run_cicd_tests(host, mode):
             f"Timed-out Data Calls: {timed_out_data_calls}"
         )
 
-    script_return += "\n\n###########################################\n\n"
+    if script_return:
+        frame_length = min(max(len(failed_data_calls), len(timed_out_data_calls)) + 19, 170)
+        output_frame = "\n\n" + '#' * frame_length + "\n\n"
+        script_return = f"{output_frame}{script_return}{output_frame}"
 
     if script_return:
         sys.exit(script_return)
