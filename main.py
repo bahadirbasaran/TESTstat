@@ -1,10 +1,11 @@
 import os
 import sys
 import argparse
+import asyncio
+
 
 if os.path.abspath(".") not in sys.path:
     sys.path.append(os.path.abspath('.'))
-
 
 if __name__ == "__main__":
 
@@ -20,9 +21,9 @@ if __name__ == "__main__":
         "--mode",
         dest="mode",
         type=str,
-        choices=["complete", "500"],
-        default="complete",
-        help="Test mode. 'complete' for the most detailed test run, '500' for 500-only testing"
+        choices=["default", "500"],
+        default="default",
+        help="Test mode. 'default' for the default run, '500' for 500-only testing"
     )
     args = parser.parse_args()
 
@@ -31,7 +32,7 @@ if __name__ == "__main__":
     if args.host:
         from scripts.cicd import run_cicd_tests
 
-        run_cicd_tests(args.host, args.mode)
+        asyncio.run(run_cicd_tests(args.host, args.mode))
     else:
         from PyQt5.QtWidgets import QApplication
         from gui.main_window import MainWindow
@@ -43,5 +44,4 @@ if __name__ == "__main__":
         ui.setup_ui()
         ui.show()
 
-        # May not exit the app, but reset the window
         sys.exit(app.exec_())
