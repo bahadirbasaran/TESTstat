@@ -32,7 +32,11 @@ if __name__ == "__main__":
     if args.host:
         from scripts.cicd import run_cicd_tests
 
-        asyncio.run(run_cicd_tests(args.host, args.mode))
+        # The asyncio.run() function was added in Python 3.7
+        # asyncio.run(run_cicd_tests(args.host, args.mode))
+        # The solution below is for compatibility concerns for the systems with Python < 3.7
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(run_cicd_tests(args.host, args.mode))
     else:
         from PyQt5.QtWidgets import QApplication
         from gui.main_window import MainWindow
