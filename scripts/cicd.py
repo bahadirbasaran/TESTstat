@@ -110,7 +110,9 @@ async def run_cicd_tests(host, mode):
         print("TIMED-OUT TEST CASES:\n")
 
         for tuple in stats["time_out"]:
-            print(f"\nTest Case: {tuple.test_case} | Data Call: {tuple.data_call} | URL: {tuple.url}")
+            print(
+                f"\nTest Case: {tuple.test_case} | Data Call: {tuple.data_call} | URL: {tuple.url}"
+            )
             for param, expected_value in tuple.expected_output.items():
                 print(f"--> Parameter '{param}' | Expected: {expected_value}")
 
