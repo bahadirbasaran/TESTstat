@@ -1,4 +1,6 @@
-import requests
+import asyncio
+
+import aiohttp
 
 from core.utils import MessageEnum, filter_param_set, reshape_param_set, get_innermost_value
 
@@ -21,6 +23,7 @@ class TestStat():
 
         protocol = "https" if with_tls else "http"
         host = host.lower().replace(' ', '')
+        self.session = aiohttp.ClientSession()
         self.is_localhost = True if host == "127.0.0.1" or host == "localhost" else False
 
         if self.is_localhost and port.isdecimal():
@@ -35,26 +38,40 @@ class TestStat():
         else:
             throw_message(MessageEnum.CRITICAL, "Port Error", "Port cannot include characters!")
 
-    def run_test(self, data_call, test_input, expected_output):
+    async def run_test(self, data_call, test_input, expected_output, return_url=False):
 
         if not self.is_localhost:
             test_input += "&cache=ignore"
 
+        url = f"{self.raw_query}{data_call}/data.json?{test_input}"
+        timeout = aiohttp.ClientTimeout(total=60)
+
         try:
-            request = f"{self.raw_query}{data_call}/data.json?{test_input}"
+            async with self.session.get(url, timeout=timeout) as response:
+                actual_output = await response.json()
 
-            print(request)
-
-            response = requests.get(request, timeout=45)
-
-        except requests.exceptions.ConnectionError:
-            return MessageEnum.CONNECTION_ERROR
-
-        except requests.exceptions.Timeout:
+        except asyncio.TimeoutError:
+            if return_url:
+                return MessageEnum.TIMEOUT, url
             return MessageEnum.TIMEOUT
 
-        test_result = self.evaluate_result(data_call, response.json(), expected_output)
+        # In case of receiving non-JSON response
+        except aiohttp.ContentTypeError:
+            if return_url:
+                return MessageEnum.BAD_GATEWAY, url
+            return MessageEnum.BAD_GATEWAY
 
+        except (aiohttp.ClientConnectorError, asyncio.CancelledError):
+            await self.session.close()
+
+            if return_url:
+                return MessageEnum.CONNECTION_ERROR, url
+            return MessageEnum.CONNECTION_ERROR
+
+        test_result = self.evaluate_result(data_call, actual_output, expected_output)
+
+        if return_url:
+            return test_result, url
         return test_result
 
     def evaluate_result(self, data_call, test_output, expected_output):
@@ -175,28 +192,24 @@ class TestStat():
         # Nested parameters should be treated differently
         nested_params = {}
 
-        # If status code is different than 200, directly return error message
-        expected_status_code = expected_output.pop("status_code")
-        # if expected_status_code != str(test_output["status_code"]):
-        #     failed_params["status_code"] = str(test_output["status_code"])
-        #     error_type, error_message = test_output["messages"][0]
-        #     failed_params[error_type] = error_message.split("\n")[0]
-        #     return failed_params
-        if expected_status_code == "200":
-            if expected_status_code != str(test_output["status_code"]):
-                failed_params["status_code"] = str(test_output["status_code"])
-                error_type, error_message = test_output["messages"][0]
-                failed_params[error_type] = error_message.split("\n")[0]
-                return failed_params
-        else:
-            if expected_status_code != str(test_output["status_code"]):
-                failed_params["status_code"] = str(test_output["status_code"])
-                if len(test_output["messages"]) > 0:
-                    error_type, error_message = test_output["messages"][0]
-                    failed_params[error_type] = error_message.split("\n")[0]
-                else:
-                    failed_params["error"] = "Status code is 200 and differs from the expected."
-                return failed_params
+        # If status code is different than expected, directly return
+        expected_status_code = expected_output["status_code"]
+        if expected_status_code == "500" != str(test_output["status_code"]):
+            return failed_params
+
+        elif expected_status_code == "500" == str(test_output["status_code"]):
+            for message in test_output["messages"]:
+                if message[0] == "error":
+                    return {"error": message[1].split("\n")[0]}
+
+        elif expected_status_code != str(test_output["status_code"]):
+            failed_params["status_code"] = str(test_output["status_code"])
+            for message in test_output["messages"]:
+                if message[0] == "error":
+                    failed_params["error"] = message[1].split("\n")[0]
+            return failed_params
+
+        expected_output.pop("status_code")
 
         # In some data call responses, 'data' is wrapped with 'results' key.
         # Extract this key if in such case.

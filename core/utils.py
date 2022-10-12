@@ -3,6 +3,7 @@ class MessageEnum():
     YES = 16384
     TIMEOUT = 408
     CONNECTION_ERROR = 500
+    BAD_GATEWAY = 502
     CRITICAL = 1
     WARNING = 2
 

@@ -1,173 +1,95 @@
 data_call,test_input,expected_output
 abuse-contact-finder,resource = 3333,status_code = 200
-abuse-contact-finder,resource = loremipsum,status_code = 200
 abuse-contact-finder,resource = as3333,status_code = 200
 abuse-contact-finder,resource = 3333,status_code = 200;abuse_contacts = not empty
 abuse-contact-finder,resource = 3333,status_code = 200;abuse_contacts = abuse@ripe.net
-abuse-contact-finder,resource = 3333,status_code = 200;abuse_contacts = abuse@ripe.net&abuse@ripe.com
-address-space-hierarchy,resource = loremipsum,status_code = 200
-address-space-hierarchy,resource = 193/21,status_code = 200;exact->inetnum = ripe-ncc;exact->status = assignedpa;more_specific = not empty;less_specific->remarks = utrecht&netherlands;less_specific->country = nl
-address-space-hierarchy,resource = 193/21,status_code = 200;more_specific->inetnum = not empty
 address-space-hierarchy,resource = 193/21,status_code = 200;less_specific = not empty
 address-space-hierarchy,resource = 193/21,status_code = 200;rir = ripe;exact->netname = ripe-ncc;exact->org = org-rien1-ripe;exact->source = ripe;less_specific->netname = nl-ripencc-ops-990305;less_specific->country = nl;less_specific->mnt-lower = ripe-ncc-mnt
 address-space-hierarchy,resource = 193/21,status_code = 200;exact->org = not empty
 address-space-hierarchy,resource = 193/21,status_code = 200;exact = not empty
-address-space-hierarchy,resource = 193/21,status_code = 200;more_specific = not empty
 address-space-hierarchy,resource = 193/21,status_code = 200;less_specific = not empty
-address-space-hierarchy,resource = 193/21,status_code = 200;exact->country = not empty;exact->admin-c = loremipsum;more_specific->descr = not empty;more_specific->org = loremipsum;less_specific->mnt-lower = ripe-ncc-mnt;less_specific->last-modified = ripe-ncc-mnt
 address-space-usage,resource = 193/23,status_code = 200
-address-space-usage,resource = loremipsum,status_code = 200
 address-space-usage,resource = 193/23,status_code = 200;assignments = not empty;allocations = not empty;ip_stats = not empty
 address-space-usage,resource = 193/23,status_code = 200;assignments->asn_name = not empty;allocations->allocation = not empty;ip_stats->status = not empty
-address-space-usage,resource = 193/23,status_code = 200;query_time = not empty;assignments->address_range = 193.0.0.0/21;assignments->status = assignedpa;allocations->assignments = >0;ip_stats->ips = >0
-address-space-usage,resource = 193/23,status_code = 200;ip_stats->status = assignedpa;ip_stats->ips = >=3000
+address-space-usage,resource = 193/23,status_code = 200;assignments->address_range = 193.0.0.0/21;assignments->status = assignedpa;allocations->assignments = >0;ip_stats->ips = >0
 allocation-history,resource = 190.28,status_code = 200
-allocation-history,resource = loremipsum,status_code = 200
 allocation-history,resource = 190.28,status_code = 200;iana->resource = 65537-4294967294;iana->status = iana
 allocation-history,resource = 190.28,status_code = 200;iana = not empty
-allocation-history,resource = 190.28,status_code = 200;ripencc = not empty
 allocation-history,resource = 140.78/16;starttime = 2020-12-12T12:00,status_code = 200;iana = not empty;ripencc = not empty
 announced-prefixes,resource = 3333,status_code = 200
-announced-prefixes,resource = loremipsum,status_code = 200
 announced-prefixes,resource = 3333,status_code = 200;prefixes = not empty
 announced-prefixes,resource = as3333;starttime = 2020-12-12T12:00,status_code = 200;prefixes->prefix = 2001:67c:2e8::/48
-announced-prefixes,resource = 3333,status_code = 200;prefixes->prefix = 193.0.18.0/10
 as-overview,resource = 1111,status_code = 200
-as-overview,resource = 127.0.0.1,status_code = 200
-as-overview,resource = 140.78/16,status_code = 200
-as-overview,resource = 3333,status_code = 200;block->resource = 3154-3353
-as-overview,resource = 3333;query_time = 2020-12-12T12:00,status_code = 200
-as-overview,resource = loremipsum,status_code = 200
 as-path-length,resource = 1111,status_code = 200
-as-path-length,resource = loremipsum,status_code = 200
-as-path-length,resource = 1111,status_code = 200;stats->count = >=53
 as-path-length,resource = 1111,status_code = 200;stats->count = <53
-as-path-length,resource = 1111,status_code = 200;stats->count = >53
-as-path-length,resource = 1111,status_code = 200;stats->count = <=3;stats->location = amsterdam
 as-path-length,resource = 1111,status_code = 200;stats = not empty
-as-path-length,resource = as98813,status_code = 200;stats = not empty
 as-path-length,resource = 1111,status_code = 200;stats->count = not empty
-as-path-length,resource = 1111,status_code = 200;stats->count = 29
-as-path-length,resource = 1111,status_code = 200;stats->count = >52
-as-path-length,resource = 1111,status_code = 200;stats = not empty
 as-path-length,resource = 1111;sort_by = count,status_code = 200;stats->stripped->sum = not empty
 as-routing-consistency,resource = 3333,status_code = 200
-as-routing-consistency,resource = loremipsum,status_code = 200
 as-routing-consistency,resource = 3333,status_code = 200;prefixes = not empty;imports = not empty;exports = not empty
 as-routing-consistency,resource = 3333,status_code = 200;prefixes->in_bgp = true;prefixes->in_whois = true;prefixes->irr_sources = ripe;prefixes->prefix = 193.0.10.0/23
 as-routing-consistency,resource = 3333,status_code = 200;imports->in_bgp = false;imports->in_whois = true;imports->peer = >=1000
-as-routing-consistency,resource = 3333,status_code = 200;prefixes->irr_sources = ripe&radb
 asn-neighbours,resource = as12386,status_code = 200
-asn-neighbours,resource = loremipsum,status_code = 200
 asn-neighbours,resource = as12386,status_code = 200;neighbours = not empty
-asn-neighbours,resource = as12386,status_code = 200;neighbour_counts->left = >0;neighbour_counts->right = >0;neighbour_counts->unique = >0;neighbour_counts->uncertain = >0
 asn-neighbours,resource = as12386;query_time = 2022-01-13T00:00:00,status_code = 200;neighbours->asn = 12479;neighbours->type = left
 asn-neighbours-history,resource = 1205,status_code = 200
-asn-neighbours-history,resource = loremipsum,status_code = 200
 asn-neighbours-history,resource = 1205,status_code = 200;neighbours = not empty
 asn-neighbours-history,resource = 1205;starttime = 2020-10-10T12:00;max_rows = 50,status_code = 200;neighbours = not empty
-asn-neighbours-history,resource = 1205;starttime = 2020-10-10T12:00;max_rows = 50,status_code = 200;neighbours->neighbour = >=1000
-atlas-probe-deployment,resource = tr,status_code = 200
-atlas-probe-deployment,resource = loremipsum,status_code = 200
-atlas-probes,resource = at,status_code = 200
-atlas-probes,resource = loremipsum,status_code = 200
-atlas-targets,resource = 140.78/16,status_code = 200
-atlas-targets,resource = loremipsum,status_code = 200
-bgp-state,resource = 140.78/16,status_code = 200
-bgp-state,resource = loremipsum,status_code = 200
-bgp-update-activity,resource = 140.78/16,status_code = 200
-bgp-update-activity,resource = loremipsum,status_code = 200
-bgp-updates,resource = 140.78/16,status_code = 200
-bgp-updates,resource = loremipsum,status_code = 200
-bgplay,resource = 140.78/16,status_code = 200
-bgplay,resource = loremipsum,status_code = 200
-blocklist,resource = 193/23,status_code = 200
-blocklist,resource = loremipsum,status_code = 200
-country-asns,resource = nl,status_code = 200
-country-asns,resource = loremipsum,status_code = 200
-country-resource-list,resource = at,status_code = 200
-country-resource-list,resource = loremipsum,status_code = 200
-country-resource-stats,resource = at,status_code = 200
-country-resource-stats,resource = loremipsum,status_code = 200
 dns-chain,resource = www.ripe.net,status_code = 200
-dns-chain,resource = loremipsum,status_code = 200
 dns-chain,resource = www.ripe.net,status_code = 200;forward_nodes = www.ripe.net&www.ripe.net.cdn.cloudflare.net;reverse_nodes = 104.18.21.44&104.18.20.44;nameservers = 193.0.19.101;authoritative_nameservers = manus.authdns.ripe.net&rirns.arin.net
 dns-chain,resource = ripe.net,status_code = 200;forward_nodes = not empty;reverse_nodes = not empty;nameservers = not empty;authoritative_nameservers = not empty
-dns-chain,resource = www.ripe.net,status_code = 200;nameservers = 127.0.0.1
-example-resources,,status_code = 200
+atlas-probe-deployment,resource = tr,status_code = 200
+atlas-probes,resource = at,status_code = 200
+atlas-targets,resource = 140.78/16,status_code = 200
+bgp-state,resource = 140.78/16,status_code = 200
+bgp-state,resource = 140.78/16;timestamp = 2020-12-21T12:00,status_code = 200
+bgp-update-activity,resource = 140.78/16,status_code = 200
+bgp-updates,resource = 140.78/16,status_code = 200
+bgplay,resource = 140.78/16,status_code = 200
+blocklist,resource = 193/23,status_code = 200
+country-asns,resource = nl,status_code = 200
+country-resource-list,resource = at,status_code = 200
+country-resource-stats,resource = at,status_code = 200
+bgp-state,resource = 140.78/16,status_code = 200
+bgp-update-activity,resource = 140.78/16,status_code = 200
+bgp-updates,resource = 140.78/16,status_code = 200
+bgplay,resource = 140.78/16,status_code = 200
+blocklist,resource = 193/23,status_code = 200
+country-asns,resource = nl,status_code = 200
+country-resource-list,resource = at,status_code = 200
 historical-whois,resource = 193.0.20.0/24,status_code = 200
-historical-whois,resource = loremipsum,status_code = 200
 iana-registry-info,resource = 193/23,status_code = 200
-iana-registry-info,resource = loremipsum,status_code = 200
 looking-glass,resource = 140.78.0.0/16,status_code = 200
-looking-glass,resource = loremipsum,status_code = 200
 maxmind-geo-lite,resource = 193/23,status_code = 200
-maxmind-geo-lite,resource = loremipsum,status_code = 200
 maxmind-geo-lite-announced-by-as,resource = 3333,status_code = 200
-maxmind-geo-lite-announced-by-as,resource = loremipsum,status_code = 200
 meternet-bandwidth-measurements,resource = 140.78/16,status_code = 200
-meternet-bandwidth-measurements,resource = loremipsum,status_code = 200
-mlab-activity-count,resource = 193.0.0.0/16,status_code = 200
-mlab-activity-count,resource = loremipsum,status_code = 200
-mlab-bandwidth,resource = 193.0.0.0/16,status_code = 200
-mlab-bandwidth,resource = loremipsum,status_code = 200
-mlab-clients,resource = 193.0.0.0/16,status_code = 200
-mlab-clients,resource = loremipsum,status_code = 200
 network-info,resource = 140.78.90.50,status_code = 200
-network-info,resource = loremipsum,status_code = 200
 prefix-count,resource = 3333,status_code = 200
-prefix-count,resource = loremipsum,status_code = 200
 prefix-overview,resource = 193/23,status_code = 200
-prefix-overview,resource = loremipsum,status_code = 200
-prefix-routing-consistency,resource = 193.0.20.0/24,status_code = 200
-prefix-routing-consistency,resource = loremipsum,status_code = 200
 prefix-size-distribution,resource = 3333,status_code = 200
-prefix-size-distribution,resource = loremipsum,status_code = 200
 related-prefixes,resource = 193/21,status_code = 200
-related-prefixes,resource = loremipsum,status_code = 200
 reverse-dns,resource = 193/21,status_code = 200
-reverse-dns,resource = loremipsum,status_code = 200
 reverse-dns-consistency,resource = 193/21,status_code = 200
-reverse-dns-consistency,resource = loremipsum,status_code = 200
 reverse-dns-ip,resource = 193.0.6.139,status_code = 200
-reverse-dns-ip,resource = loremipsum,status_code = 200
 rir,resource = 193.0.6.139,status_code = 200
-rir,resource = loremipsum,status_code = 200
 rir-geo,resource = 2001:67c:2e8::/48,status_code = 200
-rir-geo,resource = loremipsum,status_code = 200
 rir-prefix-size-distribution,resource = 140/8,status_code = 200
-rir-prefix-size-distribution,resource = loremipsum,status_code = 200
 rir-stats-country,resource = 2001:67c:2e8::/48,status_code = 200
-rir-stats-country,resource = loremipsum,status_code = 200
 ris-asns,,status_code = 200
-ris-first-last-seen,resource = 193.0.20.0/23,status_code = 200
-ris-first-last-seen,resource = loremipsum,status_code = 200
 ris-full-table-threshold,,status_code = 200
 ris-peer-count,,status_code = 200
 ris-peerings,resource = 140.78/16,status_code = 200
-ris-peerings,resource = loremipsum,status_code = 200
 ris-peers,,status_code = 200
 ris-prefixes,resource = 3333,status_code = 200
-ris-prefixes,resource = loremipsum,status_code = 200
 routing-history,resource = 3333,status_code = 200
-routing-history,resource = loremipsum,status_code = 200
 routing-status,resource = 3333,status_code = 200
-routing-status,resource = loremipsum,status_code = 200
 rpki-history,resource = 3333,status_code = 200
-rpki-history,resource = loremipsum,status_code = 200
 rpki-validation,resource = 3333;prefix = 193/21,status_code = 200
-rpki-validation,resource = loremipsum,status_code = 200
 rrc-info,,status_code = 200
 searchcomplete,resource = ripe,status_code = 200
-searchcomplete,resource = loremipsum,status_code = 200
 speedchecker-bandwidth-measurements,resource = 193/16,status_code = 200
-speedchecker-bandwidth-measurements,resource = loremipsum,status_code = 200
 visibility,resource = 2001:67c:2e8::/48,status_code = 200
-visibility,resource = loremipsum,status_code = 200
 whats-my-ip,,status_code = 200
 whois,resource = 192.0.20/23,status_code = 200
-whois,resource = loremipsum,status_code = 200
 whois-object-last-updated,object = as3333;type = aut-num;source = ripe,status_code = 200
-whois-object-last-updated,object = loremipsum,status_code = 200
-zonemaster,resource = 8b9b9a1ab9200ed9;method = details,status_code = 200
-zonemaster,resource = loremipsum,status_code = 200
+zonemaster,resource = ripe.net,status_code = 200

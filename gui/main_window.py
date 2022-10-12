@@ -1,5 +1,6 @@
 import csv
 import os
+import asyncio
 
 from core.teststat import TestStat
 from core.utils import MessageEnum
@@ -541,7 +542,7 @@ class MainWindow(QWidget):
         self.label_failed_value.setStyleSheet(StyleEnum.STATS_FAILURE)
         self.label_timed_out_value.setStyleSheet(StyleEnum.STATS_TIMEOUT)
 
-        self.run_tests(self.get_checked_row_indexes(), host, port)
+        asyncio.run(self.run_tests(self.get_checked_row_indexes(), host, port))
 
     def on_btn_compare_sources_click(self):
         """Open the comparison widget to choose a API source to compare"""
@@ -565,18 +566,22 @@ class MainWindow(QWidget):
             port_main_host = None if not self.port.text() else self.port.text()
             port_second_host = None if not port_second_host else port_second_host
 
-            failed_tests_main_host = self.run_tests(tests_to_run, main_host, port_main_host, True)
+            failed_tests_main_host = asyncio.run(
+                self.run_tests(tests_to_run, main_host, port_main_host, True)
+            )
 
             self.reset_main_window(confirmation=False, clear_checkboxes=False)
 
             # Change the combobox on main window to indicate the host of second run
             self.combobox_host.setCurrentIndex(HOSTS.index(second_host))
 
-            failed_tests_second_host = self.run_tests(
-                tests_to_run,
-                second_host,
-                port_second_host,
-                return_failed_tests=True
+            failed_tests_second_host = asyncio.run(
+                self.run_tests(
+                    tests_to_run,
+                    second_host,
+                    port_second_host,
+                    return_failed_tests=True
+                )
             )
 
             self.reset_main_window(confirmation=False, clear_checkboxes=False)
@@ -666,7 +671,31 @@ class MainWindow(QWidget):
 
             comparison_widget.exec()
 
-    def run_tests(self, tests_to_run, host, port, return_failed_tests=False):
+    async def run_tests(self, tests_to_run, host, port, return_failed_tests=False):
+
+        async def _run_routine(test_case):
+
+            data_call = self.table_test_suite.item(test_case, 1).text()
+            test_input = self.table_test_suite.item(test_case, 2).text()
+            expected_output = self.table_test_suite.item(test_case, 3).text()
+
+            # Format table items for the run_test method of the TestStat class
+            test_input = test_input.replace("\n", '&').replace(' ', '')
+            expected_pairs = expected_output.lower().replace(' ', '').split("\n")
+
+            expected_output = {}
+            for param_value_pair in expected_pairs:
+                # Inputs may include more than one '='
+                param, value = param_value_pair.split('=', 1)
+                expected_output[param] = value
+
+            # test_output:
+            #   {}  -> test is successful
+            #   int -> test could not be executed (connection error, timeout)
+            #   {param: val} -> test output that does not match with expected
+            test_output = await teststat.run_test(data_call, test_input, expected_output)
+
+            return test_case, test_output
 
         self.running = True
         num_tests_run = 0
@@ -683,34 +712,15 @@ class MainWindow(QWidget):
 
         teststat = TestStat(host, port)
 
-        for row_index in tests_to_run:
+        # As soon as a coroutine returns, process the output and update the GUI
+        for routine in asyncio.as_completed([_run_routine(test) for test in tests_to_run]):
 
             if self.stop:
                 self.stop = False
                 self.running = False
                 break
 
-            data_call = self.table_test_suite.item(row_index, 1).text()
-            test_input = self.table_test_suite.item(row_index, 2).text()
-            expected_output = self.table_test_suite.item(row_index, 3).text()
-
-            # Format table items for the run_test method of the TestStat class
-            test_input = test_input.replace("\n", '&').replace(' ', '')
-            expected_pairs = expected_output.lower().replace(' ', '').split("\n")
-
-            expected_output = {}
-            for param_value_pair in expected_pairs:
-                # Inputs may include more than one '='
-                param, value = param_value_pair.split('=', 1)
-                expected_output[param] = value
-
-            print(f"Case {row_index+1} ({num_tests_run+1}/{num_total_tests}):", end=' ')
-
-            # test_output:
-            #   {}  -> test is successful
-            #   int -> test could not be executed (connection error, timeout)
-            #   {param: val} -> test output that does not match with expected
-            test_output = teststat.run_test(data_call, test_input, expected_output)
+            row_index, test_output = await routine
 
             self.previous_results = True
 
@@ -728,7 +738,9 @@ class MainWindow(QWidget):
                 self.colorize_table_row(row_index, ColorEnum.BLACK, ColorEnum.TIMEOUT)
 
                 failed_tests.append(row_index)
+
                 continue
+
             elif test_output == MessageEnum.CONNECTION_ERROR:
                 throw_message(
                     MessageEnum.CRITICAL,
@@ -736,6 +748,7 @@ class MainWindow(QWidget):
                     "Connection could not be established!"
                 )
                 self.reset_main_window(confirmation=False)
+
                 return
 
             num_tests_run += 1
@@ -760,10 +773,11 @@ class MainWindow(QWidget):
                 self.colorize_table_row(row_index, ColorEnum.BLACK, ColorEnum.FAILURE)
 
         self.running = False
+        await teststat.session.close()
 
         if return_failed_tests:
             return failed_tests
 
     def stop_tests(self):
-        if self.running is True:
+        if self.running:
             self.stop = True
