@@ -74,7 +74,7 @@ async def run_cicd_tests(host, mode, batch_size):
         next(csv_reader)
 
         test_cases = list(enumerate(csv_reader, 1))
-        num_batches = ceil(len(test_cases)/batch_size)
+        num_batches = ceil(len(test_cases) / batch_size)
 
         for batch_index, batch in enumerate(get_batch(test_cases, batch_size), 1):
 
