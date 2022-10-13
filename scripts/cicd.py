@@ -1,13 +1,14 @@
 import sys
 import csv
 import asyncio
+from math import ceil
 from collections import namedtuple
 
 from core.teststat import TestStat
-from core.utils import MessageEnum
+from core.utils import MessageEnum, get_batch
 
 
-async def run_cicd_tests(host, mode):
+async def run_cicd_tests(host, mode, batch_size):
     """Run CICD test cases for given host in given mode"""
 
     async def _run_routine(row_index, row):
@@ -53,8 +54,8 @@ async def run_cicd_tests(host, mode):
     test_cases_path = "data/test_cases_500.csv" if mode == "500" else "data/test_cases.csv"
 
     sys.stdout.flush()
-    print("#" * 170, "\n")
-    print(f"Host: {host} | Test Cases: {test_cases_path} | Mode: {mode}\n")
+    print("#" * 220, "\n")
+    print(f"Host: {host} | Tests: {test_cases_path} | Mode: {mode} | Batch Size: {batch_size}\n")
 
     teststat = TestStat(host, cicd=True)
 
@@ -68,13 +69,23 @@ async def run_cicd_tests(host, mode):
     with open(test_cases_path) as csv_file:
 
         csv_reader = csv.reader(csv_file, delimiter=',')
+
         # Skip the header
         next(csv_reader)
 
-        # Create an event loop for all the coroutines, and proceed when all done
-        await asyncio.gather(
-            *[_run_routine(row_index, row) for row_index, row in enumerate(csv_reader, 1)]
-        )
+        test_cases = list(enumerate(csv_reader, 1))
+        num_batches = ceil(len(test_cases)/batch_size)
+
+        for batch_index, batch in enumerate(get_batch(test_cases, batch_size), 1):
+
+            coroutines_batch = [_run_routine(row_index, row) for row_index, row in batch]
+
+            # Create an event loop for a batch of coroutines, and proceed to the next when it's done
+            await asyncio.gather(*coroutines_batch)
+
+            print(f"Batch {batch_index}/{num_batches} has been completed!")
+
+        # Close the session when all batches are done
         await teststat.session.close()
 
     stats["failure"].sort(key=lambda tuple: tuple.test_case)
@@ -82,7 +93,7 @@ async def run_cicd_tests(host, mode):
 
     if stats["failure"]:
 
-        print("FAILED TEST CASES:\n")
+        print("\nFAILED TEST CASES:\n")
 
         for tuple in stats["failure"]:
             print(
@@ -106,7 +117,7 @@ async def run_cicd_tests(host, mode):
     if stats["time_out"]:
 
         if stats["failure"]:
-            print("\n", "-" * 170, "\n")
+            print("\n", "-" * 220, "\n")
         print("TIMED-OUT TEST CASES:\n")
 
         for tuple in stats["time_out"]:
@@ -116,7 +127,7 @@ async def run_cicd_tests(host, mode):
             for param, expected_value in tuple.expected_output.items():
                 print(f"--> Parameter '{param}' | Expected: {expected_value}")
 
-    print("\n", "#" * 170, "\n")
+    print("\n", "#" * 220, "\n")
     print("Number of Failed Test Cases:    ", len(stats["failure"]))
     print("Number of Timed-out Test Cases: ", len(stats["time_out"]), "\n")
 

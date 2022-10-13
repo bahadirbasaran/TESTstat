@@ -1,3 +1,6 @@
+BATCH_SIZE = 100
+
+
 class MessageEnum():
     NO = 65536
     YES = 16384
@@ -157,3 +160,12 @@ def reshape_param_set(param_set):
         current_dict[last] = value
 
     return reshaped_param_set
+
+
+def get_batch(iterable, batch_size):
+    """Slice iterable and return batches of batch_size each time"""
+
+    total_length = len(iterable)
+
+    for index in range(0, total_length, batch_size):
+        yield iterable[index:min(index + batch_size, total_length)]
