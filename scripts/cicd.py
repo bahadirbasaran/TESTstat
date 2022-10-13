@@ -93,7 +93,7 @@ async def run_cicd_tests(host, mode, batch_size):
 
     if stats["failure"]:
 
-        print("\nFAILED TEST CASES:\n")
+        print("FAILED TEST CASES:\n")
 
         for tuple in stats["failure"]:
             print(

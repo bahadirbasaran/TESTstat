@@ -44,7 +44,8 @@ class TestStat():
             test_input += "&cache=ignore"
 
         url = f"{self.raw_query}{data_call}/data.json?{test_input}"
-        timeout = aiohttp.ClientTimeout(total=120)
+
+        timeout = aiohttp.ClientTimeout(total=180)
 
         try:
             async with self.session.get(url, timeout=timeout) as response:
