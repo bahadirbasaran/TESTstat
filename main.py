@@ -3,6 +3,8 @@ import sys
 import argparse
 import asyncio
 
+from core.utils import BATCH_SIZE
+
 
 if os.path.abspath(".") not in sys.path:
     sys.path.append(os.path.abspath('.'))
@@ -25,6 +27,13 @@ if __name__ == "__main__":
         default="default",
         help="Test mode. 'default' for the default run, '500' for 500-only testing"
     )
+    parser.add_argument(
+        "--batch_size",
+        dest="batch_size",
+        type=int,
+        default=BATCH_SIZE,
+        help=f"Batch size. {BATCH_SIZE} by default."
+    )
     args = parser.parse_args()
 
     # If there is a host name in arguments, run TESTstat for the CI job.
@@ -36,7 +45,7 @@ if __name__ == "__main__":
         # asyncio.run(run_cicd_tests(args.host, args.mode))
         # The solution below is for compatibility concerns for the systems with Python < 3.7
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(run_cicd_tests(args.host, args.mode))
+        loop.run_until_complete(run_cicd_tests(args.host, args.mode, args.batch_size))
     else:
         from PyQt5.QtWidgets import QApplication
         from gui.main_window import MainWindow
