@@ -28,6 +28,12 @@ if __name__ == "__main__":
         help="Test mode. 'default' for the default run, '500' for 500-only testing"
     )
     parser.add_argument(
+        "--file_name",
+        dest="file_name",
+        type=str,
+        help="Data source to fetch test cases. If 'mode' is 500, this argument will be neglected"
+    )
+    parser.add_argument(
         "--batch_size",
         dest="batch_size",
         type=int,
@@ -45,7 +51,9 @@ if __name__ == "__main__":
         # asyncio.run(run_cicd_tests(args.host, args.mode))
         # The solution below is for compatibility concerns for the systems with Python < 3.7
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(run_cicd_tests(args.host, args.mode, args.batch_size))
+        loop.run_until_complete(
+            run_cicd_tests(args.host, args.mode, args.file_name, args.batch_size)
+        )
     else:
         from PyQt5.QtWidgets import QApplication
         from gui.main_window import MainWindow
