@@ -25,6 +25,7 @@ def post_message(message, url=MATTERMOST_URL, channel=MATTERMOST_CHANNEL):
     }
     requests.post(url, data=json.dumps(payload))
 
+
 def get_insight(stats):
 
     insight_failure = defaultdict(int)
@@ -55,7 +56,7 @@ def get_insight(stats):
 
     if insight_failure:
 
-        max_dc_length = len(max(failure_counter, key=lambda tuple:len(tuple[0]))[0]) + 1
+        max_dc_length = len(max(failure_counter, key=lambda tuple: len(tuple[0]))[0]) + 1
 
         output += "\nFailed Data Calls:\n\n"
 
@@ -66,7 +67,7 @@ def get_insight(stats):
 
     if insight_time_out:
 
-        max_dc_length = len(max(time_out_counter, key=lambda tuple:len(tuple[0]))[0]) + 1
+        max_dc_length = len(max(time_out_counter, key=lambda tuple: len(tuple[0]))[0]) + 1
 
         output += "\nTimed-out Data Calls:\n"
 
@@ -74,7 +75,7 @@ def get_insight(stats):
             pad = max_dc_length - len(key)
             output += f"- {key}:{pad*' '}{value}\n"
         output += "\n"
-    
+
     return output
 
 
