@@ -1,14 +1,84 @@
 import sys
 import csv
 import asyncio
+import json
 from math import ceil
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 
 from core.teststat import TestStat
 from core.utils import MessageEnum, get_batch
 
+import requests
 
-async def run_cicd_tests(host, mode, batch_size):
+
+MATTERMOST_URL = "https://mattermost.ripe.net/hooks/6xp8tt93i3fwde5d43jegsxi8a"
+MATTERMOST_CHANNEL = "teststat"
+
+
+def post_message(message, url=MATTERMOST_URL, channel=MATTERMOST_CHANNEL):
+    """Post given message to the Mattermost channel hooked with the given URL"""
+
+    frame = "### **#### TESTstat ####**\n"
+    payload = {
+        "channel": channel,
+        "text": frame + message
+    }
+    requests.post(url, data=json.dumps(payload))
+
+def get_insight(stats):
+
+    insight_failure = defaultdict(int)
+    insight_time_out = defaultdict(int)
+
+    total_failures = len(stats["failure"])
+    total_time_outs = len(stats["time_out"])
+
+    for stat_failure in stats["failure"]:
+        insight_failure[stat_failure.data_call] += 1
+    for stat_time_out in stats["time_out"]:
+        insight_time_out[stat_time_out.data_call] += 1
+
+    failure_counter = [(data_call, count) for data_call, count in insight_failure.items()]
+    failure_counter.sort(key=lambda tuple: tuple[1], reverse=True)
+    time_out_counter = [(data_call, count) for data_call, count in insight_time_out.items()]
+    time_out_counter.sort(key=lambda tuple: tuple[1], reverse=True)
+
+    insight_failure.clear()
+    insight_time_out.clear()
+
+    for tuple in failure_counter:
+        insight_failure[tuple[0]] = f"{tuple[1]} ({round(tuple[1] * 100 / total_failures)}%)"
+    for tuple in time_out_counter:
+        insight_time_out[tuple[0]] = f"{tuple[1]} ({round(tuple[1] * 100 / total_time_outs)}%)"
+
+    output = ""
+
+    if insight_failure:
+
+        max_dc_length = len(max(failure_counter, key=lambda tuple:len(tuple[0]))[0]) + 1
+
+        output += "\nFailed Data Calls:\n\n"
+
+        for key, value in insight_failure.items():
+            pad = max_dc_length - len(key)
+            output += f"- {key}:{pad*' '}{value}\n"
+        output += "\n"
+
+    if insight_time_out:
+
+        max_dc_length = len(max(time_out_counter, key=lambda tuple:len(tuple[0]))[0]) + 1
+
+        output += "\nTimed-out Data Calls:\n"
+
+        for key, value in insight_time_out.items():
+            pad = max_dc_length - len(key)
+            output += f"- {key}:{pad*' '}{value}\n"
+        output += "\n"
+    
+    return output
+
+
+async def run_cicd_tests(host, mode, file_name, batch_size):
     """Run CICD test cases for given host in given mode"""
 
     async def _run_routine(row_index, row):
@@ -52,10 +122,15 @@ async def run_cicd_tests(host, mode, batch_size):
             stats["failure"].append(stat)
 
     test_cases_path = "data/test_cases_500.csv" if mode == "500" else "data/test_cases.csv"
+    # test_cases_path = "data/" + file_name if mode != "500" else ""
 
     sys.stdout.flush()
-    print("#" * 220, "\n")
-    print(f"Host: {host} | Tests: {test_cases_path} | Mode: {mode} | Batch Size: {batch_size}\n")
+    print("#" * 190, "\n")
+    if test_cases_path:
+        header = f"Host: {host} | Mode: {mode} | Tests: {test_cases_path}"
+    else:
+        header = f"Host: {host} | Mode: {mode}"
+    print(header + f" | Batch Size: {batch_size}\n")
 
     teststat = TestStat(host, cicd=True)
 
@@ -74,7 +149,8 @@ async def run_cicd_tests(host, mode, batch_size):
         next(csv_reader)
 
         test_cases = list(enumerate(csv_reader, 1))
-        num_batches = ceil(len(test_cases) / batch_size)
+        total_test_cases = len(test_cases)
+        num_batches = ceil(total_test_cases / batch_size)
 
         for batch_index, batch in enumerate(get_batch(test_cases, batch_size), 1):
 
@@ -93,7 +169,7 @@ async def run_cicd_tests(host, mode, batch_size):
 
     if stats["failure"]:
 
-        print("FAILED TEST CASES:\n")
+        print("\nFAILED TEST CASES:\n")
 
         for tuple in stats["failure"]:
             print(
@@ -117,7 +193,7 @@ async def run_cicd_tests(host, mode, batch_size):
     if stats["time_out"]:
 
         if stats["failure"]:
-            print("\n", "-" * 220, "\n")
+            print("\n", "-" * 190, "\n")
         print("TIMED-OUT TEST CASES:\n")
 
         for tuple in stats["time_out"]:
@@ -127,9 +203,25 @@ async def run_cicd_tests(host, mode, batch_size):
             for param, expected_value in tuple.expected_output.items():
                 print(f"--> Parameter '{param}' | Expected: {expected_value}")
 
-    print("\n", "#" * 220, "\n")
-    print("Number of Failed Test Cases:    ", len(stats["failure"]))
-    print("Number of Timed-out Test Cases: ", len(stats["time_out"]), "\n")
+    total_failures = len(stats["failure"])
+    total_time_outs = len(stats["time_out"])
+
+    msg_insight = get_insight(stats)
+
+    print("#" * 190, "\n")
+    print("Test Cases:           ", total_test_cases)
+    print("Failed Test Cases:    ", total_failures)
+    print("Timed-out Test Cases: ", total_time_outs, "\n")
+    print(msg_insight)
+
+    # Prepare a message to be post in Mattermost channel
+    msg_header = header + "\n\n"
+    msg_total = "**- Total Test Cases:**           " + str(total_test_cases) + "\n"
+    msg_failure = "**- Failed Test Cases:**         " + str(total_failures)
+    msg_failure += "     :flan_cool:\n" if not total_failures else "\n"
+    msg_time_out = "**- Timed-out Test Cases:** " + str(total_time_outs)
+    msg_time_out += "     :flan_cool:\n" if not total_time_outs else "\n"
+    post_message(msg_header + msg_total + msg_failure + msg_time_out + msg_insight)
 
     if stats["time_out"] or stats["failure"]:
         sys.exit(1)
