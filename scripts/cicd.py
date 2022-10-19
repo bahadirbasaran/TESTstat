@@ -18,7 +18,7 @@ MATTERMOST_CHANNEL = "teststat"
 def post_message(message, url=MATTERMOST_URL, channel=MATTERMOST_CHANNEL):
     """Post given message to the Mattermost channel hooked with the given URL"""
 
-    frame = "### **#### TESTstat ####**\n"
+    frame = "### **#### TESTstat Summary ####**\n"
     payload = {
         "channel": channel,
         "text": frame + message
@@ -79,7 +79,7 @@ def get_insight(stats):
     return output
 
 
-async def run_cicd_tests(host, mode, file_name, batch_size):
+async def run_cicd_tests(host, mode, file_name, preferred_version, batch_size):
     """Run CICD test cases for given host in given mode"""
 
     async def _run_routine(row_index, row):
@@ -126,14 +126,21 @@ async def run_cicd_tests(host, mode, file_name, batch_size):
     # test_cases_path = "data/" + file_name if mode != "500" else ""
 
     sys.stdout.flush()
-    print("#" * 190, "\n")
-    if test_cases_path:
-        header = f"Host: {host} | Mode: {mode} | Tests: {test_cases_path}"
-    else:
-        header = f"Host: {host} | Mode: {mode}"
-    print(header + f" | Batch Size: {batch_size}\n")
+    print("\n", "#" * 150, "\n")
 
-    teststat = TestStat(host, cicd=True)
+    header = f"Host: {host} | Mode: {mode}"
+    if test_cases_path:
+        header += f" | Tests: {test_cases_path}"
+    if preferred_version != "default":
+        header += f" | Preferred Version: {preferred_version}"
+    header += f" | Batch Size: {batch_size}"
+
+    print(header, "\n")
+
+    if preferred_version == "default":
+        teststat = TestStat(host, cicd=True)
+    else:
+        teststat = TestStat(host, cicd=True, preferred_version=preferred_version)
 
     stats = {"failure": [], "time_out": []}
     FailureStat = namedtuple(
@@ -151,9 +158,9 @@ async def run_cicd_tests(host, mode, file_name, batch_size):
 
         test_cases = list(enumerate(csv_reader, 1))
         total_test_cases = len(test_cases)
-        num_batches = ceil(total_test_cases / batch_size)
+        num_batches = ceil(total_test_cases / int(batch_size))
 
-        for batch_index, batch in enumerate(get_batch(test_cases, batch_size), 1):
+        for batch_index, batch in enumerate(get_batch(test_cases, int(batch_size)), 1):
 
             coroutines_batch = [_run_routine(row_index, row) for row_index, row in batch]
 
@@ -194,7 +201,7 @@ async def run_cicd_tests(host, mode, file_name, batch_size):
     if stats["time_out"]:
 
         if stats["failure"]:
-            print("\n", "-" * 190, "\n")
+            print("\n", "-" * 150, "\n")
         print("TIMED-OUT TEST CASES:\n")
 
         for tuple in stats["time_out"]:
@@ -209,7 +216,7 @@ async def run_cicd_tests(host, mode, file_name, batch_size):
 
     msg_insight = get_insight(stats)
 
-    print("#" * 190, "\n")
+    print("\n", "#" * 150, "\n")
     print("Test Cases:           ", total_test_cases)
     print("Failed Test Cases:    ", total_failures)
     print("Timed-out Test Cases: ", total_time_outs, "\n")
