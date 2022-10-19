@@ -34,10 +34,17 @@ if __name__ == "__main__":
         help="Data source to fetch test cases. If 'mode' is 500, this argument will be neglected"
     )
     parser.add_argument(
+        "--preferred_version",
+        dest="preferred_version",
+        type=str,
+        default="default",
+        help="Preferred version for API queries"
+    )
+    parser.add_argument(
         "--batch_size",
         dest="batch_size",
-        type=int,
-        default=BATCH_SIZE,
+        type=str,
+        default=str(BATCH_SIZE),
         help=f"Batch size. {BATCH_SIZE} by default."
     )
     args = parser.parse_args()
@@ -52,7 +59,13 @@ if __name__ == "__main__":
         # The solution below is for compatibility concerns for the systems with Python < 3.7
         loop = asyncio.get_event_loop()
         loop.run_until_complete(
-            run_cicd_tests(args.host, args.mode, args.file_name, args.batch_size)
+            run_cicd_tests(
+                args.host,
+                args.mode,
+                args.file_name,
+                args.preferred_version,
+                args.batch_size
+            )
         )
     else:
         from PyQt5.QtWidgets import QApplication
