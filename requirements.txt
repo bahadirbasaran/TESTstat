@@ -8,5 +8,5 @@ PyQt5-Qt5==5.15.2
 PyQt5-sip==12.9.1
 qt5-applications==5.15.2.2.2
 qt5-tools==5.15.2.1.2
-requests==2.27.1
+aiohttp==3.8.1
 urllib3==1.26.9
