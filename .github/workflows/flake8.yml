@@ -21,3 +21,6 @@ jobs:
           # ./core/teststat.py:52:20: F821 undefined name 'MessageEnum'
           ignore: "F821,W503"
           max-line-length: "100"
+          # In order to avoid:
+          # ./scripts/testsuite_generation/config_testsuite_params.py:'resource_asn_200' may be undefined, or defined from star imports: config_testsuite_param_values
+          per-file-ignores: "./scripts/testsuite_generation/config_testsuite_params.py:F405"
