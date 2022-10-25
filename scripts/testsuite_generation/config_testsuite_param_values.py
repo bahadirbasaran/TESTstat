@@ -134,10 +134,12 @@ method_200 = ["details"]
 method_400 = ["loremipsum"]
 
 resource_optional_200 = [
-    l1 for res in [resource_asn_200, resource_prefix_200, resource_ip_200] for l1 in res
+    res_ind
+    for res in [resource_asn_200, resource_prefix_200, resource_ip_200]
+    for res_ind in res
 ]
 resource_optional_400 = [
-    l1 for res in [resource_geo_200, resource_req_400] for l1 in res
+    res_ind for res in [resource_geo_200, resource_req_400] for res_ind in res
 ]
 
 normalise_visibility_200 = ["true", "false"]
