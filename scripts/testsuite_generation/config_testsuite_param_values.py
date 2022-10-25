@@ -1,5 +1,4 @@
 # This file contains values for the required and Optional parameters
-
 # Required parameters
 resource_asn_200 = ["3333", "as3333", "3333&3303"]
 resource_asn_400 = ["loremipsum", "loremipsum&3333", ""]
@@ -15,15 +14,29 @@ resource_ip_400 = ["loremipsum", "loremipsum&193.0.0.0", ""]
 resource_hostname_400 = ["loremipsum", "loremipsum&www.google.com", ""]
 resource_geo_400 = ["loremipsum", "loremipsum&at", ""]
 
-resource_empty  = [""]
-resource_req_400 = ["loremipsum", "loremipsum&nl", "loremipsum&3333", "loremipsum&193/21", "loremipsum&193.0.0.0"]
+resource_empty = [""]
+resource_req_400 = [
+    "loremipsum",
+    "loremipsum&nl",
+    "loremipsum&3333",
+    "loremipsum&193/21",
+    "loremipsum&193.0.0.0",
+]
 
 resource_200 = ["3333", "as3333", "3333&3303"]
 resource_400 = ["loremipsum", "loremipsum&3333", ""]
 prefix_200 = ["193/21", "193/21&191/21"]
 prefix_400 = ["loremipsum", "loremipsum&193/21", ""]
 
-resource_groups = [resource_asn_200, resource_prefix_200, resource_ip_200, resource_hostname_200, resource_geo_200, resource_empty, resource_req_400]
+resource_groups = [
+    resource_asn_200,
+    resource_prefix_200,
+    resource_ip_200,
+    resource_hostname_200,
+    resource_geo_200,
+    resource_empty,
+    resource_req_400,
+]
 
 # Optional params
 starttime_200 = ["2020-12-12T12:00"]
@@ -120,8 +133,12 @@ family_400 = ["-1", "3", "loremipsum"]
 method_200 = ["details"]
 method_400 = ["loremipsum"]
 
-resource_optional_200 = [l1 for l in [resource_asn_200, resource_prefix_200, resource_ip_200] for l1 in l ]
-resource_optional_400 = [l1 for l in [resource_geo_200, resource_req_400] for l1 in l ]
+resource_optional_200 = [
+    l1 for res in [resource_asn_200, resource_prefix_200, resource_ip_200] for l1 in res
+]
+resource_optional_400 = [
+    l1 for res in [resource_geo_200, resource_req_400] for l1 in res
+]
 
 normalise_visibility_200 = ["true", "false"]
 normalise_visibility_400 = ["loremipsum"]
@@ -133,7 +150,7 @@ include_200 = ["more_specific", "low_visibility_flag"]
 include_400 = ["loremipsum"]
 
 min_sampling_period_200 = ["4"]
-min_sampling_period_400= ["-1", "4&6", "loremipsum"]
+min_sampling_period_400 = ["-1", "4&6", "loremipsum"]
 
 hide_empty_samples_200 = ["true", "false"]
 hide_empty_samples_400 = ["loremipsum", "5"]
@@ -144,7 +161,7 @@ v6_full_prefix_threshold_400 = ["-1", "0&7"]
 list_prefixes_200 = ["true", "false"]
 list_prefixes_400 = ["loremipsum", "5"]
 
-af_200 = ["v4","v6", "v4&v6"]
+af_200 = ["v4", "v6", "v4&v6"]
 af_400 = ["loremipsum", "5"]
 
 include_first_hop_200 = ["true", "false"]

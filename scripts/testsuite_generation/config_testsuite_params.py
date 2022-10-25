@@ -1,19 +1,40 @@
 # This file contains configuration for the automated test suite generation
 # This file holds information about the required and optional parameters for the datacalls
-# If there is only one required parameter with more values types (asn and ip address, for example) they should be passed in *args format
-# In case there are more required parameters, they should be added as separate lists containing parameter name. Check, that group parameter_name_200
-# and parameter_name_200 exists in the file config_autogeneration_param_values. As an example, see datacall "rpki-validation"
+# If there is only one required parameter with more values types (asn and ip address, for example)
+# they should be passed in *args format
+# In case there are more required parameters, they should be added as separate lists containing
+# parameter name. Check, that group parameter_name_200
+# and parameter_name_200 exists in the file config_autogeneration_param_values. As an example,
+# see datacall "rpki-validation"
 # For the optional parameters, the list of strings (parameters names) is expected
 
-from config_testsuite_param_values import *
+from config_testsuite_param_values import *  # noqa: F403
 
 # Data calls' required parameters
 resource_params = {
     "rpki-validation": [["resource"], ["prefix"]],
-    "abuse-contact-finder": [*resource_asn_200, *resource_prefix_200, *resource_ip_200, *resource_hostname_200],
-    "address-space-hierarchy": [*resource_prefix_200, *resource_ip_200, *resource_hostname_200],
-    "address-space-usage": [*resource_prefix_200, *resource_ip_200, *resource_hostname_200],
-    "allocation-history": [*resource_asn_200, *resource_prefix_200, *resource_ip_200, *resource_hostname_200],
+    "abuse-contact-finder": [
+        *resource_asn_200,
+        *resource_prefix_200,
+        *resource_ip_200,
+        *resource_hostname_200,
+    ],
+    "address-space-hierarchy": [
+        *resource_prefix_200,
+        *resource_ip_200,
+        *resource_hostname_200,
+    ],
+    "address-space-usage": [
+        *resource_prefix_200,
+        *resource_ip_200,
+        *resource_hostname_200,
+    ],
+    "allocation-history": [
+        *resource_asn_200,
+        *resource_prefix_200,
+        *resource_ip_200,
+        *resource_hostname_200,
+    ],
     "announced-prefixes": [*resource_asn_200],
     "as-overview": [*resource_asn_200],
     "as-path-length": [*resource_asn_200],
@@ -21,7 +42,12 @@ resource_params = {
     "asn-neighbours": [*resource_asn_200],
     "asn-neighbours-history": [*resource_asn_200],
     "atlas-probe-deployment": [*resource_asn_200, *resource_geo_200],
-    "atlas-probes": [*resource_asn_200, *resource_prefix_200, *resource_ip_200, *resource_geo_200],
+    "atlas-probes": [
+        *resource_asn_200,
+        *resource_prefix_200,
+        *resource_ip_200,
+        *resource_geo_200,
+    ],
     "atlas-targets": [*resource_asn_200, *resource_prefix_200, *resource_ip_200],
     "bgp-state": [*resource_asn_200, *resource_prefix_200, *resource_ip_200],
     "bgp-update-activity": [*resource_asn_200, *resource_prefix_200, *resource_ip_200],
@@ -44,14 +70,42 @@ resource_params = {
     "prefix-size-distribution": [*resource_asn_200],
     "related-prefixes": [*resource_prefix_200],
     "reverse-dns": [*resource_prefix_200, *resource_ip_200],
-    "reverse-dns-consistency": [*resource_asn_200, *resource_prefix_200, *resource_ip_200, *resource_geo_200, *resource_hostname_200],
+    "reverse-dns-consistency": [
+        *resource_asn_200,
+        *resource_prefix_200,
+        *resource_ip_200,
+        *resource_geo_200,
+        *resource_hostname_200,
+    ],
     "reverse-dns-ip": [*resource_ip_200],
-    "rir": [*resource_asn_200, *resource_prefix_200, *resource_ip_200, *resource_geo_200, *resource_hostname_200],
-    "rir-geo": [*resource_asn_200, *resource_prefix_200, *resource_ip_200, *resource_geo_200, *resource_hostname_200],
+    "rir": [
+        *resource_asn_200,
+        *resource_prefix_200,
+        *resource_ip_200,
+        *resource_geo_200,
+        *resource_hostname_200,
+    ],
+    "rir-geo": [
+        *resource_asn_200,
+        *resource_prefix_200,
+        *resource_ip_200,
+        *resource_geo_200,
+        *resource_hostname_200,
+    ],
     "rir-prefix-size-distribution": [*resource_prefix_200, *resource_ip_200],
-    "rir-stats-country": [*resource_asn_200, *resource_prefix_200, *resource_ip_200, *resource_geo_200],
+    "rir-stats-country": [
+        *resource_asn_200,
+        *resource_prefix_200,
+        *resource_ip_200,
+        *resource_geo_200,
+    ],
     "ris-asns": [*resource_empty],
-    "ris-first-last-seen": [*resource_asn_200, *resource_prefix_200, *resource_ip_200, *resource_geo_200],
+    "ris-first-last-seen": [
+        *resource_asn_200,
+        *resource_prefix_200,
+        *resource_ip_200,
+        *resource_geo_200,
+    ],
     "ris-full-table-threshold": [*resource_empty],
     "ris-peer-count": [*resource_empty],
     "ris-peerings": [*resource_asn_200, *resource_prefix_200, *resource_ip_200],
@@ -59,12 +113,27 @@ resource_params = {
     "ris-prefixes": [*resource_asn_200],
     "routing-history": [*resource_asn_200, *resource_prefix_200, *resource_ip_200],
     "routing-status": [*resource_asn_200, *resource_prefix_200, *resource_ip_200],
-    "rpki-history": [*resource_asn_200, *resource_prefix_200, *resource_ip_200, *resource_geo_200],
-    "searchcomplete": [*resource_asn_200, *resource_prefix_200, *resource_ip_200, *resource_geo_200],
+    "rpki-history": [
+        *resource_asn_200,
+        *resource_prefix_200,
+        *resource_ip_200,
+        *resource_geo_200,
+    ],
+    "searchcomplete": [
+        *resource_asn_200,
+        *resource_prefix_200,
+        *resource_ip_200,
+        *resource_geo_200,
+    ],
     "speedchecker-bandwidth-measurements": [*resource_prefix_200, *resource_ip_200],
     "visibility": [*resource_asn_200, *resource_prefix_200, *resource_ip_200],
     "whats-my-ip": [*resource_empty],
-    "whois": [*resource_asn_200, *resource_prefix_200, *resource_ip_200, *resource_geo_200],
+    "whois": [
+        *resource_asn_200,
+        *resource_prefix_200,
+        *resource_ip_200,
+        *resource_geo_200,
+    ],
     "zonemaster": [*resource_hostname_200],
     # "whois-object-last-updated": []# in maintanence currently
 }
@@ -79,7 +148,14 @@ optional_params = {
     "asn-neighbours-history": ["starttime", "endtime", "max_rows"],
     "atlas-probe-deployment": ["starttime", "endtime"],
     "bgp-state": ["timestamp", "rrcs", "unix_timestamps"],
-    "bgp-update-activity": ["starttime", "endtime", "max_samples", "min_sampling_period", "num_hours", "hide_empty_samples"],
+    "bgp-update-activity": [
+        "starttime",
+        "endtime",
+        "max_samples",
+        "min_sampling_period",
+        "num_hours",
+        "hide_empty_samples",
+    ],
     "bgp-updates": ["starttime", "endtime", "rrcs", "unix_timestamps"],
     "bgplay": ["starttime", "endtime", "rrcs", "unix_timestamps"],
     "blocklist": ["starttime", "endtime"],
@@ -100,15 +176,27 @@ optional_params = {
     "ris-asns": ["list_asns", "asn_types", "query_time"],
     "ris-first-last-seen": ["include"],
     "ris-full-table-threshold": ["query_time"],
-    "ris-peer-count": ["starttime", "endtime", "v4_full_prefix_threshold", "v6_full_prefix_threshold"],
+    "ris-peer-count": [
+        "starttime",
+        "endtime",
+        "v4_full_prefix_threshold",
+        "v6_full_prefix_threshold",
+    ],
     "ris-peerings": ["query_time"],
     "ris-peers": ["query_time"],
     "ris-prefixes": ["query_time", "list_prefixes", "types", "af", "noise"],
-    "routing-history": ["max_rows", "include_first_hop", "normalise_visibility", "min_peers", "starttime", "endtime"],
+    "routing-history": [
+        "max_rows",
+        "include_first_hop",
+        "normalise_visibility",
+        "min_peers",
+        "starttime",
+        "endtime",
+    ],
     "routing-status": ["min_peers_seeing", "timestamp"],
     "rpki-history": ["family", "resolution", "delegated"],
     "searchcomplete": ["limit"],
     "speedchecker-bandwidth-measurements": ["starttime", "endtime"],
     "visibility": ["query_time", "include"],
-    "zonemaster": ["method"]
+    "zonemaster": ["method"],
 }
