@@ -23,4 +23,4 @@ jobs:
           max-line-length: "100"
           # In order to avoid:
           # ./scripts/testsuite_generation/config_testsuite_params.py:'resource_asn_200' may be undefined, or defined from star imports: config_testsuite_param_values
-          per-file-ignores: "./scripts/testsuite_generation/config_testsuite_params.py:F405"
+          per-file-ignores: ./scripts/testsuite_generation/config_testsuite_params.py:F405
