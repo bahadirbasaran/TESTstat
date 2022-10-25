@@ -70,9 +70,7 @@ def adding_opt_params(optional_params_for_dc, req_param_string, code, mode, vars
         code_optional = None
         args_to_test = list()
         for i in range(0, len(optional_param_for_dc)):
-            args_to_test.append(
-                vars[f"config_testsuite_param_values.{optional_param_for_dc[i]}"]
-            )
+            args_to_test.append(vars[f"{optional_param_for_dc[i]}"])
             args_to_test_final = list(itertools.product(*args_to_test))
         for id in range(0, len(args_to_test_final)):
             args_ind = args_to_test_final[id]
@@ -127,7 +125,6 @@ def creating_combs(resources):
 # Test suite creation
 
 test_suite = set()
-print(vars())
 for k, v in resource_params.items():
     if k in keys:
         optional_params_for_dc = []
