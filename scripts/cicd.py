@@ -14,6 +14,7 @@ import requests
 
 MATTERMOST_URL = "https://mattermost.ripe.net/hooks/6xp8tt93i3fwde5d43jegsxi8a"
 MATTERMOST_CHANNEL = "teststat"
+MATTERMOST_NEWLINE = "` `  "
 
 
 def post_message(message, url=MATTERMOST_URL, channel=MATTERMOST_CHANNEL):
@@ -216,8 +217,8 @@ async def run_cicd_tests(host, mode, file_name, preferred_version, batch_size):
         processed_stats = process_stats(stats)
 
         msg_table = (
-            "| Data Call | Failures | Timeouts | Failed & Timed-out URLs (in order) |\n"
-            "|:----------|:--------:|:--------:|:-----------------------------------|\n"
+            "| Data Call | Failures | Timeouts | Failed & Timed-out URLs |\n"
+            "|:----------|:--------:|:--------:|:------------------------|\n"
         )
 
         for data_call, data_call_stats in processed_stats.items():
@@ -225,11 +226,18 @@ async def run_cicd_tests(host, mode, file_name, preferred_version, batch_size):
             num_failure = len(data_call_stats["failed_queries"])
             num_time_out = len(data_call_stats["timed_out_queries"])
 
-            failed_queries = "` `  ".join(data_call_stats["failed_queries"])
-            timed_out_queries = "` `  ".join(data_call_stats["timed_out_queries"])
+            data_call_stats["failed_queries"] = [
+                f"**F:**[{url}]({url})" for url in data_call_stats["failed_queries"]
+            ]
+            data_call_stats["timed_out_queries"] = [
+                f"**T:**[{url}]({url})" for url in data_call_stats["timed_out_queries"]
+            ]
+
+            failed_queries = MATTERMOST_NEWLINE.join(data_call_stats["failed_queries"])
+            timed_out_queries = MATTERMOST_NEWLINE.join(data_call_stats["timed_out_queries"])
 
             if num_failure and num_time_out:
-                queries = failed_queries + "` `  " + timed_out_queries
+                queries = failed_queries + MATTERMOST_NEWLINE + timed_out_queries
             elif num_failure:
                 queries = failed_queries
             else:
