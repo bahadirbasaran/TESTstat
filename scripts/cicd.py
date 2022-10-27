@@ -13,7 +13,7 @@ import requests
 
 
 MATTERMOST_URL = "https://mattermost.ripe.net/hooks/6xp8tt93i3fwde5d43jegsxi8a"
-MATTERMOST_CHANNEL = "ripestat-teststat"
+MATTERMOST_CHANNEL = "teststat"
 MATTERMOST_NEWLINE = "` `  "
 
 
