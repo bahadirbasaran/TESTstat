@@ -34,6 +34,13 @@ if __name__ == "__main__":
         help="Data source to fetch test cases. If 'mode' is 500, this argument will be neglected"
     )
     parser.add_argument(
+        "--dc",
+        dest="preferred_data_call",
+        type=str,
+        default="",
+        help="Preferred data call to run the tests for"
+    )
+    parser.add_argument(
         "--preferred_version",
         dest="preferred_version",
         type=str,
@@ -63,6 +70,7 @@ if __name__ == "__main__":
                 args.host,
                 args.mode,
                 args.file_name,
+                args.preferred_data_call,
                 args.preferred_version,
                 args.batch_size
             )

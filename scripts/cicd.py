@@ -13,7 +13,7 @@ import requests
 
 
 MATTERMOST_URL = "https://mattermost.ripe.net/hooks/6xp8tt93i3fwde5d43jegsxi8a"
-MATTERMOST_CHANNEL = "teststat"
+MATTERMOST_CHANNEL = "ripestat-teststat"
 MATTERMOST_NEWLINE = "` `  "
 
 
@@ -67,7 +67,7 @@ def process_stats(stats):
     return {data_call: processed_stats[data_call] for data_call in data_calls_in_order}
 
 
-async def run_cicd_tests(host, mode, file_name, preferred_version, batch_size):
+async def run_cicd_tests(host, mode, file_name, preferred_data_call, preferred_version, batch_size):
     """Run CICD test cases for given host in given mode"""
 
     async def _run_routine(row_index, row):
@@ -142,6 +142,9 @@ async def run_cicd_tests(host, mode, file_name, preferred_version, batch_size):
 
         # Skip the header
         next(csv_reader)
+
+        if preferred_data_call:
+            csv_reader = filter(lambda row: row[0] == preferred_data_call, list(csv_reader))
 
         test_cases = list(enumerate(csv_reader, 1))
         total_test_cases = len(test_cases)
