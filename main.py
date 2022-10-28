@@ -28,10 +28,11 @@ if __name__ == "__main__":
         help="Test mode. 'default' for the default run, '500' for 500-only testing"
     )
     parser.add_argument(
-        "--file_name",
-        dest="file_name",
+        "--batch_size",
+        dest="batch_size",
         type=str,
-        help="Data source to fetch test cases. If 'mode' is 500, this argument will be neglected"
+        default=str(BATCH_SIZE),
+        help=f"Batch size. {BATCH_SIZE} by default."
     )
     parser.add_argument(
         "--dc",
@@ -43,13 +44,6 @@ if __name__ == "__main__":
             "Preferred data call(s) and versions to run the tests for."
             "Example syntax: --dc bgplay network-info_1.0 abuse-contact-finder_2.0_2.1"
         )
-    )
-    parser.add_argument(
-        "--batch_size",
-        dest="batch_size",
-        type=str,
-        default=str(BATCH_SIZE),
-        help=f"Batch size. {BATCH_SIZE} by default."
     )
     args = parser.parse_args()
 
@@ -66,9 +60,8 @@ if __name__ == "__main__":
             run_cicd_tests(
                 args.host,
                 args.mode,
-                args.file_name,
-                args.preferred_data_calls,
-                args.batch_size
+                args.batch_size,
+                args.preferred_data_calls
             )
         )
     else:

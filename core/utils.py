@@ -236,5 +236,3 @@ def process_stats(stats, sort_by="count"):
         data_calls_in_order = list(sorted(processed_stats))
 
     return {data_call: processed_stats[data_call] for data_call in data_calls_in_order}
-
-    

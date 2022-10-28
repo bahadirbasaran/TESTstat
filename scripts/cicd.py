@@ -6,10 +6,10 @@ from collections import namedtuple
 
 from core.teststat import TestStat
 from core.utils import MessageEnum, MATTERMOST_NEWLINE, MATTERMOST_TABLE_FRAME, \
-                                    get_batch, post_message, process_stats
+                        get_batch, post_message, process_stats
 
 
-async def run_cicd_tests(host, mode, file_name, preferred_data_calls, batch_size):
+async def run_cicd_tests(host, mode, batch_size, preferred_data_calls):
     """Run CICD test cases for given host in given mode"""
 
     async def _run_routine(row_index, row, dc_version):
