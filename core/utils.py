@@ -1,4 +1,18 @@
+import json
+from datetime import datetime
+
+import requests
+
+
 BATCH_SIZE = 100
+
+MATTERMOST_URL = "https://mattermost.ripe.net/hooks/6xp8tt93i3fwde5d43jegsxi8a"
+MATTERMOST_CHANNEL = "ripestat-teststat"
+MATTERMOST_NEWLINE = "` `  "
+MATTERMOST_TABLE_FRAME = (
+    "| Data Call | Failures | Timeouts | Failed & Timed-out URLs |\n"
+    "|:----------|:--------:|:--------:|:------------------------|\n"
+)
 
 
 class MessageEnum():
@@ -169,3 +183,58 @@ def get_batch(iterable, batch_size):
 
     for index in range(0, total_length, batch_size):
         yield iterable[index:min(index + batch_size, total_length)]
+
+
+def post_message(message, url=MATTERMOST_URL, channel=MATTERMOST_CHANNEL):
+    """Post given message to the Mattermost channel hooked with the given URL"""
+
+    current_date = datetime.now().strftime("%d/%m/%y")
+    frame = f"### TESTstat Report - {current_date}\n"
+    payload = {
+        "channel": channel,
+        "text": frame + message
+    }
+    requests.post(url, data=json.dumps(payload))
+
+
+def process_stats(stats, sort_by="count"):
+    """Process stats and return relevant URLs for each data call"""
+
+    processed_stats = {}
+
+    for tuple in stats["failure"]:
+        if tuple.data_call not in processed_stats:
+            processed_stats[tuple.data_call] = {
+                "failed_queries": [tuple.url],
+                "timed_out_queries": []
+            }
+        else:
+            processed_stats[tuple.data_call]["failed_queries"].append(tuple.url)
+
+    for tuple in stats["time_out"]:
+        if tuple.data_call not in processed_stats:
+            processed_stats[tuple.data_call] = {
+                "failed_queries": [],
+                "timed_out_queries": [tuple.url]
+            }
+        else:
+            processed_stats[tuple.data_call]["timed_out_queries"].append(tuple.url)
+
+    if sort_by == "count":
+        # Sort data calls in reverse order, prioritize failures over time-outs
+        data_calls_in_order = list(
+            sorted(
+                processed_stats,
+                key=lambda data_call: (
+                    len(processed_stats[data_call]["failed_queries"]),
+                    len(processed_stats[data_call]["timed_out_queries"])
+                ),
+                reverse=True
+            )
+        )
+    else:
+        data_calls_in_order = list(sorted(processed_stats))
+
+    return {data_call: processed_stats[data_call] for data_call in data_calls_in_order}
+
+    

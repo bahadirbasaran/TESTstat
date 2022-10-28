@@ -35,17 +35,14 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--dc",
-        dest="preferred_data_call",
+        dest="preferred_data_calls",
         type=str,
-        default="",
-        help="Preferred data call to run the tests for"
-    )
-    parser.add_argument(
-        "--preferred_version",
-        dest="preferred_version",
-        type=str,
-        default="default",
-        help="Preferred version for API queries"
+        nargs='*',
+        default=[],
+        help=(
+            "Preferred data call(s) and versions to run the tests for."
+            "Example syntax: --dc bgplay network-info_1.0 abuse-contact-finder_2.0_2.1"
+        )
     )
     parser.add_argument(
         "--batch_size",
@@ -70,8 +67,7 @@ if __name__ == "__main__":
                 args.host,
                 args.mode,
                 args.file_name,
-                args.preferred_data_call,
-                args.preferred_version,
+                args.preferred_data_calls,
                 args.batch_size
             )
         )

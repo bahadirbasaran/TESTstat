@@ -13,7 +13,7 @@ from core.config import DATA_CALL_MAP, NESTED_PARAMS
 
 class TestStat():
 
-    def __init__(self, host, port=None, with_tls=True, cicd=False, preferred_version="default"):
+    def __init__(self, host, port=None, with_tls=True, cicd=False):
 
         # gui/utils.py imports PyQt5 package underneath. This is an unnecessary
         # load for CI/CD tasks, because there is no need to install PyQt5 each
@@ -25,7 +25,6 @@ class TestStat():
         host = host.lower().replace(' ', '')
         self.session = aiohttp.ClientSession()
         self.is_localhost = True if host == "127.0.0.1" or host == "localhost" else False
-        self.preferred_version = preferred_version
 
         if self.is_localhost and port.isdecimal():
             self.raw_query = f"http://127.0.0.1:{port}/data/"
@@ -43,8 +42,6 @@ class TestStat():
 
         if not self.is_localhost:
             test_input += "&cache=ignore"
-        if self.preferred_version != "default":
-            test_input += f"&preferred_version={self.preferred_version}"
 
         url = f"{self.raw_query}{data_call}/data.json?{test_input}"
 
