@@ -7,7 +7,7 @@ import requests
 BATCH_SIZE = 100
 
 MATTERMOST_URL = "https://mattermost.ripe.net/hooks/6xp8tt93i3fwde5d43jegsxi8a"
-MATTERMOST_CHANNEL = "ripestat-teststat"
+MATTERMOST_CHANNEL = "teststat"
 MATTERMOST_NEWLINE = "` `  "
 MATTERMOST_TABLE_FRAME = (
     "| Data Call | Failures | Timeouts | Failed & Timed-out URLs |\n"

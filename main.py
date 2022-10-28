@@ -42,7 +42,7 @@ if __name__ == "__main__":
         default=[],
         help=(
             "Preferred data call(s) and versions to run the tests for."
-            "Example syntax: --dc bgplay network-info_1.0 abuse-contact-finder_2.0_2.1"
+            "Example syntax: --dc bgplay abuse-contact-finder_2.0_2.1"
         )
     )
     args = parser.parse_args()

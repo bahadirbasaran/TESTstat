@@ -65,9 +65,9 @@ async def run_cicd_tests(host, mode, batch_size, preferred_data_calls):
 
     sys.stdout.flush()
     print("\n", "#" * 100, "\n\n")
-    print(f"Host: {host} | Mode: {mode} | Data Source: {test_cases_path}\n\n")
+    print(f"Host: {host}\t|\tMode: {mode}\t|\tData Source: {test_cases_path}\n\n")
 
-    header = f"**Host:** {host} | **Mode:** {mode} | **Data Source:** {test_cases_path}\n\n"
+    header = f"**Host:** {host}   |   **Mode:** {mode}   |   **Data Source:** {test_cases_path}\n\n"
 
     stats = {"failure": [], "time_out": []}
     FailureStat = namedtuple(
@@ -84,7 +84,7 @@ async def run_cicd_tests(host, mode, batch_size, preferred_data_calls):
         next(csv_reader)
 
         # Filter data calls if specified.
-        # e.g. preferred_data_calls = ['prefix-count_1.2', 'abuse-contact-finder_2.0_2.1', 'bgplay']
+        # e.g. preferred_data_calls = ['bgplay', 'abuse-contact-finder_2.0_2.1']
         if preferred_data_calls:
             dc_version_map = {
                 dc_and_versions.split('_')[0]: dc_and_versions.split('_')[1:]
