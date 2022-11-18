@@ -1,21 +1,23 @@
+import csv
 import json
+import random as rand
 from datetime import datetime
+from collections import defaultdict
 
 import requests
 
+from core.config import MATTERMOST_CHANNEL, MATTERMOST_URL
 
-BATCH_SIZE = 100
 
-MATTERMOST_URL = "https://mattermost.ripe.net/hooks/6xp8tt93i3fwde5d43jegsxi8a"
-MATTERMOST_CHANNEL = "teststat"
 MATTERMOST_NEWLINE = "` `  "
 MATTERMOST_TABLE_FRAME = (
-    "| Data Call | Failures | Timeouts | Failed & Timed-out URLs |\n"
-    "|:----------|:--------:|:--------:|:------------------------|\n"
+    "| Data Call | Tests | Failures | Timeouts | Failed & Timed-out URLs |\n"
+    "|:----------|:-----:|:--------:|:--------:|:------------------------|\n"
 )
 
 
 class MessageEnum():
+
     NO = 65536
     YES = 16384
     TIMEOUT = 408
@@ -176,13 +178,47 @@ def reshape_param_set(param_set):
     return reshaped_param_set
 
 
-def get_batch(iterable, batch_size):
-    """Slice iterable and return batches of batch_size each time"""
+def compare_output_equality(comparison_fields, *outputs):
+    """
+    Compare test outputs and return True if all have the same status code and data.
+    If comparison_fields is given, compare only those fields in the response data block.
+    """
 
-    total_length = len(iterable)
+    # If any of the queries return time-out/exception etc.
+    for output in outputs:
+        if isinstance(output, int):
+            return output
 
-    for index in range(0, total_length, batch_size):
-        yield iterable[index:min(index + batch_size, total_length)]
+    if not all(str(output["status_code"]) == str(outputs[0]["status_code"]) for output in outputs):
+        return False
+
+    # Sort lists to comply with json.dumps (different order produces different results)
+    for output in outputs:
+        for key, value in output["data"].items():
+            if isinstance(value, list):
+                output["data"][key] = sorted(value)
+
+    if comparison_fields:
+
+        if not all(
+            json.dumps(
+                {fld: val for fld, val in output["data"].items() if fld in comparison_fields}
+            ).encode('utf-8') ==
+            json.dumps(
+                {fld: val for fld, val in outputs[0]["data"].items() if fld in comparison_fields}
+            ).encode('utf-8')
+            for output in outputs
+        ):
+            return False
+        return True
+
+    if not all(
+        json.dumps(
+            output["data"]).encode('utf-8') == json.dumps(outputs[0]["data"]).encode('utf-8')
+        for output in outputs
+    ):
+        return False
+    return True
 
 
 def post_message(message, url=MATTERMOST_URL, channel=MATTERMOST_CHANNEL):
@@ -236,3 +272,78 @@ def process_stats(stats, sort_by="count"):
         data_calls_in_order = list(sorted(processed_stats))
 
     return {data_call: processed_stats[data_call] for data_call in data_calls_in_order}
+
+
+def get_batch(iterable, batch_size):
+    """Slice iterable and return batches of batch_size each time"""
+
+    total_length = len(iterable)
+
+    for index in range(0, total_length, batch_size):
+        yield iterable[index:min(index + batch_size, total_length)]
+
+
+def get_dc_version_map(preferred_data_calls):
+    """Create a data call-version mapping"""
+
+    dc_version_map = {}
+
+    for dc_and_versions in preferred_data_calls.split():
+        data_call = dc_and_versions.split('_')[0]
+        versions = dc_and_versions.split('_')[1:]
+        dc_version_map[data_call] = versions
+
+    return dc_version_map
+
+
+def parse_csv(csv_path, preferred_data_calls=None, random=None):
+    """
+    Parse given CSV file and return test cases for all/requested data calls
+    If random is given, sample a specific number of test cases per data call
+    (implemented only for full run without any data call preference)
+    """
+
+    with open(csv_path) as csv_file:
+
+        csv_reader = csv.reader(csv_file, delimiter=',')
+
+        # Skip the header
+        next(csv_reader)
+
+        # Filter data calls (with preferred versions) if specified.
+        # e.g. preferred_data_calls = ['bgplay', 'abuse-contact-finder_2.0_2.1']
+        if preferred_data_calls:
+            dc_version_map = get_dc_version_map(preferred_data_calls)
+
+            csv_reader = filter(lambda row: row[0] in dc_version_map, list(csv_reader))
+
+            test_cases = []
+
+            for row_index, row in enumerate(csv_reader, 1):
+
+                # If there is no specific version requested
+                if not dc_version_map[row[0]]:
+                    test_cases.append((row_index, row, None))
+                else:
+                    for version in dc_version_map[row[0]]:
+                        test_cases.append((row_index, row, version))
+        else:
+            if not random:
+                test_cases = [(row[0], row[1], None) for row in list(enumerate(csv_reader, 1))]
+            else:
+                test_cases = []
+                test_cases_per_dc = defaultdict(list)
+
+                for row in list(csv_reader):
+                    test_cases_per_dc[row[0]].append(row)
+
+                for tests in test_cases_per_dc.values():
+                    if len(tests) <= random:
+                        for test in tests:
+                            test_cases.append((len(test_cases) + 1, test, None))
+                    else:
+                        random_tests = rand.sample(tests, random)
+                        for test in random_tests:
+                            test_cases.append((len(test_cases) + 1, test, None))
+
+    return test_cases

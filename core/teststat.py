@@ -3,22 +3,18 @@ import asyncio
 import aiohttp
 
 from core.utils import MessageEnum, filter_param_set, reshape_param_set, get_innermost_value
-
-# Import conditional flags
 from core.config import ALL, ANY, COMPARE, INCLUDE, INCLUDE_KEYS, MATCH, NOT_EMPTY, TRIM_AS
-
-# Import parameter related definitions
-from core.config import DATA_CALL_MAP, NESTED_PARAMS
+from core.config import DATA_CALL_MAP, ParamsCommons
 
 
 class TestStat():
 
-    def __init__(self, host, port=None, with_tls=True, cicd=False):
+    def __init__(self, host, port=None, with_tls=True, gui=False):
 
         # gui/utils.py imports PyQt5 package underneath. This is an unnecessary
         # load for CI/CD tasks, because there is no need to install PyQt5 each
         # time for running all the test cases without the GUI.
-        if not cicd:
+        if gui:
             from gui.utils import throw_message
 
         protocol = "https" if with_tls else "http"
@@ -38,14 +34,21 @@ class TestStat():
         else:
             throw_message(MessageEnum.CRITICAL, "Port Error", "Port cannot include characters!")
 
-    async def run_test(self, data_call, test_input, expected_output, return_url=False):
+    async def run_test(
+        self,
+        data_call,
+        test_input,
+        expected_output,
+        return_url=False,
+        return_data=False
+    ):
 
         if not self.is_localhost:
             test_input += "&cache=ignore"
 
         url = f"{self.raw_query}{data_call}/data.json?{test_input}"
 
-        timeout = aiohttp.ClientTimeout(total=60)
+        timeout = aiohttp.ClientTimeout(total=15)
 
         try:
             async with self.session.get(url, timeout=timeout) as response:
@@ -68,6 +71,11 @@ class TestStat():
             if return_url:
                 return MessageEnum.CONNECTION_ERROR, url
             return MessageEnum.CONNECTION_ERROR
+
+        if return_data:
+            if return_url:
+                return actual_output, url
+            return actual_output
 
         test_result = self.evaluate_result(data_call, actual_output, expected_output)
 
@@ -231,7 +239,7 @@ class TestStat():
                 continue
 
             # Seperate nested parameters from regular parameters
-            if param.split("->")[0] in NESTED_PARAMS:
+            if param.split("->")[0] in ParamsCommons.NESTED_PARAMS:
                 nested_params[param] = value
                 continue
 

@@ -1,4 +1,5 @@
 data_call,test_input,expected_output
+abuse-contact-finder,
 abuse-contact-finder,resource = 3333,status_code = 200
 abuse-contact-finder,resource = as3333,status_code = 200
 abuse-contact-finder,resource = 3333,status_code = 200;abuse_contacts = not empty

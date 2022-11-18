@@ -1,10 +1,9 @@
 from gui.utils import throw_message, MessageEnum, StyleEnum
-from core.config import DATA_CALL_MAP, NESTED_PARAMS
+from core.config import DATA_CALL_MAP, ParamsCommons
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, \
-    QLabel, QComboBox, QTableWidgetItem, QCheckBox, QLineEdit, \
-    QFormLayout, QVBoxLayout, QScrollArea
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QPushButton, QLabel, QComboBox, \
+    QTableWidgetItem, QCheckBox, QLineEdit, QFormLayout, QVBoxLayout, QScrollArea
 
 
 class TestCaseWindow(QWidget):
@@ -182,8 +181,10 @@ class TestCaseWindow(QWidget):
             for param, value in param_set.items():
 
                 # Create first a checkbox "Not Empty" for nested parameters
-                if isinstance(value, dict) and \
-                        (param in NESTED_PARAMS or f"{parent_label}->{param}" in NESTED_PARAMS):
+                if isinstance(value, dict) and (
+                    param in ParamsCommons.NESTED_PARAMS or
+                    f"{parent_label}->{param}" in ParamsCommons.NESTED_PARAMS
+                ):
 
                     label_identifier = f"{param}:" if not parent_label \
                         else f"{parent_label}->{param}:"
@@ -288,7 +289,7 @@ class TestCaseWindow(QWidget):
                 label = parent_label + "->" + param if parent_label else param
                 var = parent_var + "_" + param if parent_var else param
 
-                if label in NESTED_PARAMS:
+                if label in ParamsCommons.NESTED_PARAMS:
                     if getattr(self, f"checkbox_input_{var}").isChecked():
                         output_params.append(f"{label} = not empty")
 

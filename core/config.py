@@ -19,6 +19,12 @@
 #   https://stat.ripe.net/data/address-space-hierarchy/data.json?resource=110/4
 
 
+# Application-wide definitions
+BATCH_SIZE = 100
+
+MATTERMOST_URL = "https://mattermost.ripe.net/hooks/6xp8tt93i3fwde5d43jegsxi8a"
+MATTERMOST_CHANNEL = "ripestat-teststat"
+
 ALL = "All following are True"
 ANY = "At least one of following is True"
 COMPARE = "Compare quantitatively (<[=] >[=])"
@@ -39,31 +45,31 @@ MATCH = (
 NOT_EMPTY = "Check any given data field in response is empty or not"
 TRIM_AS = "If resource starts with 'as', trim it"
 
-# NESTED_PARAMS keeps the parameters that contain list of parameters
-NESTED_PARAMS = [
-    "exact",
-    "more_specific",
-    "less_specific",
-    "assignments",
-    "allocations",
-    "ip_stats",
-    "iana",
-    "ripencc",
-    "iana->timelines",
-    "ripencc->timelines",
-    "prefixes",
-    "prefixes->timelines",
-    "stats",
-    "imports",
-    "exports",
-    "neighbours",
-    "neighbours->timelines",
-    "probes"
-]
 
+class ParamsCommons():
+    """Contains parameters' commons shared across different data calls/fields"""
 
-class CommonParamsEnum():
-    """Contains parameter groups shared across different data calls/fields"""
+    # NESTED_PARAMS keeps the parameters that contain list of parameters
+    NESTED_PARAMS = [
+        "exact",
+        "more_specific",
+        "less_specific",
+        "assignments",
+        "allocations",
+        "ip_stats",
+        "iana",
+        "ripencc",
+        "iana->timelines",
+        "ripencc->timelines",
+        "prefixes",
+        "prefixes->timelines",
+        "stats",
+        "imports",
+        "exports",
+        "neighbours",
+        "neighbours->timelines",
+        "probes"
+    ]
 
     WHOIS_PARAMS = {
         "inetnum": [ANY, NOT_EMPTY, MATCH],
@@ -130,9 +136,9 @@ DATA_CALL_MAP = {
         "required_params": ["resource"],
         "optional_params": [],
         "output_params": {
-            "exact": CommonParamsEnum.WHOIS_PARAMS,
-            "more_specific": CommonParamsEnum.WHOIS_PARAMS,
-            "less_specific": CommonParamsEnum.WHOIS_PARAMS,
+            "exact": ParamsCommons.WHOIS_PARAMS,
+            "more_specific": ParamsCommons.WHOIS_PARAMS,
+            "less_specific": ParamsCommons.WHOIS_PARAMS,
             "rir": [ANY, NOT_EMPTY, MATCH],
             "resource": [ANY, NOT_EMPTY, MATCH]
         }
@@ -170,12 +176,12 @@ DATA_CALL_MAP = {
             "iana": {
                 "resource": [ANY, NOT_EMPTY, MATCH],
                 "status": [ANY, NOT_EMPTY, MATCH],
-                "timelines": CommonParamsEnum.TIMELINES
+                "timelines": ParamsCommons.TIMELINES
             },
             "ripencc": {
                 "resource": [ANY, NOT_EMPTY, MATCH],
                 "status": [ANY, NOT_EMPTY, MATCH],
-                "timelines": CommonParamsEnum.TIMELINES
+                "timelines": ParamsCommons.TIMELINES
             }
         }
     },
@@ -187,7 +193,7 @@ DATA_CALL_MAP = {
         "output_params": {
             "prefixes": {
                 "prefix": [ANY, NOT_EMPTY, MATCH],
-                "timelines": CommonParamsEnum.TIMELINES,
+                "timelines": ParamsCommons.TIMELINES,
             }
         }
     },
@@ -216,8 +222,8 @@ DATA_CALL_MAP = {
             "stats": {
                 "count": [ANY, NOT_EMPTY, MATCH, COMPARE],
                 "location": [ANY, NOT_EMPTY, MATCH],
-                "stripped": CommonParamsEnum.AS_PATH_STATS,
-                "unstripped": CommonParamsEnum.AS_PATH_STATS
+                "stripped": ParamsCommons.AS_PATH_STATS,
+                "unstripped": ParamsCommons.AS_PATH_STATS
             },
             "sort_by": [ANY, NOT_EMPTY, MATCH]
         }
@@ -234,8 +240,8 @@ DATA_CALL_MAP = {
                 "irr_sources": [ANY, NOT_EMPTY, INCLUDE],
                 "prefix": [ANY, NOT_EMPTY, MATCH]
             },
-            "imports": CommonParamsEnum.AS_PEER_PARAMS,
-            "exports": CommonParamsEnum.AS_PEER_PARAMS,
+            "imports": ParamsCommons.AS_PEER_PARAMS,
+            "exports": ParamsCommons.AS_PEER_PARAMS,
             "authority": [ANY, NOT_EMPTY, MATCH]
         }
     },
@@ -268,7 +274,7 @@ DATA_CALL_MAP = {
         "output_params": {
             "neighbours": {
                 "neighbour": [ANY, NOT_EMPTY, MATCH, COMPARE],
-                "timelines": CommonParamsEnum.TIMELINES
+                "timelines": ParamsCommons.TIMELINES
             }
         }
     },
@@ -711,7 +717,6 @@ DATA_CALL_MAP = {
     },
 
     # cannot obtain measurements
-    """
     "meternet-bandwidth-measurements": {
         "data_call_name": "Meter.net Bandwidth Measurements",
         "required_params": ["resource"],
@@ -734,8 +739,8 @@ DATA_CALL_MAP = {
         }
     },
     # in maintenance
-   "mlab-activity-count": {
-        "data_call_name": "M-lab Activity Count",
+    "mlab-activity-count": {
+        "data_call_name": "Mlab Activity Count",
         "required_params": ["resource"],
         "optional_params": ["starttime", "endtime"],
         "output_params": {
@@ -777,7 +782,7 @@ DATA_CALL_MAP = {
             "query_endtime": [],
             "resource": []
         }
-    }, """
+    },
 
     "network-info": {
         "data_call_name": "Network Info",
@@ -799,8 +804,8 @@ DATA_CALL_MAP = {
             "resolution"
         ],
         "output_params": {
-            "ipv4": CommonParamsEnum.PREFIX_CHANGES_PER_TIMESTAMP,
-            "ipv6": CommonParamsEnum.PREFIX_CHANGES_PER_TIMESTAMP,
+            "ipv4": ParamsCommons.PREFIX_CHANGES_PER_TIMESTAMP,
+            "ipv6": ParamsCommons.PREFIX_CHANGES_PER_TIMESTAMP,
             "resolution": [ANY, NOT_EMPTY, MATCH]
         }
     },
@@ -849,8 +854,8 @@ DATA_CALL_MAP = {
         "required_params": ["resource"],
         "optional_params": ["timestamp", "min_peers_seeing"],
         "output_params": {
-            "ipv4": CommonParamsEnum.PREFIX_SIZE,
-            "ipv6": CommonParamsEnum.PREFIX_SIZE
+            "ipv4": ParamsCommons.PREFIX_SIZE,
+            "ipv6": ParamsCommons.PREFIX_SIZE
         }
     },
 
@@ -1512,6 +1517,5 @@ DATA_CALL_MAP = {
                 "overall_result": [ANY, NOT_EMPTY, MATCH]
             }
         }
-    },
-
+    }
 }

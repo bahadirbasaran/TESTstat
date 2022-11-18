@@ -12,7 +12,6 @@ import config_testsuite_param_values as ctpv
 
 # Data calls' required parameters
 resource_params = {
-    "rpki-validation": [["resource"], ["prefix"]],
     "abuse-contact-finder": [
         *ctpv.resource_asn_200,
         *ctpv.resource_prefix_200,
@@ -82,6 +81,7 @@ resource_params = {
     "country-resource-list": [*ctpv.resource_geo_200],
     "country-resource-stats": [*ctpv.resource_geo_200],
     "dns-chain": [*ctpv.resource_ip_200, *ctpv.resource_hostname_200],
+    "example-resources": [],
     "historical-whois": [
         *ctpv.resource_asn_200,
         *ctpv.resource_prefix_200,
@@ -99,6 +99,22 @@ resource_params = {
     ],
     "maxmind-geo-lite": [*ctpv.resource_prefix_200, *ctpv.resource_ip_200],
     "maxmind-geo-lite-announced-by-as": [*ctpv.resource_asn_200],
+    "meternet-bandwidth-measurements": [*ctpv.resource_prefix_200],
+    "mlab-activity-count": [
+        *ctpv.resource_prefix_200,
+        *ctpv.resource_ip_200,
+        *ctpv.resource_geo_200
+    ],
+    "mlab-bandwidth": [
+        *ctpv.resource_prefix_200,
+        *ctpv.resource_ip_200,
+        *ctpv.resource_geo_200
+    ],
+    "mlab-clients": [
+        *ctpv.resource_prefix_200,
+        *ctpv.resource_ip_200,
+        *ctpv.resource_geo_200
+    ],
     "network-info": [*ctpv.resource_prefix_200, *ctpv.resource_ip_200],
     "prefix-count": [*ctpv.resource_asn_200],
     "prefix-overview": [*ctpv.resource_prefix_200, *ctpv.resource_ip_200],
@@ -167,6 +183,8 @@ resource_params = {
         *ctpv.resource_ip_200,
         *ctpv.resource_geo_200,
     ],
+    "rpki-validation": [["resource"], ["prefix"]],
+    "rrc-info": [],
     "searchcomplete": [
         *ctpv.resource_asn_200,
         *ctpv.resource_prefix_200,
@@ -189,8 +207,8 @@ resource_params = {
         *ctpv.resource_ip_200,
         *ctpv.resource_geo_200,
     ],
-    "zonemaster": [*ctpv.resource_hostname_200],
-    # "whois-object-last-updated": []# in maintanence currently
+    "whois-object-last-updated": [["object"], ["type"], ["source"]],
+    "zonemaster": [*ctpv.resource_hostname_200]
 }
 
 # Data calls' optional parameters
@@ -220,6 +238,10 @@ optional_params = {
     "historical-whois": ["version"],
     "iana-registry-info": ["resource_optional", "best_match_only"],
     "looking-glass": ["look_back_limit"],
+    "meternet-bandwidth-measurements": ["starttime", "endtime"],
+    "mlab-activity-count": ["starttime", "endtime"],
+    "mlab-bandwidth": ["starttime", "endtime"],
+    "mlab-clients": ["starttime", "endtime"],
     "prefix-count": ["starttime", "endtime", "resolution", "min_peers_seeing"],
     "prefix-overview": ["min_peers_seeing", "query_time", "max_related"],
     "prefix-size-distribution": ["timestamp", "min_peers_seeing"],
@@ -253,5 +275,6 @@ optional_params = {
     "searchcomplete": ["limit"],
     "speedchecker-bandwidth-measurements": ["starttime", "endtime"],
     "visibility": ["query_time", "include"],
+    "whois-object-last-updated": ["timestamp", "compare_with_live"],
     "zonemaster": ["method"],
 }
