@@ -182,8 +182,8 @@ class TestCaseWindow(QWidget):
 
                 # Create first a checkbox "Not Empty" for nested parameters
                 if isinstance(value, dict) and (
-                    param in ParamsCommons.NESTED_PARAMS or
-                    f"{parent_label}->{param}" in ParamsCommons.NESTED_PARAMS
+                    param in ParamsCommons.NESTED_PARAMS
+                    or f"{parent_label}->{param}" in ParamsCommons.NESTED_PARAMS
                 ):
 
                     label_identifier = f"{param}:" if not parent_label \

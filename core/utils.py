@@ -203,8 +203,8 @@ def compare_output_equality(comparison_fields, *outputs):
         if not all(
             json.dumps(
                 {fld: val for fld, val in output["data"].items() if fld in comparison_fields}
-            ).encode('utf-8') ==
-            json.dumps(
+            ).encode('utf-8')
+            == json.dumps(
                 {fld: val for fld, val in outputs[0]["data"].items() if fld in comparison_fields}
             ).encode('utf-8')
             for output in outputs
