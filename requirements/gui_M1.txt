@@ -4,3 +4,5 @@ click==7.1.2
 idna==3.3
 aiohttp==3.8.1
 urllib3==1.26.9
+matplotlib==3.7.1
+google-cloud-storage==2.7.0

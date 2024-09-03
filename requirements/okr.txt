@@ -1,0 +1,4 @@
+aiohttp==3.8.1
+requests==2.27.1
+matplotlib==3.7.1
+google-cloud-storage==2.7.0

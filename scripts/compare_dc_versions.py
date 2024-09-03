@@ -19,7 +19,7 @@ async def run_version_comparison(
     async def _run_routine(test_input):
 
         expected_output = {"status_code": "200"}
-        test_output = await teststat.run_test(dc, test_input, expected_output, return_data=True)
+        test_output = await teststat.run_test(dc, test_input, expected_output, return_output=True)
         output_per_version[test_input.split('&')[0]].append(test_output)
 
     teststat = TestStat(host)
@@ -32,10 +32,8 @@ async def run_version_comparison(
 
         if not limit:
             lines = file_reader.readlines()
-
         elif '-' in limit:
             lines = file_reader.readlines()[int(limit.split('-')[0]):int(limit.split('-')[1])]
-
         else:
             lines = []
             try:
@@ -72,7 +70,7 @@ async def run_version_comparison(
     if not num_mismatch:
         print(
             f"\n\nAll {dc} test resources ({total_test_cases}) return the same response for "
-            f"{comparison_fields} in versions {', '.join(versions)}\n\n"
+            f"{', '.join(comparison_fields)} in versions {', '.join(versions)}\n\n"
         )
     else:
         with open(f"data/{dc_with_versions}.txt", 'w') as file_writer:
@@ -83,6 +81,7 @@ async def run_version_comparison(
 
         output_path = f"{os.path.abspath('..')}/data/{dc_with_versions}.txt"
         print(
-            f"{dc} test resources that do not return the same response for {comparison_fields} "
-            f"in versions {', '.join(versions)} have been listed at:\n\n{output_path}\n"
+            f"{dc} test resources that do not return the same response for "
+            f"{', '.join(comparison_fields)} in versions {', '.join(versions)}"
+            f"have been listed at:\n\n{output_path}\n"
         )

@@ -10,3 +10,5 @@ qt5-applications==5.15.2.2.2
 qt5-tools==5.15.2.1.2
 aiohttp==3.8.1
 urllib3==1.26.9
+matplotlib==3.7.1
+google-cloud-storage==2.7.0

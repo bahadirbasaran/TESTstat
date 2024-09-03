@@ -1,0 +1,342 @@
+data_call,test_input,expected_output
+abuse-contact-finder,resource = 3333,status_code = 200
+abuse-contact-finder,resource = 200,status_code = 200
+abuse-contact-finder,resource = 2823,status_code = 200
+abuse-contact-finder,resource = 2904,status_code = 200
+abuse-contact-finder,resource = 16416,status_code = 200
+abuse-contact-finder,resource = 193.0.0.0/21,status_code = 200
+abuse-contact-finder,resource = 193.0.0.0,status_code = 200
+abuse-contact-finder,resource = ::5f3b:aa35,status_code = 200
+abuse-contact-finder,resource = ::ffff:147.50.243.0,status_code = 200
+abuse-contact-finder,resource = f5e2:6a82:7838:21b0:59a2:d3cb:a897:841c,status_code = 200
+address-space-hierarchy,resource = 193.0.0.0/21,status_code = 200
+address-space-hierarchy,resource = 193.0.1.2-193.0.1.5,status_code = 200
+address-space-usage,resource = 193.0.0.0/21,status_code = 200
+address-space-usage,resource = 193.0.1.2-193.0.1.5,status_code = 200
+allocation-history,resource = 3333,status_code = 200
+allocation-history,resource = 200,status_code = 200
+allocation-history,resource = 2823,status_code = 200
+allocation-history,resource = 2904,status_code = 200
+allocation-history,resource = 16416,status_code = 200
+allocation-history,resource = 193.0.0.0/21,status_code = 200
+allocation-history,resource = 193.0.1.2-193.0.1.5,status_code = 200
+announced-prefixes,resource = 3333,status_code = 200
+announced-prefixes,resource = 200,status_code = 200
+announced-prefixes,resource = 2823,status_code = 200
+announced-prefixes,resource = 2904,status_code = 200
+announced-prefixes,resource = 16416,status_code = 200
+as-overview,resource = 3333,status_code = 200
+as-overview,resource = 200,status_code = 200
+as-overview,resource = 2823,status_code = 200
+as-overview,resource = 2904,status_code = 200
+as-overview,resource = 16416,status_code = 200
+as-path-length,resource = 3333,status_code = 200
+as-path-length,resource = 200,status_code = 200
+as-path-length,resource = 2823,status_code = 200
+as-path-length,resource = 2904,status_code = 200
+as-path-length,resource = 16416,status_code = 200
+as-routing-consistency,resource = 3333,status_code = 200
+as-routing-consistency,resource = 200,status_code = 200
+as-routing-consistency,resource = 2823,status_code = 200
+as-routing-consistency,resource = 2904,status_code = 200
+as-routing-consistency,resource = 16416,status_code = 200
+asn-neighbours,resource = 3333,status_code = 200
+asn-neighbours,resource = 200,status_code = 200
+asn-neighbours,resource = 2823,status_code = 200
+asn-neighbours,resource = 2904,status_code = 200
+asn-neighbours,resource = 16416,status_code = 200
+asn-neighbours-history,resource = 3333,status_code = 200
+asn-neighbours-history,resource = 200,status_code = 200
+asn-neighbours-history,resource = 2823,status_code = 200
+asn-neighbours-history,resource = 2904,status_code = 200
+asn-neighbours-history,resource = 16416,status_code = 200
+atlas-probe-deployment,resource = 3333,status_code = 200
+atlas-probe-deployment,resource = 200,status_code = 200
+atlas-probe-deployment,resource = 2823,status_code = 200
+atlas-probe-deployment,resource = 2904,status_code = 200
+atlas-probe-deployment,resource = 16416,status_code = 200
+atlas-probe-deployment,resource = nl,status_code = 200
+atlas-probes,resource = 3333,status_code = 200
+atlas-probes,resource = 200,status_code = 200
+atlas-probes,resource = 2823,status_code = 200
+atlas-probes,resource = 2904,status_code = 200
+atlas-probes,resource = 16416,status_code = 200
+atlas-probes,resource = 193.0.0.0/21,status_code = 200
+atlas-probes,resource = nl,status_code = 200
+atlas-targets,resource = 3333,status_code = 200
+atlas-targets,resource = 200,status_code = 200
+atlas-targets,resource = 2823,status_code = 200
+atlas-targets,resource = 2904,status_code = 200
+atlas-targets,resource = 16416,status_code = 200
+atlas-targets,resource = 193.0.0.0/21,status_code = 200
+atlas-targets,resource = www.ripe.net,status_code = 200
+bgp-state,resource = 3333,status_code = 200
+bgp-state,resource = 200,status_code = 200
+bgp-state,resource = 2823,status_code = 200
+bgp-state,resource = 2904,status_code = 200
+bgp-state,resource = 16416,status_code = 200
+bgp-state,resource = 193.0.0.0/21,status_code = 200
+bgp-state,resource = 193.0.0.0,status_code = 200
+bgp-state,resource = ::5f3b:aa35,status_code = 200
+bgp-state,resource = ::ffff:147.50.243.0,status_code = 200
+bgp-state,resource = f5e2:6a82:7838:21b0:59a2:d3cb:a897:841c,status_code = 200
+bgp-state,resource = 193.0.0.0&191.0.0.0,status_code = 200
+bgp-state,resource = 193/21&191/21,status_code = 200
+bgp-update-activity,resource = 3333,status_code = 200
+bgp-update-activity,resource = 200,status_code = 200
+bgp-update-activity,resource = 2823,status_code = 200
+bgp-update-activity,resource = 2904,status_code = 200
+bgp-update-activity,resource = 16416,status_code = 200
+bgp-update-activity,resource = 193.0.0.0/21,status_code = 200
+bgp-update-activity,resource = 193.0.1.2-193.0.1.5,status_code = 200
+bgp-updates,resource = 3333,status_code = 200
+bgp-updates,resource = 200,status_code = 200
+bgp-updates,resource = 2823,status_code = 200
+bgp-updates,resource = 2904,status_code = 200
+bgp-updates,resource = 16416,status_code = 200
+bgp-updates,resource = 193.0.0.0/21,status_code = 200
+bgp-updates,resource = 193.0.0.0,status_code = 200
+bgp-updates,resource = ::5f3b:aa35,status_code = 200
+bgp-updates,resource = ::ffff:147.50.243.0,status_code = 200
+bgp-updates,resource = f5e2:6a82:7838:21b0:59a2:d3cb:a897:841c,status_code = 200
+bgp-updates,resource = 193.0.0.0&191.0.0.0,status_code = 200
+bgp-updates,resource = 193/21&191/21,status_code = 200
+bgplay,resource = 3333,status_code = 200
+bgplay,resource = 200,status_code = 200
+bgplay,resource = 2823,status_code = 200
+bgplay,resource = 2904,status_code = 200
+bgplay,resource = 16416,status_code = 200
+bgplay,resource = 193.0.0.0/21,status_code = 200
+bgplay,resource = 193.0.0.0,status_code = 200
+bgplay,resource = ::5f3b:aa35,status_code = 200
+bgplay,resource = ::ffff:147.50.243.0,status_code = 200
+bgplay,resource = f5e2:6a82:7838:21b0:59a2:d3cb:a897:841c,status_code = 200
+bgplay,resource = 193.0.0.0&191.0.0.0,status_code = 200
+bgplay,resource = 193/21&191/21,status_code = 200
+country-asns,resource = nl,status_code = 200
+country-resource-list,resource = nl,status_code = 200
+country-resource-stats,resource = nl,status_code = 200
+dns-chain,resource = 193.0.0.0,status_code = 200
+dns-chain,resource = ::5f3b:aa35,status_code = 200
+dns-chain,resource = ::ffff:147.50.243.0,status_code = 200
+dns-chain,resource = f5e2:6a82:7838:21b0:59a2:d3cb:a897:841c,status_code = 200
+dns-chain,resource = www.ripe.net,status_code = 200
+example-resources,,status_code = 200
+historical-whois,resource = 3333,status_code = 200
+historical-whois,resource = 200,status_code = 200
+historical-whois,resource = 2823,status_code = 200
+historical-whois,resource = 2904,status_code = 200
+historical-whois,resource = 16416,status_code = 200
+historical-whois,resource = 193.0.0.0/21,status_code = 200
+historical-whois,resource = 1106,status_code = 200
+historical-whois,resource = aut-num:AS1106,status_code = 200
+historical-whois,resource = domain:0.0.0.0.0.0.0.0.1.c.0.b.5.0.a.2.ip6.arpa,status_code = 200
+iana-registry-info,,status_code = 200
+looking-glass,resource = 193.0.0.0/21,status_code = 200
+looking-glass,resource = 193.0.0.0,status_code = 200
+looking-glass,resource = ::5f3b:aa35,status_code = 200
+looking-glass,resource = ::ffff:147.50.243.0,status_code = 200
+looking-glass,resource = f5e2:6a82:7838:21b0:59a2:d3cb:a897:841c,status_code = 200
+maxmind-geo-lite,resource = 193.0.0.0/21,status_code = 200
+maxmind-geo-lite,resource = 193.0.0.0,status_code = 200
+maxmind-geo-lite,resource = ::5f3b:aa35,status_code = 200
+maxmind-geo-lite,resource = ::ffff:147.50.243.0,status_code = 200
+maxmind-geo-lite,resource = f5e2:6a82:7838:21b0:59a2:d3cb:a897:841c,status_code = 200
+maxmind-geo-lite-announced-by-as,resource = 3333,status_code = 200
+maxmind-geo-lite-announced-by-as,resource = 200,status_code = 200
+maxmind-geo-lite-announced-by-as,resource = 2823,status_code = 200
+maxmind-geo-lite-announced-by-as,resource = 2904,status_code = 200
+maxmind-geo-lite-announced-by-as,resource = 16416,status_code = 200
+meternet-bandwidth-measurements,resource = 193.0.0.0/21,status_code = 200
+mlab-activity-count,resource = 193.0.0.0/21,status_code = 200
+mlab-activity-count,resource = 193.0.0.0,status_code = 200
+mlab-activity-count,resource = nl,status_code = 200
+mlab-bandwidth,resource = 193.0.0.0/21,status_code = 200
+mlab-bandwidth,resource = 193.0.0.0,status_code = 200
+mlab-bandwidth,resource = nl,status_code = 200
+mlab-clients,resource = 193.0.0.0/21,status_code = 200
+mlab-clients,resource = 193.0.0.0,status_code = 200
+mlab-clients,resource = nl,status_code = 200
+network-info,resource = 193.0.0.0,status_code = 200
+network-info,resource = ::5f3b:aa35,status_code = 200
+network-info,resource = ::ffff:147.50.243.0,status_code = 200
+network-info,resource = f5e2:6a82:7838:21b0:59a2:d3cb:a897:841c,status_code = 200
+prefix-count,resource = 3333,status_code = 200
+prefix-count,resource = 200,status_code = 200
+prefix-count,resource = 2823,status_code = 200
+prefix-count,resource = 2904,status_code = 200
+prefix-count,resource = 16416,status_code = 200
+prefix-overview,resource = 193.0.0.0/21,status_code = 200
+prefix-routing-consistency,resource = 193.0.0.0/21,status_code = 200
+prefix-size-distribution,resource = 3333,status_code = 200
+prefix-size-distribution,resource = 200,status_code = 200
+prefix-size-distribution,resource = 2823,status_code = 200
+prefix-size-distribution,resource = 2904,status_code = 200
+prefix-size-distribution,resource = 16416,status_code = 200
+related-prefixes,resource = 193.0.0.0/21,status_code = 200
+related-prefixes,resource = 193.0.1.2-193.0.1.5,status_code = 200
+reverse-dns,resource = 193.0.0.0/21,status_code = 200
+reverse-dns-consistency,resource = 3333,status_code = 200
+reverse-dns-consistency,resource = 200,status_code = 200
+reverse-dns-consistency,resource = 2823,status_code = 200
+reverse-dns-consistency,resource = 2904,status_code = 200
+reverse-dns-consistency,resource = 16416,status_code = 200
+reverse-dns-consistency,resource = 193.0.0.0/21,status_code = 200
+reverse-dns-ip,resource = 193.0.0.0,status_code = 200
+reverse-dns-ip,resource = ::5f3b:aa35,status_code = 200
+reverse-dns-ip,resource = ::ffff:147.50.243.0,status_code = 200
+reverse-dns-ip,resource = f5e2:6a82:7838:21b0:59a2:d3cb:a897:841c,status_code = 200
+rir,resource = 193.0.0.0,status_code = 200
+rir,resource = ::5f3b:aa35,status_code = 200
+rir,resource = ::ffff:147.50.243.0,status_code = 200
+rir,resource = f5e2:6a82:7838:21b0:59a2:d3cb:a897:841c,status_code = 200
+rir,resource = 193.0.0.0/21,status_code = 200
+rir,resource = 193.0.1.2-193.0.1.5,status_code = 200
+rir,resource = 3333,status_code = 200
+rir,resource = 200,status_code = 200
+rir,resource = 2823,status_code = 200
+rir,resource = 2904,status_code = 200
+rir,resource = 16416,status_code = 200
+rir-geo,resource = 193.0.0.0,status_code = 200
+rir-geo,resource = ::5f3b:aa35,status_code = 200
+rir-geo,resource = ::ffff:147.50.243.0,status_code = 200
+rir-geo,resource = f5e2:6a82:7838:21b0:59a2:d3cb:a897:841c,status_code = 200
+rir-geo,resource = 193.0.0.0/21,status_code = 200
+rir-geo,resource = 193.0.1.2-193.0.1.5,status_code = 200
+rir-geo,resource = 3333,status_code = 200
+rir-geo,resource = 200,status_code = 200
+rir-geo,resource = 2823,status_code = 200
+rir-geo,resource = 2904,status_code = 200
+rir-geo,resource = 16416,status_code = 200
+rir-prefix-size-distribution,resource = 193.0.0.0/21,status_code = 200
+rir-stats-country,resource = 193.0.0.0,status_code = 200
+rir-stats-country,resource = ::5f3b:aa35,status_code = 200
+rir-stats-country,resource = ::ffff:147.50.243.0,status_code = 200
+rir-stats-country,resource = f5e2:6a82:7838:21b0:59a2:d3cb:a897:841c,status_code = 200
+rir-stats-country,resource = 193.0.0.0/21,status_code = 200
+rir-stats-country,resource = 193.0.1.2-193.0.1.5,status_code = 200
+rir-stats-country,resource = 3333,status_code = 200
+rir-stats-country,resource = 200,status_code = 200
+rir-stats-country,resource = 2823,status_code = 200
+rir-stats-country,resource = 2904,status_code = 200
+rir-stats-country,resource = 16416,status_code = 200
+ris-asns,,status_code = 200
+ris-first-last-seen,resource = 3333,status_code = 200
+ris-first-last-seen,resource = 200,status_code = 200
+ris-first-last-seen,resource = 2823,status_code = 200
+ris-first-last-seen,resource = 2904,status_code = 200
+ris-first-last-seen,resource = 16416,status_code = 200
+ris-first-last-seen,resource = 193.0.0.0/21,status_code = 200
+ris-full-table-threshold,,status_code = 200
+ris-peer-count,,status_code = 200
+ris-peerings,resource = 193.0.0.0/21,status_code = 200
+ris-peers,,status_code = 200
+ris-prefixes,resource = 3333,status_code = 200
+ris-prefixes,resource = 200,status_code = 200
+ris-prefixes,resource = 2823,status_code = 200
+ris-prefixes,resource = 2904,status_code = 200
+ris-prefixes,resource = 16416,status_code = 200
+routing-history,resource = 3333,status_code = 200
+routing-history,resource = 200,status_code = 200
+routing-history,resource = 2823,status_code = 200
+routing-history,resource = 2904,status_code = 200
+routing-history,resource = 16416,status_code = 200
+routing-history,resource = 193.0.0.0/21,status_code = 200
+routing-status,resource = 3333,status_code = 200
+routing-status,resource = 200,status_code = 200
+routing-status,resource = 2823,status_code = 200
+routing-status,resource = 2904,status_code = 200
+routing-status,resource = 16416,status_code = 200
+routing-status,resource = 193.0.0.0/21,status_code = 200
+routing-status,resource = 193.0.0.0,status_code = 200
+routing-status,resource = ::5f3b:aa35,status_code = 200
+routing-status,resource = ::ffff:147.50.243.0,status_code = 200
+routing-status,resource = f5e2:6a82:7838:21b0:59a2:d3cb:a897:841c,status_code = 200
+rpki-history,resource = 3333,status_code = 200
+rpki-history,resource = 200,status_code = 200
+rpki-history,resource = 2823,status_code = 200
+rpki-history,resource = 2904,status_code = 200
+rpki-history,resource = 16416,status_code = 200
+rpki-history,resource = 193.0.0.0/21,status_code = 200
+rpki-history,resource = nl,status_code = 200
+rpki-validation,resource = 3333;prefix = 193.0.0.0/21,status_code = 200
+rpki-validation,resource = 200;prefix = 193.0.0.0/21,status_code = 200
+rpki-validation,resource = 2823;prefix = 193.0.0.0/21,status_code = 200
+rpki-validation,resource = 2904;prefix = 193.0.0.0/21,status_code = 200
+rpki-validation,resource = 16416;prefix = 193.0.0.0/21,status_code = 200
+rrc-info,,status_code = 200
+searchcomplete,resource = 3333,status_code = 200
+searchcomplete,resource = 200,status_code = 200
+searchcomplete,resource = 2823,status_code = 200
+searchcomplete,resource = 2904,status_code = 200
+searchcomplete,resource = 16416,status_code = 200
+searchcomplete,resource = 193.0.0.0/21,status_code = 200
+searchcomplete,resource = 193.0.0.0,status_code = 200
+searchcomplete,resource = ::5f3b:aa35,status_code = 200
+searchcomplete,resource = ::ffff:147.50.243.0,status_code = 200
+searchcomplete,resource = f5e2:6a82:7838:21b0:59a2:d3cb:a897:841c,status_code = 200
+searchcomplete,resource = www.ripe.net,status_code = 200
+searchcomplete,resource = nl,status_code = 200
+searchcomplete,resource = 1106,status_code = 200
+searchcomplete,resource = aut-num:AS1106,status_code = 200
+searchcomplete,resource = domain:0.0.0.0.0.0.0.0.1.c.0.b.5.0.a.2.ip6.arpa,status_code = 200
+searchcomplete,resource = ,status_code = 200
+speedchecker-bandwidth-measurements,resource = 193.0.0.0/21,status_code = 200
+visibility,resource = 3333,status_code = 200
+visibility,resource = 200,status_code = 200
+visibility,resource = 2823,status_code = 200
+visibility,resource = 2904,status_code = 200
+visibility,resource = 16416,status_code = 200
+visibility,resource = 193.0.0.0/21,status_code = 200
+visibility,resource = 193.0.0.0,status_code = 200
+visibility,resource = ::5f3b:aa35,status_code = 200
+visibility,resource = ::ffff:147.50.243.0,status_code = 200
+visibility,resource = f5e2:6a82:7838:21b0:59a2:d3cb:a897:841c,status_code = 200
+whats-my-ip,,status_code = 200
+whois,resource = 3333,status_code = 200
+whois,resource = 200,status_code = 200
+whois,resource = 2823,status_code = 200
+whois,resource = 2904,status_code = 200
+whois,resource = 16416,status_code = 200
+whois,resource = 193.0.0.0,status_code = 200
+whois,resource = ::5f3b:aa35,status_code = 200
+whois,resource = ::ffff:147.50.243.0,status_code = 200
+whois,resource = f5e2:6a82:7838:21b0:59a2:d3cb:a897:841c,status_code = 200
+whois,resource = 193.0.1.2-193.0.1.5,status_code = 200
+whois-object-last-updated,object = 3333;type = aut-num;source = RIPE,status_code = 200
+whois-object-last-updated,object = 3333;type = aut-num;source = APNIC,status_code = 200
+whois-object-last-updated,object = 3333;type = inetnum;source = RIPE,status_code = 200
+whois-object-last-updated,object = 3333;type = inetnum;source = APNIC,status_code = 200
+whois-object-last-updated,object = 3333;type = person;source = RIPE,status_code = 200
+whois-object-last-updated,object = 3333;type = person;source = APNIC,status_code = 200
+whois-object-last-updated,object = 200;type = aut-num;source = RIPE,status_code = 200
+whois-object-last-updated,object = 200;type = aut-num;source = APNIC,status_code = 200
+whois-object-last-updated,object = 200;type = inetnum;source = RIPE,status_code = 200
+whois-object-last-updated,object = 200;type = inetnum;source = APNIC,status_code = 200
+whois-object-last-updated,object = 200;type = person;source = RIPE,status_code = 200
+whois-object-last-updated,object = 200;type = person;source = APNIC,status_code = 200
+whois-object-last-updated,object = 2823;type = aut-num;source = RIPE,status_code = 200
+whois-object-last-updated,object = 2823;type = aut-num;source = APNIC,status_code = 200
+whois-object-last-updated,object = 2823;type = inetnum;source = RIPE,status_code = 200
+whois-object-last-updated,object = 2823;type = inetnum;source = APNIC,status_code = 200
+whois-object-last-updated,object = 2823;type = person;source = RIPE,status_code = 200
+whois-object-last-updated,object = 2823;type = person;source = APNIC,status_code = 200
+whois-object-last-updated,object = 2904;type = aut-num;source = RIPE,status_code = 200
+whois-object-last-updated,object = 2904;type = aut-num;source = APNIC,status_code = 200
+whois-object-last-updated,object = 2904;type = inetnum;source = RIPE,status_code = 200
+whois-object-last-updated,object = 2904;type = inetnum;source = APNIC,status_code = 200
+whois-object-last-updated,object = 2904;type = person;source = RIPE,status_code = 200
+whois-object-last-updated,object = 2904;type = person;source = APNIC,status_code = 200
+whois-object-last-updated,object = 16416;type = aut-num;source = RIPE,status_code = 200
+whois-object-last-updated,object = 16416;type = aut-num;source = APNIC,status_code = 200
+whois-object-last-updated,object = 16416;type = inetnum;source = RIPE,status_code = 200
+whois-object-last-updated,object = 16416;type = inetnum;source = APNIC,status_code = 200
+whois-object-last-updated,object = 16416;type = person;source = RIPE,status_code = 200
+whois-object-last-updated,object = 16416;type = person;source = APNIC,status_code = 200
+whois-object-last-updated,object = 193.0.0.0/21;type = aut-num;source = RIPE,status_code = 200
+whois-object-last-updated,object = 193.0.0.0/21;type = aut-num;source = APNIC,status_code = 200
+whois-object-last-updated,object = 193.0.0.0/21;type = inetnum;source = RIPE,status_code = 200
+whois-object-last-updated,object = 193.0.0.0/21;type = inetnum;source = APNIC,status_code = 200
+whois-object-last-updated,object = 193.0.0.0/21;type = person;source = RIPE,status_code = 200
+whois-object-last-updated,object = 193.0.0.0/21;type = person;source = APNIC,status_code = 200
+zonemaster,resource = www.ripe.net,status_code = 200

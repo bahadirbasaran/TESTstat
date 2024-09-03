@@ -14,78 +14,124 @@ import itertools
 from datetime import datetime
 
 from config_testsuite_param_values import *  # noqa: F403
-from config_testsuite_params import resource_params, optional_params
+from config_testsuite_params import resource_params, optional_params, param_names_conversion
 
 
-def add_optional_params(optional_params_for_dc, req_param_string, code, mode, vars):
-    """
-    Create set of test cases by adding optional parameter combinations to the
-    required parameters string.
-    """
+class Value:
+    def __init__(self, name, value, status):
+        self.name = name
+        self.value = value
+        self.status = status
 
-    output_set = set()
 
-    for optional_param_for_dc in optional_params_for_dc:
+class Datacall:
+    def __init__(self, name, required_parameters, optional_params, vars):        
+        self.name = name
+        self.required_parameters = self.create_list_of_parameters(required_parameters, vars)
+        self.all_required_values = self.parse_parameters(self.required_parameters)
+        self.required_params_combinations = self.create_combinations(self.required_parameters, len(self.required_parameters))
+        self.optional_parameters = self.create_list_of_parameters(optional_params, vars)
+        self.all_optional_values = self.parse_parameters(self.optional_parameters)
+        self.optional_params_combinations = self.create_combinations(self.optional_parameters,  range(1, len(self.optional_parameters)+1)) if len(self.optional_parameters) > 0 else []
 
-        args_to_test = []
+    def create_list_of_parameter_names(self, dc_param_values, vars):
+        if len(dc_param_values) == 0:
+            parameters_names = []
+        elif sum(isinstance(i, list) for i in dc_param_values) > 1:
+            parameters_names = [param_names_conversion[i[0]] if i[0] in param_names_conversion.keys() else i[0] for i in dc_param_values]
+        elif dc_param_values[0] not in resource_universe:
+            parameters_names = dc_param_values
+        else:
+            parameters_names = ["resource"]
+        return parameters_names
 
-        for i in range(0, len(optional_param_for_dc)):
-            args_to_test.append(vars[f"{optional_param_for_dc[i]}"])
-            args_to_test_final = list(itertools.product(*args_to_test))
+    def create_list_of_parameters(self, dc_param_values, vars):
+        parameters_names = self.create_list_of_parameter_names(dc_param_values, vars)
+        parameters_list = []
+        if parameters_names == ["resource"]:
+            parameters_list.append(Parameter("resource", dc_param_values, list(set([val for val in resource_universe if val not in dc_param_values])), True))
+        else:
+            parameters_list = [(Parameter(parameter_name, vars[f"{parameter_name}_200"], vars[f"{parameter_name}_400"], False)) for parameter_name in parameters_names]
+        return parameters_list
 
-        for id in range(0, len(args_to_test_final)):
-            args_ind = args_to_test_final[id]
-            opt_param_string = ""
-            optional_param_for_dc_to_use = [
-                optional_param_for_dc_ind[:-4]
-                for optional_param_for_dc_ind in optional_param_for_dc
-            ]
+    def parse_parameters(self, parameters):
+        all_values = []
+        for param in parameters:
+            for p in param.valid_vals:
+                all_values.append(Value(param.name, p, 200))
+            for p in param.invalid_vals:
+                all_values.append(Value(param.name, p, 400))
+        return all_values   
+    
+    def create_combinations(self, parameters_to_combine, lengths):
+        raw_combinations = []
+        if not isinstance(lengths, range):
+            lengths = range(lengths, lengths+1)
+        for comb_length in lengths:
+            raw_combinations.extend(list(itertools.combinations(parameters_to_combine, comb_length)))
+        all_combs = [list(itertools.product(*a)) for a in [[i.all_vals for i in combination] for combination in raw_combinations]] #rename
+        all_combs = [i for inner_list in all_combs for i in inner_list]
+        return all_combs
 
-            for i in list(zip(optional_param_for_dc_to_use, args_ind)):
-                if len(opt_param_string) < 1:
-                    opt_param_string += f"{i[0]} = {i[1]}"
+
+class Parameter:
+    def __init__(self, name, valid_values, invalid_values, is_required):
+        self.name = name
+        self.valid_vals, self.invalid_vals = self.parse_values(valid_values, invalid_values)
+        self.is_required = is_required
+        self.all_vals = [Value(self.name, val, 400) for val in self.invalid_vals] + [Value(self.name, val, 200) for val in self.valid_vals]
+    
+    def parse_values(self, valid_values, invalid_values):
+        if valid_values == [""]:
+            valid_vals = valid_values + invalid_values
+            invalid_vals = []
+        else:
+            valid_vals = valid_values
+            invalid_vals = invalid_values
+        return valid_vals, invalid_vals
+
+
+class Result:
+    def __init__(self, dc, required_outputs, optional_outputs, mode):
+        self.dc_name = dc
+        self.required_outputs = required_outputs
+        self.req_string = self.create_string(required_outputs)
+        self.optional_outputs = optional_outputs
+        self.opt_string = self.create_string(optional_outputs)
+        self.status_output = self.create_status(self.required_outputs, self.optional_outputs, mode)
+        self.output_string = f"{self.dc_name},{self.req_string}{self.opt_string},status_code = {self.status_output}"
+
+    def __eq__(self, counterpart):
+        if isinstance(counterpart, Result):
+            return self.output_string == counterpart.output_string
+        return False
+    
+    def __hash__(self):
+        return hash(self.output_string)
+
+    def create_status(self, required_outputs, optional_outputs, mode):
+        if mode == 500:
+            return 500
+        else:
+            status_codes = [output.status for output in required_outputs] + ([output.status for output in optional_outputs] if optional_outputs is not None else [])
+            try:
+                return max(status_codes)
+            except ValueError:
+                return 400
+
+    
+    def create_string(self, outputs):
+        out_string = ""
+        if outputs is None:
+            return out_string
+        for output in outputs:
+            if output.value != "":
+                if output.name in param_names_conversion:
+                    out_string += f"{param_names_conversion[output.name]} = {output.value}"
                 else:
-                    opt_param_string += f";{i[0]} = {i[1]}"
-
-            codes = [
-                optional_param_for_dc_ind[-3:]
-                for optional_param_for_dc_ind in optional_param_for_dc
-            ]
-
-            code_optional = 400 if any(c == "400" for c in codes) else None
-            if mode == "500":
-                status_code = 500
-            elif code_optional:
-                status_code = code_optional
-            else:
-                status_code = code
-
-            if len(req_param_string) < 1:
-                output_set.add(f"{dc},{opt_param_string},status_code = {status_code}")
-            else:
-                output_set.add(
-                    f"{dc},{req_param_string};{opt_param_string},status_code = {status_code}"
-                )
-
-    return output_set
-
-
-def create_combinations(resources):
-    """Create all possible combinations of given input resources"""
-
-    raw_combinations = []
-    all_combinations = []
-
-    for combination_length in range(1, len(resources) + 1):
-        raw_combinations.extend(list(itertools.combinations(resources, combination_length)))
-
-    for req_param_combination in raw_combinations:
-        all_combinations.extend(
-            list(itertools.product(*[[f"{j}_400", f"{j}_200"] for j in req_param_combination]))
-        )
-
-    return all_combinations
-
+                    out_string += f"{output.name} = {output.value}"
+                out_string += ";"
+        return out_string
 
 if __name__ == "__main__":
 
@@ -115,115 +161,44 @@ if __name__ == "__main__":
         default="500",
         help="Expected output status code. 500 by default."
     )
+    
+    parser.add_argument(
+        "--no_optional",
+        action="store_true",
+        help="Setting to add to required inputs."
+    )
+
     args = parser.parse_args()
 
+    # We need a work-around solution here because in case of --dc DC1 DC2
+    # Jenkins sets args.preferred_data_calls = ['DC1 DC2']
+    # In local use, args.preferred_data_calls = ['DC1', 'DC2']
     if args.preferred_data_calls[0]:
-        data_calls = args.preferred_data_calls.pop().split()
+        if len(args.preferred_data_calls) > 1:
+            data_calls = args.preferred_data_calls
+        else:
+            data_calls = args.preferred_data_calls.pop().split()
     else:
         data_calls = resource_params.keys()
 
     test_suite = set()
 
-    for dc, dc_param_values in resource_params.items():
+    for dc in data_calls:
 
-        if dc in data_calls:
-            optional_params_for_dc = []
-            if dc in optional_params.keys():
-                optional_params_for_dc = create_combinations(optional_params[dc])
+        try:
+            dc_params = resource_params[dc]
+        except KeyError:
+            print(f"{dc} does not exist")
+            continue
 
-            # Process data calls with one required input
-            if sum(isinstance(i, list) for i in dc_param_values) < 2:
-                for group in resource_groups:  # noqa F405
-                    for element in group:
-                        if args.mode == "500":
-                            status_code = 500
-                        elif element in dc_param_values:
-                            status_code = 200
-                        else:
-                            status_code = 400
-                        if len(element) < 1:
-                            req_param_string = ""
-                        else:
-                            req_param_string = f"resource = {element}"
-                        test_suite.add(f"{dc},{req_param_string},status_code = {status_code}")
-
-                        # Add optional parameters
-                        if len(optional_params_for_dc) > 0:
-                            test_suite = test_suite.union(
-                                add_optional_params(
-                                    optional_params_for_dc,
-                                    req_param_string,
-                                    status_code,
-                                    args.mode,
-                                    vars(),
-                                )
-                            )
-
-            # Process data calls with more than 1 required parameter
-            else:
-                resource_params_for_dc = [value for val in dc_param_values for value in val]
-                all_combs_for_dc = create_combinations(resource_params_for_dc)
-
-                # Add required parameters
-                for req_param_for_dc in all_combs_for_dc:
-                    req_args_to_test = list()
-
-                    for i in range(0, len(req_param_for_dc)):
-                        req_args_to_test.append(vars()[req_param_for_dc[i]])
-                        req_args_to_test_final = list(itertools.product(*req_args_to_test))
-
-                    for req_args_ind in req_args_to_test_final:
-                        code = 200
-                        req_param_string = str()
-                        req_param_for_dc_to_use = [
-                            req_param_for_dc_ind[:-4]
-                            for req_param_for_dc_ind in req_param_for_dc
-                        ]
-                        codes = [
-                            req_param_for_dc_ind[-3:]
-                            for req_param_for_dc_ind in req_param_for_dc
-                        ]
-
-                        if args.mode == "500":
-                            code = 500
-                        elif any(c == "400" for c in codes) or \
-                                len(codes) < len(resource_params_for_dc):
-                            code = 400
-
-                        for i in list(zip(req_param_for_dc_to_use, req_args_ind)):
-                            if len(req_param_string) < 1:
-                                if len(i[1]) > 0:
-                                    req_param_string += f"{i[0]} = {i[1]}"
-                            else:
-                                if len(i[1]) > 0:
-                                    req_param_string += f";{i[0]} = {i[1]}"
-
-                        codes = [
-                            req_param_for_dc_ind[-3:]
-                            for req_param_for_dc_ind in req_param_for_dc
-                        ]
-
-                        if args.mode == "500":
-                            code = 500
-                        elif any(c == "400" for c in codes) or \
-                                len(codes) < len(resource_params_for_dc):
-                            code = 400
-
-                        test_suite.add(f"{dc},{req_param_string},status_code = {code}")
-
-                        # Add optional parameters
-                        if len(optional_params_for_dc) > 0:
-                            test_suite = test_suite.union(
-                                add_optional_params(
-                                    optional_params_for_dc,
-                                    req_param_string,
-                                    code,
-                                    args.mode,
-                                    vars(),
-                                )
-                            )
+        datacall = Datacall(dc, dc_params, optional_params[dc] if dc in optional_params.keys() else [], vars())
+        for required_params_combination in datacall.required_params_combinations:
+            test_suite.add(Result(datacall.name, required_params_combination, None, int(args.mode)))
+            if not args.no_optional:
+                for optional_params_combination in datacall.optional_params_combinations:
+                    test_suite.add(Result(datacall.name, required_params_combination, optional_params_combination, int(args.mode)))    
 
     with open(args.output, "w") as file_writer:
         file_writer.write("data_call,test_input,expected_output")
-        for line in sorted(list(test_suite)):
+        for line in sorted([result.output_string for result in test_suite]):
             file_writer.write(f"\n{line}")

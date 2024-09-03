@@ -15,24 +15,20 @@ resource_params = {
     "abuse-contact-finder": [
         *ctpv.resource_asn_200,
         *ctpv.resource_prefix_200,
-        *ctpv.resource_ip_200,
-        *ctpv.resource_hostname_200,
+        *ctpv.resource_ip_200
     ],
     "address-space-hierarchy": [
         *ctpv.resource_prefix_200,
-        *ctpv.resource_ip_200,
-        *ctpv.resource_hostname_200,
+        *ctpv.resource_range_200
     ],
     "address-space-usage": [
-        *ctpv.resource_prefix_200,
-        *ctpv.resource_ip_200,
-        *ctpv.resource_hostname_200,
+        *ctpv.resource_prefix_200, 
+        *ctpv.resource_range_200
     ],
     "allocation-history": [
-        *ctpv.resource_asn_200,
+        *ctpv.resource_asn_200, 
         *ctpv.resource_prefix_200,
-        *ctpv.resource_ip_200,
-        *ctpv.resource_hostname_200,
+        *ctpv.resource_range_200
     ],
     "announced-prefixes": [*ctpv.resource_asn_200],
     "as-overview": [*ctpv.resource_asn_200],
@@ -44,38 +40,35 @@ resource_params = {
     "atlas-probes": [
         *ctpv.resource_asn_200,
         *ctpv.resource_prefix_200,
-        *ctpv.resource_ip_200,
-        *ctpv.resource_geo_200,
+        *ctpv.resource_geo_200
     ],
     "atlas-targets": [
         *ctpv.resource_asn_200,
         *ctpv.resource_prefix_200,
-        *ctpv.resource_ip_200,
+        *ctpv.resource_hostname_200
     ],
     "bgp-state": [
         *ctpv.resource_asn_200,
         *ctpv.resource_prefix_200,
         *ctpv.resource_ip_200,
+        *ctpv.resource_list_200
     ],
     "bgp-update-activity": [
-        *ctpv.resource_asn_200,
+        *ctpv.resource_asn_200, 
         *ctpv.resource_prefix_200,
-        *ctpv.resource_ip_200,
+        *ctpv.resource_range_200
     ],
     "bgp-updates": [
         *ctpv.resource_asn_200,
         *ctpv.resource_prefix_200,
         *ctpv.resource_ip_200,
+        *ctpv.resource_list_200
     ],
-    "bgplay": [
+    "bgplay": [ 
         *ctpv.resource_asn_200,
         *ctpv.resource_prefix_200,
         *ctpv.resource_ip_200,
-    ],
-    "blocklist": [
-        *ctpv.resource_asn_200,
-        *ctpv.resource_prefix_200,
-        *ctpv.resource_ip_200,
+        *ctpv.resource_list_200
     ],
     "country-asns": [*ctpv.resource_geo_200],
     "country-resource-list": [*ctpv.resource_geo_200],
@@ -85,103 +78,102 @@ resource_params = {
     "historical-whois": [
         *ctpv.resource_asn_200,
         *ctpv.resource_prefix_200,
-        *ctpv.resource_ip_200,
+         *ctpv.resource_ripedb_obj_200
     ],
-    "iana-registry-info": [
-        *ctpv.resource_asn_200,
-        *ctpv.resource_prefix_200,
-        *ctpv.resource_ip_200,
-    ],
+    "iana-registry-info": [],
     "looking-glass": [
-        *ctpv.resource_asn_200,
         *ctpv.resource_prefix_200,
-        *ctpv.resource_ip_200,
+        *ctpv.resource_ip_200
     ],
-    "maxmind-geo-lite": [*ctpv.resource_prefix_200, *ctpv.resource_ip_200],
+    "maxmind-geo-lite": [
+        *ctpv.resource_prefix_200,
+        *ctpv.resource_ip_200
+    ],
     "maxmind-geo-lite-announced-by-as": [*ctpv.resource_asn_200],
     "meternet-bandwidth-measurements": [*ctpv.resource_prefix_200],
     "mlab-activity-count": [
         *ctpv.resource_prefix_200,
         *ctpv.resource_ip_200,
-        *ctpv.resource_geo_200
+        *ctpv.resource_geo_200,
+        *ctpv.resource_range_200
     ],
     "mlab-bandwidth": [
         *ctpv.resource_prefix_200,
         *ctpv.resource_ip_200,
-        *ctpv.resource_geo_200
+        *ctpv.resource_geo_200,
+        *ctpv.resource_range_200
     ],
     "mlab-clients": [
         *ctpv.resource_prefix_200,
         *ctpv.resource_ip_200,
-        *ctpv.resource_geo_200
+        *ctpv.resource_geo_200,
+        *ctpv.resource_range_200
     ],
-    "network-info": [*ctpv.resource_prefix_200, *ctpv.resource_ip_200],
+    "network-info": [*ctpv.resource_ip_200],
     "prefix-count": [*ctpv.resource_asn_200],
-    "prefix-overview": [*ctpv.resource_prefix_200, *ctpv.resource_ip_200],
-    "prefix-routing-consistency": [*ctpv.resource_prefix_200, *ctpv.resource_ip_200],
+    "prefix-overview": [
+        *ctpv.resource_prefix_200
+    ],
+    "prefix-routing-consistency": [
+        *ctpv.resource_prefix_200
+    ],
     "prefix-size-distribution": [*ctpv.resource_asn_200],
-    "related-prefixes": [*ctpv.resource_prefix_200],
-    "reverse-dns": [*ctpv.resource_prefix_200, *ctpv.resource_ip_200],
+    "related-prefixes": [
+        *ctpv.resource_prefix_200,
+        *ctpv.resource_range_200
+    ],
+    "reverse-dns": [
+        *ctpv.resource_prefix_200
+    ],
     "reverse-dns-consistency": [
         *ctpv.resource_asn_200,
-        *ctpv.resource_prefix_200,
-        *ctpv.resource_ip_200,
-        *ctpv.resource_geo_200,
-        *ctpv.resource_hostname_200,
+        *ctpv.resource_prefix_200
     ],
     "reverse-dns-ip": [*ctpv.resource_ip_200],
     "rir": [
-        *ctpv.resource_asn_200,
-        *ctpv.resource_prefix_200,
         *ctpv.resource_ip_200,
-        *ctpv.resource_geo_200,
-        *ctpv.resource_hostname_200,
+        *ctpv.resource_prefix_200,
+        *ctpv.resource_range_200,
+        *ctpv.resource_asn_200
     ],
     "rir-geo": [
-        *ctpv.resource_asn_200,
-        *ctpv.resource_prefix_200,
         *ctpv.resource_ip_200,
-        *ctpv.resource_geo_200,
-        *ctpv.resource_hostname_200,
+        *ctpv.resource_prefix_200,
+        *ctpv.resource_range_200,
+        *ctpv.resource_asn_200
     ],
-    "rir-prefix-size-distribution": [*ctpv.resource_prefix_200, *ctpv.resource_ip_200],
+    "rir-prefix-size-distribution": [*ctpv.resource_prefix_200],
     "rir-stats-country": [
-        *ctpv.resource_asn_200,
-        *ctpv.resource_prefix_200,
         *ctpv.resource_ip_200,
-        *ctpv.resource_geo_200,
+        *ctpv.resource_prefix_200,
+        *ctpv.resource_range_200,
+        *ctpv.resource_asn_200
     ],
-    "ris-asns": [*ctpv.resource_empty],
+    "ris-asns": [],
     "ris-first-last-seen": [
-        *ctpv.resource_asn_200,
-        *ctpv.resource_prefix_200,
-        *ctpv.resource_ip_200,
-        *ctpv.resource_geo_200,
+        *ctpv.resource_asn_200, 
+        *ctpv.resource_prefix_200
     ],
-    "ris-full-table-threshold": [*ctpv.resource_empty],
-    "ris-peer-count": [*ctpv.resource_empty],
+    "ris-full-table-threshold": [],
+    "ris-peer-count": [],
     "ris-peerings": [
-        *ctpv.resource_asn_200,
-        *ctpv.resource_prefix_200,
-        *ctpv.resource_ip_200,
+        *ctpv.resource_prefix_200
     ],
-    "ris-peers": [*ctpv.resource_empty],
+    "ris-peers": [],
     "ris-prefixes": [*ctpv.resource_asn_200],
     "routing-history": [
-        *ctpv.resource_asn_200,
-        *ctpv.resource_prefix_200,
-        *ctpv.resource_ip_200,
+        *ctpv.resource_asn_200, 
+        *ctpv.resource_prefix_200
     ],
     "routing-status": [
-        *ctpv.resource_asn_200,
+        *ctpv.resource_asn_200, 
         *ctpv.resource_prefix_200,
-        *ctpv.resource_ip_200,
+        *ctpv.resource_ip_200
     ],
     "rpki-history": [
         *ctpv.resource_asn_200,
         *ctpv.resource_prefix_200,
-        *ctpv.resource_ip_200,
-        *ctpv.resource_geo_200,
+        *ctpv.resource_geo_200, #add trust anchor
     ],
     "rpki-validation": [["resource"], ["prefix"]],
     "rrc-info": [],
@@ -189,26 +181,27 @@ resource_params = {
         *ctpv.resource_asn_200,
         *ctpv.resource_prefix_200,
         *ctpv.resource_ip_200,
+        *ctpv.resource_hostname_200,
         *ctpv.resource_geo_200,
+        *ctpv.resource_ripedb_obj_200,
+        *ctpv.resource_empty
     ],
     "speedchecker-bandwidth-measurements": [
-        *ctpv.resource_prefix_200,
-        *ctpv.resource_ip_200,
+        *ctpv.resource_prefix_200
     ],
     "visibility": [
         *ctpv.resource_asn_200,
         *ctpv.resource_prefix_200,
         *ctpv.resource_ip_200,
     ],
-    "whats-my-ip": [*ctpv.resource_empty],
+    "whats-my-ip": [],
     "whois": [
         *ctpv.resource_asn_200,
-        *ctpv.resource_prefix_200,
         *ctpv.resource_ip_200,
-        *ctpv.resource_geo_200,
+        *ctpv.resource_range_200
     ],
     "whois-object-last-updated": [["object"], ["type"], ["source"]],
-    "zonemaster": [*ctpv.resource_hostname_200]
+    "zonemaster": []
 }
 
 # Data calls' optional parameters
@@ -217,7 +210,7 @@ optional_params = {
     "allocation-history": ["starttime", "endtime"],
     "announced-prefixes": ["starttime", "endtime", "min_peers_seeing"],
     "as-path-length": ["sort_by"],
-    "asn-neighbours": ["query_time"],
+    "asn-neighbours": ["query_time", "lod"],
     "asn-neighbours-history": ["starttime", "endtime", "max_rows"],
     "atlas-probe-deployment": ["starttime", "endtime"],
     "bgp-state": ["timestamp", "rrcs", "unix_timestamps"],
@@ -231,12 +224,11 @@ optional_params = {
     ],
     "bgp-updates": ["starttime", "endtime", "rrcs", "unix_timestamps"],
     "bgplay": ["starttime", "endtime", "rrcs", "unix_timestamps"],
-    "blocklist": ["starttime", "endtime"],
     "country-asns": ["query_time", "lod"],
     "country-resource-list": ["time", "v4_format"],
     "country-resource-stats": ["starttime", "endtime", "resolution"],
     "historical-whois": ["version"],
-    "iana-registry-info": ["resource_optional", "best_match_only"],
+    "iana-registry-info": ["resource", "best_match_only"],
     "looking-glass": ["look_back_limit"],
     "meternet-bandwidth-measurements": ["starttime", "endtime"],
     "mlab-activity-count": ["starttime", "endtime"],
@@ -271,10 +263,18 @@ optional_params = {
         "endtime",
     ],
     "routing-status": ["min_peers_seeing", "timestamp"],
-    "rpki-history": ["family", "resolution", "delegated"],
+    # "rpki-history": ["family", "resolution_rpki", "delegated", "include_rpki"], -- docs could not be parsed
     "searchcomplete": ["limit"],
     "speedchecker-bandwidth-measurements": ["starttime", "endtime"],
-    "visibility": ["query_time", "include"],
+    "visibility": ["query_time", "include_visibility"], #naming different due to the existing include parameter
     "whois-object-last-updated": ["timestamp", "compare_with_live"],
-    "zonemaster": ["method"],
+    # "zonemaster": ["method"], no docs for this one
 }
+
+# Info on renaming the inputs
+
+param_names_conversion = {
+    "resolution_rpki": "resolution",
+    "include_rpki": "include",
+    "include_visibility": "include"
+    }

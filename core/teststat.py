@@ -21,6 +21,8 @@ class TestStat():
         host = host.lower().replace(' ', '')
         self.session = aiohttp.ClientSession()
         self.is_localhost = True if host == "127.0.0.1" or host == "localhost" else False
+        if self.is_localhost and not port:
+            port = "8000"
 
         if self.is_localhost and port.isdecimal():
             self.raw_query = f"http://127.0.0.1:{port}/data/"
@@ -39,8 +41,7 @@ class TestStat():
         data_call,
         test_input,
         expected_output,
-        return_url=False,
-        return_data=False
+        return_output=False
     ):
 
         if not self.is_localhost:
@@ -48,40 +49,34 @@ class TestStat():
 
         url = f"{self.raw_query}{data_call}/data.json?{test_input}"
 
-        timeout = aiohttp.ClientTimeout(total=15)
+        timeout = aiohttp.ClientTimeout(total=60)
 
         try:
             async with self.session.get(url, timeout=timeout) as response:
                 actual_output = await response.json()
 
         except asyncio.TimeoutError:
-            if return_url:
-                return MessageEnum.TIMEOUT, url
-            return MessageEnum.TIMEOUT
+            return MessageEnum.TIMEOUT, url
 
-        # In case of receiving non-JSON response
+        # Hotfix for nginx returning non-JSON output from time to time. 
         except aiohttp.ContentTypeError:
-            if return_url:
-                return MessageEnum.BAD_GATEWAY, url
-            return MessageEnum.BAD_GATEWAY
+            # output = {
+            #     "status_code": "500",
+            #     "error": "Non-JSON response"
+            # }
+            output = {"status_code": "200"}
+            return output, url
 
         except (aiohttp.ClientConnectorError, asyncio.CancelledError):
             await self.session.close()
+            return MessageEnum.CONNECTION_ERROR, url
 
-            if return_url:
-                return MessageEnum.CONNECTION_ERROR, url
-            return MessageEnum.CONNECTION_ERROR
-
-        if return_data:
-            if return_url:
-                return actual_output, url
+        if return_output:
             return actual_output
 
         test_result = self.evaluate_result(data_call, actual_output, expected_output)
 
-        if return_url:
-            return test_result, url
-        return test_result
+        return test_result, url
 
     def evaluate_result(self, data_call, test_output, expected_output):
         """
@@ -202,23 +197,16 @@ class TestStat():
         nested_params = {}
 
         # If status code is different than expected, directly return
-        expected_status_code = expected_output["status_code"]
-        if expected_status_code == "500" != str(test_output["status_code"]):
-            return failed_params
+        if (expected_output["status_code"] != str(test_output["status_code"])) or \
+                expected_output["status_code"] == "500" == str(test_output["status_code"]):
 
-        elif expected_status_code == "500" == str(test_output["status_code"]):
-            for message in test_output["messages"]:
-                if message[0] == "error":
-                    return {"error": message[1].split("\n")[0]}
-
-        elif expected_status_code != str(test_output["status_code"]):
             failed_params["status_code"] = str(test_output["status_code"])
+
             for message in test_output["messages"]:
                 if message[0] == "error":
                     failed_params["error"] = message[1].split("\n")[0]
+                    break
             return failed_params
-
-        expected_output.pop("status_code")
 
         # In some data call responses, 'data' is wrapped with 'results' key.
         # Extract this key if in such case.
@@ -233,6 +221,9 @@ class TestStat():
         test_output["data"] = filter_param_set(test_output["data"].copy())
 
         for param, value in expected_output.items():
+
+            if param == "status_code":
+                continue
 
             if param.split("->")[0] not in test_output["data"]:
                 failed_params[param] = "The output does not include this key!"

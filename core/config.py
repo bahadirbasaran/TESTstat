@@ -20,10 +20,9 @@
 
 
 # Application-wide definitions
-BATCH_SIZE = 100
-
+BATCH_SIZE = 20
 MATTERMOST_URL = "https://mattermost.ripe.net/hooks/6xp8tt93i3fwde5d43jegsxi8a"
-MATTERMOST_CHANNEL = "ripestat-teststat"
+SLACK_URL = "https://hooks.slack.com/services/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"
 
 ALL = "All following are True"
 ANY = "At least one of following is True"
@@ -550,6 +549,15 @@ DATA_CALL_MAP = {
         }
     },
 
+    "dns-blocklists": {
+        "data_call_name": "DNS Blocklists",
+        "required_params": ["resource"],
+        "optional_params": [],
+        "output_params": {
+            "blocklists": {}
+        }
+    },
+
     "example-resources": {
         "data_call_name": "Example Resources",
         "required_params": [],
@@ -716,7 +724,6 @@ DATA_CALL_MAP = {
         }
     },
 
-    # cannot obtain measurements
     "meternet-bandwidth-measurements": {
         "data_call_name": "Meter.net Bandwidth Measurements",
         "required_params": ["resource"],
@@ -738,7 +745,7 @@ DATA_CALL_MAP = {
             "resource": []
         }
     },
-    # in maintenance
+
     "mlab-activity-count": {
         "data_call_name": "Mlab Activity Count",
         "required_params": ["resource"],
@@ -751,7 +758,7 @@ DATA_CALL_MAP = {
             "resource": []
         }
     },
-    # in maintenance
+
     "mlab-bandwidth": {
         "data_call_name": "Mlab Bandwidth",
         "required_params": ["resource"],
@@ -763,7 +770,7 @@ DATA_CALL_MAP = {
             "resource": []
         }
     },
-    # in maintenance
+
     "mlab-clients": {
         "data_call_name": "Mlab Clients",
         "required_params": ["resource"],
@@ -1073,7 +1080,8 @@ DATA_CALL_MAP = {
             }
         }
     },
-    # how to optimize the keys here?
+
+    #TODO how to optimize the keys here?
     "ris-peers": {
         "data_call_name": "RIS Peers",
         "required_params": [],
@@ -1345,7 +1353,7 @@ DATA_CALL_MAP = {
     "rpki-history": {
         "data_call_name": "RPKI History",
         "required_params": ["resource"],
-        "optional_params": ["family", "resolution", "delegated"],
+        "optional_params": ["family", "resolution", "delegated", "include"],
         "output_params": {
             "timeseries": {
                 "asn": [ANY, NOT_EMPTY, MATCH],
@@ -1519,3 +1527,7 @@ DATA_CALL_MAP = {
         }
     }
 }
+
+DC_IN_MAINTENANCE = [
+    "blocklist",
+]

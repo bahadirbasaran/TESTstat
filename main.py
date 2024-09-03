@@ -3,8 +3,9 @@ import sys
 import argparse
 import asyncio
 
-from core.config import BATCH_SIZE
+from core.config import BATCH_SIZE, DC_IN_MAINTENANCE
 from scripts.cicd import run_cicd_tests
+from scripts.data_quality import run_rrc_check
 from scripts.compare_dc_versions import run_version_comparison
 
 
@@ -17,14 +18,15 @@ if __name__ == "__main__":
     parser.add_argument(
         "--host",
         type=str,
-        choices=["stat.ripe.net"] + [f"dev00{n}.stat.ripe.net" for n in range(1, 9)],
+        choices=["localhost", "stat.ripe.net", "beta001.stat.ripe.net"] + 
+            [f"dev00{n}.stat.ripe.net" for n in range(1, 10)],
         help="Host to connect"
     )
     parser.add_argument(
         "--batch_size",
-        type=str,
-        default=str(BATCH_SIZE),
-        help="Batch size. 100 by default."
+        type=int,
+        default=BATCH_SIZE,
+        help="Batch size. 20 by default."
     )
     parser.add_argument(
         "--path",
@@ -40,7 +42,8 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--random",
-        default=None,
+        nargs='*',
+        default=False,
         help="Sample a specific number of test cases per data call"
     )
     parser.add_argument(
@@ -55,9 +58,15 @@ if __name__ == "__main__":
         )
     )
     parser.add_argument(
-        "--mode",
+        "--maintenance",
+        dest="excluded_data_calls",
         type=str,
-        default="500"
+        nargs='*',
+        default=DC_IN_MAINTENANCE,
+        help=(
+            "Excluded data call(s) that are in maintenance"
+            "Example syntax: --dc blocklist mlab-clients"
+        )
     )
     parser.add_argument(
         "--compare_versions",
@@ -72,10 +81,34 @@ if __name__ == "__main__":
         default=[""],
         help="Data fields to compare"
     )
+    parser.add_argument(
+        "--slack_hooks",
+        action="store_true",
+        help="If set, TESTstat will post messages to the configured Slack channel."
+    )
+    parser.add_argument(
+        "--okr",
+        type=bool,
+        default=False,
+        help="If True, TESTstat runs for OKRs"
+    )
+    parser.add_argument(
+        "--dq",
+        type=str,
+        choices=["rrc"],
+        help="Data quality test selection"
+    )
     args = parser.parse_args()
 
+    # Argument validation
     if int(args.batch_size) < 0 or int(args.batch_size) > 200:
         parser.error("Batch size should be in the range [0, 200]!")
+
+    if args.random:
+        try:
+            args.random = int(args.random.pop())
+        except ValueError:
+            parser.error("random should be an integer!")
 
     if args.compare_versions:
 
@@ -101,32 +134,54 @@ if __name__ == "__main__":
         loop.run_until_complete(
             run_version_comparison(
                 args.host,
-                int(args.batch_size),
+                args.batch_size,
                 args.path,
                 args.limit,
                 args.preferred_data_calls.pop(),
-                args.comparison_fields.pop()
+                args.comparison_fields
             )
         )
 
     elif args.host:
 
         if not args.path:
-            args.path = "data/test_cases_500.csv"
+            args.path = "data/service_reliability_tests/test_cases_200.csv"
+
+        # If there is a preferred data call, ignore the randomness in any case
+        if args.preferred_data_calls and args.preferred_data_calls[0]:
+            args.random = False
+
+        # If 'excluded_data_calls' is a type of list, this means arg '--maintenance' has been used in local run instead of Jenkins.
+        # In such case, pass that list directly to test run and override DC_IN_MAINTENANCE in config.
+        if not isinstance(args.excluded_data_calls, list) and args.excluded_data_calls:
+            args.excluded_data_calls = args.excluded_data_calls.split(' ')
+
+        loop = asyncio.get_event_loop()
 
         # The asyncio.run() function was added in Python 3.7
-        # asyncio.run(run_cicd_tests(args.host, args.mode))
         # The solution below is for compatibility concerns for the systems with Python < 3.7
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(
-            run_cicd_tests(
-                args.host,
-                int(args.batch_size),
-                args.path,
-                int(args.random),
-                args.preferred_data_calls.pop()
+
+        if args.okr:
+            # Import here to avoid matplotlib dependency on Jenkins
+            from scripts.okr import run_okr_tests
+
+            loop.run_until_complete(
+                run_okr_tests(args.host, args.batch_size)
             )
-        )
+        elif args.dq == "rrc":
+            run_rrc_check(args.host, args.slack_hooks)
+        else:
+            loop.run_until_complete(
+                run_cicd_tests(
+                    args.host,
+                    args.batch_size,
+                    args.path,
+                    args.random,
+                    args.preferred_data_calls,
+                    args.excluded_data_calls,
+                    args.slack_hooks
+                )
+            )
 
     # GUI usage
     else:

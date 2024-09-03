@@ -57,6 +57,10 @@ def throw_message(type, title, message):
         msg.setIcon(QMessageBox.Warning)
         msg.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
 
+    elif type == MessageEnum.INFO:
+        msg.setIcon(QMessageBox.Warning)
+        msg.setStandardButtons(QMessageBox.Ok)
+
     ret_val = msg.exec_()
 
     return ret_val

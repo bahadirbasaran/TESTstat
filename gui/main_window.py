@@ -435,6 +435,7 @@ class MainWindow(QWidget):
 
         load_csv_widget = QDialog()
         load_csv_widget.setStyleSheet(StyleEnum.UI)
+        load_csv_widget.setFixedSize(240, 120)
         load_csv_widget.setWindowTitle("Select Data Source")
         load_csv_widget_layout = QVBoxLayout(load_csv_widget)
 
@@ -538,10 +539,6 @@ class MainWindow(QWidget):
             if self.table_test_suite.item(row, 0).checkState() == Qt.Checked:
                 self.table_test_suite.item(row, 0).setText("")
 
-        self.label_passed_value.setStyleSheet(StyleEnum.STATS_PASSED)
-        self.label_failed_value.setStyleSheet(StyleEnum.STATS_FAILURE)
-        self.label_timed_out_value.setStyleSheet(StyleEnum.STATS_TIMEOUT)
-
         asyncio.run(self.run_tests(self.get_checked_row_indexes(), host, port))
 
     def on_btn_compare_sources_click(self):
@@ -567,7 +564,7 @@ class MainWindow(QWidget):
             port_second_host = None if not port_second_host else port_second_host
 
             failed_tests_main_host = asyncio.run(
-                self.run_tests(tests_to_run, main_host, port_main_host, True)
+                self.run_tests(tests_to_run, main_host, port_main_host, return_failed_tests=True)
             )
 
             self.reset_main_window(confirmation=False, clear_checkboxes=False)
@@ -605,7 +602,7 @@ class MainWindow(QWidget):
 
             if len(failed_tests_main_host) == 0 and len(failed_tests_second_host) == 0:
                 throw_message(
-                    MessageEnum.WARNING,
+                    MessageEnum.INFO,
                     "Warning!",
                     "The sources are identical for the selected cases"
                 )
@@ -693,9 +690,17 @@ class MainWindow(QWidget):
             #   {}  -> test is successful
             #   int -> test could not be executed (connection error, timeout)
             #   {param: val} -> test output that does not match with expected
-            test_output = await teststat.run_test(data_call, test_input, expected_output)
+            test_output, _ = await teststat.run_test(data_call, test_input, expected_output)
 
-            return test_case, test_output
+            return test_case, expected_output, test_output
+
+        def _create_failure_item(output):
+
+            failed_output = []
+            for param, value in output.items():
+                failed_output.append(f"{param} = {value}")
+
+            return QTableWidgetItem("\n".join(failed_output))
 
         self.running = True
         num_tests_run = 0
@@ -708,7 +713,11 @@ class MainWindow(QWidget):
         self.progressbar.show()
         self.progressbar.setProperty("maximum", num_total_tests)
 
-        self.label_passed_value.setText(f"{num_passed_tests}")
+        self.label_passed_value.setStyleSheet(StyleEnum.STATS_PASSED)
+        self.label_failed_value.setStyleSheet(StyleEnum.STATS_FAILURE)
+        self.label_timed_out_value.setStyleSheet(StyleEnum.STATS_TIMEOUT)
+
+        #self.label_passed_value.setText(f"{num_passed_tests}")
 
         teststat = TestStat(host, port)
 
@@ -720,7 +729,7 @@ class MainWindow(QWidget):
                 self.running = False
                 break
 
-            row_index, test_output = await routine
+            row_index, expected_output, test_output = await routine
 
             self.previous_results = True
 
@@ -740,7 +749,6 @@ class MainWindow(QWidget):
                 failed_tests.append(row_index)
 
                 continue
-
             elif test_output == MessageEnum.CONNECTION_ERROR:
                 throw_message(
                     MessageEnum.CRITICAL,
@@ -754,24 +762,25 @@ class MainWindow(QWidget):
             num_tests_run += 1
             self.progressbar.setProperty("value", num_tests_run)
 
-            if not test_output:
+            if not test_output or \
+                    (expected_output["status_code"] == test_output["status_code"] == "500"):
                 num_passed_tests += 1
                 self.label_passed_value.setText(f"{num_passed_tests}")
-                self.table_test_suite.setItem(row_index, 4, QTableWidgetItem(""))
+                if not test_output:
+                    self.table_test_suite.setItem(row_index, 4, QTableWidgetItem(""))
+                else:
+                    item_failed_output = _create_failure_item(test_output)
+                    self.table_test_suite.setItem(row_index, 4, item_failed_output)
                 self.colorize_table_row(row_index, ColorEnum.BLACK, ColorEnum.SUCCESS)
             else:
                 num_failed_tests += 1
                 self.label_failed_value.setText(f"{num_failed_tests}")
                 failed_tests.append(row_index)
-                failed_output = []
-                for param, value in test_output.items():
-                    failed_output.append(f"{param} = {value}")
-
-                item_failed_output = QTableWidgetItem("\n".join(failed_output))
+                item_failed_output = _create_failure_item(test_output)
                 self.table_test_suite.setItem(row_index, 4, item_failed_output)
-                self.table_test_suite.resizeRowsToContents()
                 self.colorize_table_row(row_index, ColorEnum.BLACK, ColorEnum.FAILURE)
 
+        self.table_test_suite.resizeRowsToContents()
         self.running = False
         await teststat.session.close()
 

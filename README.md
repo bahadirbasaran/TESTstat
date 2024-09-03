@@ -8,19 +8,21 @@ mkdir /teststat
 cd <YOUR_DEV_ROOT>
 
 # Checkout the repository to TESTstat
-git clone https://github.com/bahadirbasaran/TESTstat.git
+git clone https://gitlab.ripe.net/rnd/teststat.git
+
+brew install python@3.9 
 ```
 
 ## Workflow for virtual environment
 ```
 # Create a virtualenv with the homebrew python
-python3 -m venv venv3
+python3.9 -m venv venv
  
 # Activate the virtualenv
-source venv3/bin/activate
+source venv/bin/activate
  
 # Install the packages inside virtualenv
-pip install -r requirements.txt
+pip install -r requirements/gui.txt
 
 # Run the app
 python main.py
@@ -39,10 +41,17 @@ brew install pyqt@5
 source teststat_venv/bin/activate
  
 # Install the packages inside virtualenv
-pip install -r requirements_M1.txt
-            
+pip install -r requirements/gui_M1.txt
 
 # Run the app
 python main.py
+```
 
+## Containerized workflow
+
+The GitLab Docker [build image](.gitlab/Dockerfile) installs a Python 3.9 virtual environment with all requirements and can be used locally.
+
+```sh
+docker build -t teststat -f .gitlab/Dockerfile .
+docker run -v "$(pwd)":/src -it teststat
 ```

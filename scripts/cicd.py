@@ -1,35 +1,44 @@
-import time
 import asyncio
 from math import ceil
-from collections import namedtuple, Counter
+from collections import Counter
+from datetime import datetime
 
 from core.teststat import TestStat
-from core.utils import MessageEnum, MATTERMOST_NEWLINE, MATTERMOST_TABLE_FRAME, \
-    parse_csv, get_batch, post_message, process_stats
+from core.utils import (
+    FailureStat,
+    TimeoutStat,
+    parse_csv,
+    parse_row,
+    get_batch,
+    post_slack_message,
+    process_stats,
+    filter_repeating_stats)
 
 
-async def run_cicd_tests(host, batch_size, test_source, random, preferred_data_calls):
+async def run_cicd_tests(
+    host,
+    batch_size,
+    test_source,
+    random,
+    preferred_data_calls,
+    excluded_data_calls,
+    slack_hooks
+):
     """Run CICD test cases for given host and given test source"""
 
     async def _run_routine(row_index, row, dc_version):
 
-        data_call = row[0]
-        test_input = row[1].replace(' ', '').replace('&', ',').replace(';', '&')
+        data_call, test_input, expected_output = parse_row(row)
         if dc_version:
             test_input += f"&preferred_version={dc_version}"
 
-        expected_output = {}
-        for param_value_pair in row[2].split(';'):
-            param, value = param_value_pair.replace(' ', '').split('=', 1)
-            expected_output[param] = value.replace('&', ',')
+        test_output, url = await teststat.run_test(data_call, test_input, expected_output)
 
-        test_output, url = await teststat.run_test(data_call, test_input, expected_output, True)
-
-        data_call = data_call.replace('-', ' ').title()
         if dc_version:
-            data_call += f" (v{dc_version})"
+            data_call += f"_{dc_version}"
 
-        if test_output == MessageEnum.TIMEOUT:
+        # TODO: differentiate test_output for different kind of integers in MessageEnum
+        if isinstance(test_output, int):
             stat = TimeoutStat(
                 test_case=row_index,
                 data_call=data_call,
@@ -38,17 +47,9 @@ async def run_cicd_tests(host, batch_size, test_source, random, preferred_data_c
             )
             stats["time_out"].append(stat)
 
-        elif test_output == MessageEnum.BAD_GATEWAY:
-            stat = FailureStat(
-                test_case=row_index,
-                data_call=data_call,
-                url=url,
-                expected_output=expected_output,
-                actual_output={"error": "502 Bad Gateway"}
-            )
-            stats["failure"].append(stat)
-
-        elif test_output:
+        elif (expected_output["status_code"] != "500" and test_output) or \
+                ("status_code" in test_output and
+                    (expected_output["status_code"] == str(test_output["status_code"]) == "500")):
             stat = FailureStat(
                 test_case=row_index,
                 data_call=data_call,
@@ -61,61 +62,74 @@ async def run_cicd_tests(host, batch_size, test_source, random, preferred_data_c
     teststat = TestStat(host)
 
     stats = {"failure": [], "time_out": []}
-    FailureStat = namedtuple(
-        "Failure",
-        ["test_case", "data_call", "url", "expected_output", "actual_output"]
+
+    test_cases = parse_csv(test_source, preferred_data_calls, excluded_data_calls, random, shuffle=True)
+
+    test_counts_per_dc = Counter(
+        f"{test[0]}_{version}" if version else test[0] for _, test, version in test_cases
     )
-    TimeoutStat = namedtuple("Timeout", ["test_case", "data_call", "url", "expected_output"])
-
-    test_cases = parse_csv(test_source, preferred_data_calls, random)
-
-    test_counts_per_dc = Counter([test_case[0] for _, test_case, _ in test_cases])
     total_test_cases = len(test_cases)
     num_batches = ceil(total_test_cases / batch_size)
+
+    if batch_size == 1:
+        previous_batch_dc = None
 
     print("\n", "#" * 100, "\n\n")
     print(f"Host: {host}   |   Test Source: {test_source}\n\n")
 
-    start_time = time.time()
+    for test_run in range(1, 2):
+        print(f"Initiating test run: {test_run}")
+    
+        # Create an event loop for a batch of coroutines, and proceed to the next when it's done
+        for batch_index, batch in enumerate(get_batch(test_cases, batch_size), 1):
 
-    # Create an event loop for a batch of coroutines, and proceed to the next when it's done
-    for batch_index, batch in enumerate(get_batch(test_cases, batch_size), 1):
+            # In synchronous run (regression testing), sleep more between test cases with data calls
+            # that would use the same backend to avoid rate limiting applied by the relevant backend.
+            if batch_size == 1:
+                current_batch_dc = batch[0][1][0]
+                if previous_batch_dc and (current_batch_dc[:2] == previous_batch_dc[:2]):
+                    await asyncio.sleep(3)
+                else:
+                    await asyncio.sleep(0.5)
 
-        await asyncio.gather(
-            *[_run_routine(row_index, row, version) for row_index, row, version in batch]
-        )
-        print(f"-> Batch {batch_index}/{num_batches} has been completed!")
+                previous_batch_dc = current_batch_dc
+            
+            else:
+                await asyncio.sleep(1)
+
+            await asyncio.gather(
+                *[_run_routine(row_index, row, version) for row_index, row, version in batch]
+            )
+            print(f"-> Batch {batch_index}/{num_batches} has been completed!")
 
     # Close the session when all batches are done
     await teststat.session.close()
 
+    stats["failure"] = filter_repeating_stats(stats["failure"], test_run)
+    stats["time_out"] = filter_repeating_stats(stats["time_out"], test_run)
     stats["failure"].sort(key=lambda tuple: tuple.test_case)
     stats["time_out"].sort(key=lambda tuple: tuple.test_case)
+
     num_failure = len(stats["failure"])
     num_time_out = len(stats["time_out"])
 
+    # TODO: The following block may fail for nested parameters!
     if stats["failure"]:
 
-        print("\nFAILED TEST CASES:\n")
+        print("\n\nFAILED TEST CASES:")
 
         for tuple in stats["failure"]:
             print(
                 f"\nTest Case: {tuple.test_case} | Data Call: {tuple.data_call} | URL: {tuple.url}"
             )
 
-            if "status_code" in tuple.actual_output:
-                print("--> Status Code: ", tuple.actual_output["status_code"])
-
+            for param, expected_value in tuple.expected_output.items():
+                print(
+                    f"--> Parameter '{param}'"
+                    f"  ||  Expected: {expected_value} | Actual: {tuple.actual_output[param]}"
+                )
             if "error" in tuple.actual_output:
-                for param, expected_value in tuple.expected_output.items():
-                    print(f"--> Parameter '{param}' | Expected: {expected_value}")
-                print("   --> Error: ", tuple.actual_output["error"])
-            else:
-                for param, expected_value in tuple.expected_output.items():
-                    print(
-                        f"--> Parameter '{param}':"
-                        f"   --> Expected: {expected_value} | Actual: {tuple.actual_output[param]}"
-                    )
+                print("----> Error: ", tuple.actual_output["error"])
 
     if stats["time_out"]:
 
@@ -130,52 +144,108 @@ async def run_cicd_tests(host, batch_size, test_source, random, preferred_data_c
             for param, expected_value in tuple.expected_output.items():
                 print(f"--> Parameter '{param}' | Expected: {expected_value}")
 
-    header = f"**Host:** {host}   |   **Test Source:** {test_source}\n\n"
-
     print("\n", "#" * 100, "\n")
-    print(f"Test Cases:           {total_test_cases:,}")
+    if not random:
+        print(f"Test Cases:           {total_test_cases:,}")
+    else:
+        print(f"Test Cases:           {total_test_cases:,} (Random {random} test cases per DC)")
     print(f"Failed Test Cases:    {num_failure:,}")
     print(f"Timed-out Test Cases: {num_time_out:,}\n")
 
-    # Prepare a message to be posted in Mattermost channel
-    header += f"**- Total Test Cases:**           {total_test_cases:,}" + "\n"
-    header += f"**- Failed Test Cases:**         {num_failure:,}"
-    header += "     :flan_cool:\n" if not num_failure else "\n"
-    header += f"**- Timed-out Test Cases:** {str(num_time_out)}"
-    header += "     :flan_cool:\n\n" if not num_time_out else "\n\n"
+    if not slack_hooks:
+        return
+    
+    current_date = datetime.now().strftime("%d/%m/%y")
+    report_label = ":red_circle:" if num_failure or num_time_out else ":large_green_circle:"
+
+    header_blocks = [
+        {
+            "type": "header",
+            "text": {
+                "type": "plain_text",
+                "text": f"{report_label} TESTstat Regression Report - {current_date}"
+            }
+        },
+        {
+            "type": "section",
+            "fields": [
+                {
+                    "type": "mrkdwn",
+                    "text": f"*Host: * <https://{host}|{host}>"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": f"*Total Test Cases: * {total_test_cases:,}" if not random \
+                        else f"*Total Test Cases: * {total_test_cases:,}\nRandom {random} tests per DC"
+                }
+            ]
+        },
+        {
+            "type": "section",
+            "fields": [
+                {
+                    "type": "mrkdwn",
+                    "text": f"*Failures: * {num_failure:,}"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": f"*Time-outs: * {num_time_out:,}"
+                }
+            ]
+        },
+        {"type": "divider"},
+        {"type": "divider"}
+    ]
+
+    if num_failure + num_time_out == total_test_cases:
+        del header_blocks[2:]
+        header_blocks[1]["fields"][1]["text"] = f"\n\n\n*An error occurred during the connection!*"
+        post_slack_message({"blocks": header_blocks})
+        return
+
+    message_blocks = []
 
     if num_failure or num_time_out:
+
         processed_stats = process_stats(stats)
 
-        msg_table = MATTERMOST_TABLE_FRAME
-
         for data_call, data_call_stats in processed_stats.items():
-
-            num_tests = test_counts_per_dc[data_call]
+            
+            num_test = test_counts_per_dc[data_call]
+            data_call = data_call.replace('-', ' ').replace('_', " v").title()
             num_failure = len(data_call_stats["failed_queries"])
             num_time_out = len(data_call_stats["timed_out_queries"])
 
-            data_call_stats["failed_queries"] = [
-                f"**F:**[{url}]({url})" for url in data_call_stats["failed_queries"]
-            ]
-            data_call_stats["timed_out_queries"] = [
-                f"**T:**[{url}]({url})" for url in data_call_stats["timed_out_queries"]
-            ]
+            block = {
+                "type": "section",
+                "fields": [
+                    {
+                        "type": "mrkdwn",
+                        "text": f"*Data Call: * {data_call}"
+                    },
+                    {
+                        "type": "mrkdwn",
+                        "text": f"*# Tests | Failures | Time-outs: * {num_test} *|* {num_failure} *|* {num_time_out}"
+                    }
+                ]
+            }
 
-            failed_queries = MATTERMOST_NEWLINE.join(data_call_stats["failed_queries"])
-            timed_out_queries = MATTERMOST_NEWLINE.join(data_call_stats["timed_out_queries"])
+            for block_label, key, url_label in zip(
+                ["Failures", "Time-outs"],
+                ["failed_queries", "timed_out_queries"],
+                ["Failed Request", "Timed-out Request"]
+            ):
+                text = f"*{block_label}:*\n"
+                for idx, url in enumerate(data_call_stats[key], 1):
+                    text += f"<{url}|{url_label} {idx}>\n"
 
-            if num_failure and num_time_out:
-                queries = failed_queries + MATTERMOST_NEWLINE + timed_out_queries
-            elif num_failure:
-                queries = failed_queries
-            else:
-                queries = timed_out_queries
+                block["fields"].append({
+                    "type": "mrkdwn",
+                    "text": text
+                })
 
-            msg_table += f"|{data_call}|{num_tests:,}|{num_failure:,}|{num_time_out:,}|{queries}|\n"
+            message_blocks.append(block)
+            message_blocks.append({"type": "divider"})
 
-        header += msg_table
 
-    post_message(header)
-
-    print("Elapsed time: ", time.strftime("%H:%M:%S", time.gmtime(time.time() - start_time)))
+    post_slack_message({"blocks": header_blocks + message_blocks})
