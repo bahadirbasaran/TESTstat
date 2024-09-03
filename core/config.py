@@ -16,13 +16,12 @@
 # matches all the expected output values typed by user with one of the nested
 # items in e.g. "exact" param of response. Otherwise, it returns an error
 # "<param>: No item matching all the expected inputs found!".
-#   https://stat.ripe.net/data/address-space-hierarchy/data.json?resource=110/4
 
 
 # Application-wide definitions
 BATCH_SIZE = 20
-MATTERMOST_URL = "https://mattermost.ripe.net/hooks/6xp8tt93i3fwde5d43jegsxi8a"
-SLACK_URL = "https://hooks.slack.com/services/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"
+MATTERMOST_URL = "YOUR_MATTERMOST_HOOK_URL"
+SLACK_URL = "YOUR_SLACK_HOOK_URL"
 
 ALL = "All following are True"
 ANY = "At least one of following is True"

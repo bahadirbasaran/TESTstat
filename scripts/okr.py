@@ -42,9 +42,9 @@ def post_data_to_GCS(file_path):
 
     file_name = file_path[:-4].split('/')[-1]
     bucket_name = "stat_bucket"
-    bucket_url = "https://storage.googleapis.com/stat_bucket/"
+    bucket_url = "https://storage.googleapis.com/stat_bucket/"  # This is a public bucket.
 
-    client = storage.Client.from_service_account_json(json_credentials_path="") # TODO: credentials are required to be hidden.
+    client = storage.Client.from_service_account_json(json_credentials_path="")
     bucket = storage.Bucket(client, bucket_name)
     blob = bucket.blob(file_name)
     blob.upload_from_filename(file_path)
