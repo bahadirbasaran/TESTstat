@@ -1,18 +1,3 @@
-# Prerequisites
-## Clone the repository
-```
-# Create application folder, here is just a suggestion
-mkdir /teststat
-
-# Go to your development root directory
-cd <YOUR_DEV_ROOT>
-
-# Checkout the repository to TESTstat
-git clone https://gitlab.ripe.net/rnd/teststat.git
-
-brew install python@3.9 
-```
-
 ## Workflow for virtual environment
 ```
 # Create a virtualenv with the homebrew python
